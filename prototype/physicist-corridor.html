@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>物理学家走廊 · Atlas Corridor</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23020202'/%3E%3Crect x='18' y='10' width='28' height='44' fill='none' stroke='%23d8c07a' stroke-width='3'/%3E%3Ccircle cx='32' cy='27' r='8' fill='%238fddea'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #020202;
+      --ink: #eee9dc;
+      --muted: #8e887f;
+      --line: rgba(238,233,220,.14);
+      --gold: #d8c07a;
+      --cyan: #8fddea;
+      --mono: "IBM Plex Mono", monospace;
+      --serif: "Noto Serif SC", serif;
+      --sans: "Noto Sans SC", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); }
+    body { font-family: var(--sans); overflow: hidden; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    .corridor {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      min-width: 1080px;
+      min-height: 720px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 48% 33%, rgba(216,192,122,.10), transparent 15%),
+        radial-gradient(circle at 60% 62%, rgba(143,221,234,.06), transparent 26%),
+        linear-gradient(180deg, #080807 0%, #020202 66%, #000 100%);
+    }
+    .grain {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      opacity: .14;
+      mix-blend-mode: screen;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E");
+    }
+    .room {
+      position: absolute;
+      inset: 0;
+      perspective: 1200px;
+      pointer-events: none;
+    }
+    .wall {
+      position: absolute;
+      left: 8vw;
+      right: 8vw;
+      top: 7vh;
+      height: 68vh;
+      background: linear-gradient(180deg, rgba(18,18,16,.96), rgba(4,4,4,.96));
+      border-top: 1px solid rgba(238,233,220,.07);
+      box-shadow: inset 0 0 160px rgba(255,255,255,.018), 0 46px 160px rgba(0,0,0,.72);
+      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    }
+    .floor {
+      position: absolute;
+      left: -18vw;
+      right: -18vw;
+      bottom: -34vh;
+      height: 58vh;
+      transform: rotateX(65deg);
+      transform-origin: 50% 0;
+      border-top: 1px solid rgba(238,233,220,.06);
+      background: linear-gradient(180deg, rgba(22,22,20,.50), #020202 68%);
+    }
+    .light {
+      position: absolute;
+      left: 50%;
+      top: 2vh;
+      width: 68vw;
+      height: 70vh;
+      transform: translateX(-50%);
+      background: conic-gradient(from 180deg at 50% 0%, transparent 0 34%, rgba(238,233,220,.11) 42%, rgba(143,221,234,.07) 50%, rgba(238,233,220,.11) 58%, transparent 66% 100%);
+      filter: blur(20px);
+      opacity: .70;
+      mix-blend-mode: screen;
+    }
+    .topline {
+      position: absolute;
+      left: clamp(40px, 5vw, 80px);
+      right: clamp(40px, 5vw, 80px);
+      top: 34px;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      color: #8d887f;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .15em;
+    }
+    .topline a { color: #d9cfb2; }
+    .intro {
+      position: absolute;
+      left: clamp(48px, 6vw, 90px);
+      top: clamp(88px, 14vh, 140px);
+      z-index: 8;
+      width: min(440px, 32vw);
+    }
+    .kicker {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .18em;
+      margin-bottom: 24px;
+    }
+    h1, h2 {
+      margin: 0;
+      font-family: var(--serif);
+      line-height: 1.04;
+      text-wrap: pretty;
+    }
+    h1 { font-size: clamp(48px, 5vw, 76px); }
+    .intro p {
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.85;
+    }
+    .progress-panel {
+      margin-top: 28px;
+      border-top: 1px solid rgba(216,192,122,.28);
+      padding-top: 15px;
+      color: #958d82;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .12em;
+    }
+    .hint {
+      margin-top: 12px;
+      color: #776f65;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .progress-bar {
+      height: 2px;
+      background: rgba(238,233,220,.11);
+      margin-top: 12px;
+    }
+    .progress-bar i {
+      display: block;
+      height: 100%;
+      width: var(--w, 0%);
+      background: linear-gradient(90deg, var(--cyan), var(--gold));
+    }
+    .rail-wrap {
+      position: absolute;
+      left: 31vw;
+      right: 0;
+      top: 16vh;
+      bottom: 22vh;
+      z-index: 7;
+      overflow: hidden;
+      mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 88%, transparent 100%);
+    }
+    .rail {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      padding: 0 14vw 0 4vw;
+      transform: translateX(var(--offset, 0px));
+      transition: transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    .portrait {
+      width: 166px;
+      flex: 0 0 166px;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      text-align: left;
+      transform: translateY(0);
+      transition: transform .35s cubic-bezier(.16,1,.3,1), opacity .35s, filter .35s;
+      opacity: .48;
+    }
+    .portrait.active {
+      transform: translateY(-18px);
+      opacity: 1;
+    }
+    .portrait.locked { opacity: .66; }
+    .photo {
+      position: relative;
+      width: 166px;
+      height: 238px;
+      background:
+        radial-gradient(circle at 50% 26%, rgba(238,233,220,.50), rgba(238,233,220,.10) 22%, transparent 40%),
+        linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.02)),
+        #080808;
+      box-shadow: 0 34px 80px rgba(0,0,0,.45), inset 0 0 70px rgba(255,255,255,.025);
+      overflow: hidden;
+      filter: grayscale(1);
+    }
+    .locked .photo {
+      background:
+        radial-gradient(circle at 50% 28%, rgba(238,233,220,.28), rgba(238,233,220,.07) 24%, transparent 44%),
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01)),
+        #050505;
+    }
+    .photo::before {
+      content: attr(data-initials);
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: rgba(238,233,220,.24);
+      font-family: var(--serif);
+      font-size: 72px;
+      letter-spacing: -.08em;
+    }
+    .locked .photo::before { color: rgba(238,233,220,.16); }
+    .photo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(115deg, transparent 0 44%, rgba(255,255,255,.13) 48%, transparent 52% 100%);
+      opacity: .18;
+    }
+    .portrait small {
+      display: block;
+      margin-top: 13px;
+      color: #7b746a;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .13em;
+    }
+    .portrait strong {
+      display: block;
+      margin-top: 7px;
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 600;
+      line-height: 1.1;
+    }
+    .locked strong { color: #c7bfae; }
+    .detail {
+      position: absolute;
+      right: clamp(46px, 5vw, 86px);
+      bottom: clamp(44px, 7vh, 82px);
+      z-index: 12;
+      width: min(540px, 40vw);
+      max-height: 42vh;
+      overflow: auto;
+      border-top: 1px solid rgba(216,192,122,.30);
+      padding-top: 18px;
+      scrollbar-color: rgba(216,192,122,.42) transparent;
+    }
+    .detail .tag {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .16em;
+      margin-bottom: 13px;
+    }
+    .detail h2 {
+      font-size: 34px;
+      font-weight: 600;
+    }
+    .detail p {
+      margin: 12px 0 0;
+      color: #928b80;
+      font-size: 14px;
+      line-height: 1.75;
+      text-wrap: pretty;
+    }
+    .relic {
+      margin-top: 16px;
+      padding: 16px 0 0;
+      border-top: 1px solid rgba(238,233,220,.15);
+    }
+    .relic.unlocked {
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      gap: 18px;
+      align-items: start;
+      border-top-color: rgba(216,192,122,.36);
+    }
+    .relic.locked {
+      opacity: .46;
+      border-top-style: dashed;
+    }
+    .totem {
+      width: 70px;
+      height: 70px;
+      color: var(--gold);
+      filter: drop-shadow(0 0 24px rgba(216,192,122,.20));
+    }
+    .totem svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .totem.locked {
+      color: #6f685e;
+      filter: none;
+    }
+    .relic b {
+      display: block;
+      color: #d7c68e;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .12em;
+      margin-bottom: 8px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .chip {
+      color: #bdb39d;
+      border-top: 1px solid rgba(238,233,220,.18);
+      padding-top: 6px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .10em;
+    }
+    .controls {
+      position: absolute;
+      left: clamp(48px, 6vw, 90px);
+      bottom: clamp(44px, 7vh, 82px);
+      z-index: 14;
+      display: flex;
+      gap: 16px;
+    }
+    .controls button, .controls a {
+      border: 0;
+      border-top: 1px solid rgba(238,233,220,.22);
+      padding: 10px 0 0;
+      width: 112px;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .13em;
+    }
+    .portal-transition {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0;
+      background: #000;
+    }
+    .portal-transition.active { opacity: 1; animation: walkBlackout .96s cubic-bezier(.76,0,.24,1) forwards; }
+    .portal-transition::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 10vmin;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%) scale(.08);
+      border-radius: 50%;
+      border: 1px solid rgba(238,233,220,.72);
+      box-shadow: 0 0 90px rgba(238,233,220,.30), inset 0 0 38px rgba(143,221,234,.20);
+      opacity: 0;
+    }
+    .portal-transition.active::before { animation: portalOpen .82s cubic-bezier(.16,1,.3,1) forwards; }
+    @keyframes portalOpen {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(.08); }
+      18% { opacity: 1; }
+      100% { opacity: .18; transform: translate(-50%, -50%) scale(24); }
+    }
+    @keyframes portalBlackout {
+      0% { background: rgba(0,0,0,0); }
+      62% { background: rgba(0,0,0,.26); }
+      100% { background: rgba(0,0,0,1); }
+    }  </style>
+</head>
+<body class="is-entering">
+  <main class="corridor">
+    <div class="room" aria-hidden="true"><div class="wall"></div><div class="floor"></div><div class="light"></div></div>
+    <div class="grain"></div>
+    <header class="topline">
+      <a href="./index.html" data-transition>← HOME</a>
+      <span>EXHIBIT 02 · ATLAS CORRIDOR</span>
+    </header>
+    <section class="intro">
+      <div class="kicker">PHYSICISTS</div>
+      <h1>物理学家走廊</h1>
+      <p>这里的物理学家档案全部开放。完成第一展厅的测量后，对应人物的专属信物会在走廊中点亮并被长期保存。</p>
+      <div class="progress-panel">
+        <span id="progressText">RELICS 0/20</span>
+        <div class="progress-bar"><i id="progressBar"></i></div>
+        <div class="hint">人物可直接浏览；信物需要测试结果触发。</div>
+      </div>
+    </section>
+    <section class="rail-wrap" aria-label="物理学家图鉴走廊">
+      <div class="rail" id="rail"></div>
+    </section>
+    <aside class="detail" id="detail"></aside>
+    <nav class="controls">
+      <button id="prevBtn" type="button">PREV</button>
+      <button id="nextBtn" type="button">NEXT</button>
+      <a href="./physicist-test.html" data-transition>TAKE TEST</a>
+    </nav>
+    <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
+  </main>
+
+  <script src="./physicist-data.js"></script>
+  <script>
+    const people = window.PhysicistAtlasData.people;
+    const storageKey = "physicistAtlas:v1";
+    const rail = document.getElementById("rail");
+    const detail = document.getElementById("detail");
+    const progressText = document.getElementById("progressText");
+    const progressBar = document.getElementById("progressBar");
+    let active = 0;
+
+    function readAtlasState() {
+      try {
+        return JSON.parse(localStorage.getItem(storageKey)) || { unlocked: [], totalTests: 0, lastResult: null, unlockedAt: {} };
+      } catch {
+        return { unlocked: [], totalTests: 0, lastResult: null, unlockedAt: {} };
+      }
+    }
+
+    function isUnlocked(person) {
+      return readAtlasState().unlocked.includes(person.id);
+    }
+
+    function dateLabel(iso) {
+      if (!iso) return "UNKNOWN DATE";
+      return new Date(iso).toLocaleDateString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" });
+    }
+
+    function renderProgress() {
+      const state = readAtlasState();
+      progressText.textContent = `RELICS ${state.unlocked.length}/${people.length} · TESTS ${state.totalTests || 0}`;
+      progressBar.style.setProperty("--w", `${(state.unlocked.length / people.length) * 100}%`);
+      if (state.lastResult) {
+        const lastIndex = people.findIndex(person => person.id === state.lastResult);
+        if (lastIndex >= 0) active = lastIndex;
+      }
+    }
+
+    function renderRail() {
+      rail.innerHTML = people.map((p, index) => {
+        const unlocked = isUnlocked(p);
+        return `<button class="portrait ${index === active ? "active" : ""} ${unlocked ? "unlocked" : "locked"}" type="button" data-index="${index}">
+          <div class="photo" data-initials="${p.initials}"></div>
+          <small>${unlocked ? "RELIC LIT" : "RELIC DARK"} · NO.${String(p.index).padStart(2, "0")}</small>
+          <strong>${p.name}</strong>
+        </button>`;
+      }).join("");
+      rail.style.setProperty("--offset", `${-active * 196}px`);
+      rail.querySelectorAll(".portrait").forEach(btn => {
+        btn.addEventListener("click", () => setActive(Number(btn.dataset.index)));
+      });
+    }
+
+    function renderDetail() {
+      const p = people[active];
+      const state = readAtlasState();
+      const unlocked = isUnlocked(p);
+      const totem = renderTotem(p, unlocked);
+      const prompt = buildPrompt(p);
+      detail.innerHTML = `
+        <div class="tag">${p.id.toUpperCase()} · ${unlocked ? `RELIC UNLOCKED ${dateLabel(state.unlockedAt?.[p.id])}` : "RELIC NOT YET UNLOCKED"}</div>
+        <h2>${p.name}</h2>
+        <p><b>${p.title}</b></p>
+        <p>${p.analysis[0] || ""}</p>
+        <div class="relic ${unlocked ? "unlocked" : "locked"}">
+          ${totem}
+          <div>
+            <b>${unlocked ? `专属信物：${p.relic.name}` : "信物尚未点亮"}</b>
+            <p>${unlocked ? p.relic.description : "完成测试并匹配到这位物理学家后，这件信物会以点亮状态留在走廊中。你的浏览器会记住它，关闭网站后也不会清零。"}</p>
+          </div>
+        </div>
+        <p><b>更容易测到这个结果：</b>${prompt}</p>
+        <div class="chips"><span class="chip">${p.feature}</span><span class="chip">${unlocked ? "RELIC STORED" : "TEST TO LIGHT RELIC"}</span></div>`;
+    }
+
+    function renderTotem(person, unlocked) {
+      const n = person.index;
+      const rotation = (n * 17) % 180;
+      const sides = 3 + (n % 6);
+      const inner = 18 + (n % 5) * 3;
+      const points = Array.from({ length: sides }, (_, i) => {
+        const a = -Math.PI / 2 + i * Math.PI * 2 / sides;
+        return `${50 + Math.cos(a) * 29},${50 + Math.sin(a) * 29}`;
+      }).join(" ");
+      const small = Array.from({ length: 4 + (n % 4) }, (_, i) => {
+        const a = i * Math.PI * 2 / (4 + (n % 4)) + n;
+        return `<circle cx="${50 + Math.cos(a) * inner}" cy="${50 + Math.sin(a) * inner}" r="${unlocked ? 1.8 : 1.2}" fill="currentColor" opacity="${unlocked ? .9 : .36}"/>`;
+      }).join("");
+      return `<div class="totem ${unlocked ? "unlocked" : "locked"}" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <polygon points="${points}" fill="none" stroke="currentColor" stroke-width="${unlocked ? 2.2 : 1.2}" opacity="${unlocked ? .86 : .36}" transform="rotate(${rotation} 50 50)"/>
+          <circle cx="50" cy="50" r="${12 + (n % 4) * 4}" fill="none" stroke="currentColor" stroke-width="${unlocked ? 1.8 : 1}" opacity="${unlocked ? .72 : .28}"/>
+          <path d="M50 16 L50 84 M16 50 L84 50" stroke="currentColor" stroke-width="${unlocked ? 1.4 : .8}" opacity="${unlocked ? .36 : .16}"/>
+          ${small}
+        </svg>
+      </div>`;
+    }
+
+    function buildPrompt(person) {
+      const hints = [];
+      const target = person.target || {};
+      if ((target.T || 0) >= 3) hints.push("偏向理论推演");
+      if ((target.E || 0) >= 3) hints.push("偏向实验和动手验证");
+      if ((target.I || 0) >= 3) hints.push("相信直觉飞跃");
+      if ((target.L || 0) >= 3) hints.push("选择严谨逻辑");
+      if ((target.Q || 0) >= 3) hints.push("拥抱概率和不确定性");
+      if ((target.C || 0) >= 3) hints.push("坚持秩序与决定论");
+      if ((target.S || 0) >= 3) hints.push("更像独自推进问题");
+      if ((target.Le || 0) >= 3) hints.push("更像组织者或传播者");
+      if ((target.A || 0) >= 3) hints.push("保留跨界、玩心和意象感");
+      if ((target.R || 0) >= 3) hints.push("选择克制、刻苦和传统严谨");
+      return hints.slice(0, 4).join("，") + "。";
+    }
+
+    function setActive(index) {
+      active = (index + people.length) % people.length;
+      renderRail();
+      renderDetail();
+    }
+
+    function attachTransitions(root = document) {
+      root.querySelectorAll("[data-transition]").forEach((link) => {
+        link.addEventListener("click", (event) => {
+          const href = link.getAttribute("href");
+          if (!href || href === "#") return;
+          event.preventDefault();
+          document.getElementById("portalTransition").classList.add("active");
+        sessionStorage.setItem("museumTransition", "soft");
+        window.setTimeout(() => { window.location.href = href; }, 360);
+        });
+      });
+    }
+
+    document.getElementById("prevBtn").addEventListener("click", () => setActive(active - 1));
+    document.getElementById("nextBtn").addEventListener("click", () => setActive(active + 1));
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") setActive(active - 1);
+      if (event.key === "ArrowRight") setActive(active + 1);
+    });
+
+    renderProgress();
+    renderRail();
+    renderDetail();
+    attachTransitions();
+    window.setTimeout(() => {
+      document.body.classList.remove("is-entering");
+    }, 760);
+  </script>
+</body>
+</html>

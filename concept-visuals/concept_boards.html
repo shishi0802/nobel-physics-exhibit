@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nobel Physics Gallery Concept Boards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root { --w: 1440px; --h: 960px; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #111; font-family: "Noto Sans SC", sans-serif; }
+  .board { width: var(--w); height: var(--h); position: relative; overflow: hidden; display: none; }
+  .board.active { display: block; }
+  .mono { font-family: "IBM Plex Mono", monospace; }
+  .serif { font-family: "Noto Serif SC", serif; }
+
+  /* A */
+  #a { background: radial-gradient(circle at 50% 38%, #122330 0%, #07090d 38%, #030405 100%); color: #e8ecef; }
+  #a canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #a .grid { position:absolute; inset:-20%; background-image: linear-gradient(rgba(143,231,255,.10) 1px, transparent 1px), linear-gradient(90deg, rgba(143,231,255,.10) 1px, transparent 1px); background-size: 54px 54px; transform: perspective(700px) rotateX(62deg) translateY(220px); transform-origin: 50% 72%; opacity:.28; mask-image: linear-gradient(transparent, #000 28%, #000 78%, transparent); }
+  #a .orb { position:absolute; width: 560px; height:560px; border-radius:50%; left:440px; top:152px; border:1px solid rgba(143,231,255,.25); box-shadow: inset 0 0 80px rgba(143,231,255,.08), 0 0 120px rgba(143,231,255,.12); }
+  #a .orb:before, #a .orb:after { content:""; position:absolute; inset:44px; border:1px solid rgba(214,183,106,.25); border-radius:50%; transform: rotateX(66deg); }
+  #a .orb:after { inset:118px; border-color: rgba(255,90,78,.28); transform: rotateY(62deg); }
+  #a .node { position:absolute; width: 12px; height: 12px; border-radius:50%; background:#8fe7ff; box-shadow:0 0 22px #8fe7ff; }
+  #a .n1{left:604px;top:260px}.n2{left:835px;top:384px;background:#d6b76a;box-shadow:0 0 24px #d6b76a}.n3{left:700px;top:560px}.n4{left:505px;top:438px;background:#ff5a4e;box-shadow:0 0 22px #ff5a4e}
+  #a .title { position:absolute; left:78px; top:86px; width: 720px; }
+  #a h1 { margin:0; font:900 76px/1.02 "Noto Serif SC"; letter-spacing:0; text-wrap:pretty; }
+  #a .sub { margin-top: 24px; color:#8e9aa3; font-size:20px; line-height:1.7; width:560px; }
+  #a .hud { position:absolute; right:70px; top:74px; width:310px; border:1px solid rgba(143,231,255,.18); background:rgba(5,8,12,.38); backdrop-filter: blur(18px); padding:24px; }
+  #a .hud .row { display:flex; justify-content:space-between; border-bottom:1px solid rgba(143,231,255,.12); padding:12px 0; color:#9db1bc; font-size:13px; }
+  #a .quote { position:absolute; left:90px; bottom:86px; width:520px; border-left:2px solid #d6b76a; padding-left:24px; color:#d7d4c8; font-size:22px; line-height:1.55; }
+  #a .quote span { display:block; margin-top:15px; color:#8e9aa3; font-size:13px; letter-spacing:.12em; }
+  #a .dock { position:absolute; right:76px; bottom:76px; display:grid; grid-template-columns:repeat(3, 120px); gap:12px; }
+  #a .tile { height:84px; border:1px solid rgba(232,236,239,.14); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.015)); padding:14px; color:#dce8ee; font-size:13px; }
+  #a .tile b { display:block; font-size:22px; color:#8fe7ff; margin-bottom:6px; }
+
+  /* B */
+  #b { background:#f7f6f1; color:#161616; }
+  #b:before { content:""; position:absolute; inset:0; background-image: linear-gradient(#dedbd1 1px, transparent 1px), linear-gradient(90deg, #dedbd1 1px, transparent 1px); background-size: 72px 72px; opacity:.34; }
+  #b .plinth { position:absolute; left:420px; top:190px; width:600px; height:540px; background:linear-gradient(180deg, rgba(255,255,255,.82), rgba(237,236,229,.72)); border:1px solid #d9d6ca; box-shadow:0 42px 90px rgba(30,28,20,.12); }
+  #b .specimen { position:absolute; left:535px; top:262px; width:370px; height:370px; border-radius:50%; background: radial-gradient(circle at 50% 50%, rgba(134,186,214,.18), rgba(134,186,214,.04) 40%, transparent 62%); border:1px solid rgba(20,20,20,.12); }
+  #b .wave { position:absolute; left:482px; top:352px; width:475px; height:160px; border-top:2px solid #111; border-bottom:2px solid #111; opacity:.18; filter: blur(.2px); clip-path: polygon(0 50%, 8% 30%, 16% 68%, 24% 34%, 32% 62%, 40% 38%, 48% 58%, 56% 42%, 64% 55%, 72% 45%, 80% 52%, 88% 48%, 100% 50%, 100% 100%, 0 100%); }
+  #b .title { position:absolute; left:82px; top:78px; width:600px; }
+  #b h1 { margin:0; font:900 66px/1.05 "Noto Serif SC"; letter-spacing:0; }
+  #b .sub { margin-top:24px; font-size:18px; line-height:1.85; color:#5d5a53; width:460px; }
+  #b .caption { position:absolute; right:94px; top:104px; width:300px; font-size:14px; line-height:1.8; color:#67635b; border-top:1px solid #161616; padding-top:18px; }
+  #b .controls { position:absolute; left:90px; bottom:92px; display:flex; gap:34px; align-items:end; }
+  #b .dial { width:132px; height:132px; border:1px solid #1b1b1b; border-radius:50%; position:relative; background:#fbfaf6; }
+  #b .dial:after { content:""; position:absolute; left:64px; top:20px; width:2px; height:48px; background:#111; transform:rotate(34deg); transform-origin:bottom; }
+  #b .label { font-size:12px; color:#6b675f; margin-top:12px; letter-spacing:.08em; }
+  #b .quote { position:absolute; right:102px; bottom:110px; width:392px; font:500 25px/1.6 "Noto Serif SC"; color:#25231f; }
+  #b .quote span { display:block; font:500 12px/1.2 "IBM Plex Mono"; color:#8b8679; margin-top:16px; letter-spacing:.14em; }
+  #b .mark { position:absolute; left:50%; bottom:52px; transform:translateX(-50%); color:#8e897d; font-size:12px; letter-spacing:.2em; }
+
+  /* C */
+  #c { background:#0b0a07; color:#f4d58a; font-family:"IBM Plex Mono", monospace; }
+  #c:before { content:""; position:absolute; inset:0; background-image: linear-gradient(rgba(244,213,138,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(244,213,138,.07) 1px, transparent 1px); background-size: 24px 24px; }
+  #c:after { content:""; position:absolute; inset:0; background: radial-gradient(circle at 70% 35%, rgba(244,213,138,.11), transparent 28%), linear-gradient(180deg, transparent, rgba(0,0,0,.34)); }
+  #c .frame { position:absolute; inset:50px; border:1px solid rgba(244,213,138,.42); }
+  #c .frame:before, #c .frame:after { content:""; position:absolute; inset:18px; border:1px solid rgba(244,213,138,.16); }
+  #c .topbar { position:absolute; left:78px; right:78px; top:72px; display:flex; justify-content:space-between; font-size:13px; color:#b89d62; letter-spacing:.08em; }
+  #c .title { position:absolute; left:84px; top:120px; width:710px; }
+  #c h1 { margin:0; font:700 58px/1.02 "Noto Serif SC"; color:#ffe3a1; }
+  #c .sub { margin-top:22px; color:#bca66d; font-size:15px; line-height:1.75; width:570px; }
+  #c .matrix { position:absolute; left:82px; bottom:88px; width:520px; display:grid; grid-template-columns:90px 1fr 78px; border-top:1px solid rgba(244,213,138,.4); border-left:1px solid rgba(244,213,138,.25); }
+  #c .cell { min-height:46px; border-right:1px solid rgba(244,213,138,.25); border-bottom:1px solid rgba(244,213,138,.25); padding:12px 14px; color:#d8bd79; font-size:12px; }
+  #c .scope { position:absolute; right:110px; top:186px; width:470px; height:470px; border:1px solid rgba(244,213,138,.35); border-radius:50%; }
+  #c .scope:before { content:""; position:absolute; inset:48px; border:1px dashed rgba(244,213,138,.25); border-radius:50%; }
+  #c .scope:after { content:""; position:absolute; left:50%; top:-30px; bottom:-30px; width:1px; background:rgba(244,213,138,.26); box-shadow:-170px 235px 0 rgba(244,213,138,.14), 170px 235px 0 rgba(244,213,138,.14); }
+  #c .plot { position:absolute; right:142px; top:286px; width:405px; height:230px; border-left:1px solid rgba(244,213,138,.52); border-bottom:1px solid rgba(244,213,138,.52); }
+  #c .plot svg { width:100%; height:100%; overflow:visible; }
+  #c .side { position:absolute; right:86px; bottom:98px; width:410px; border-top:1px solid rgba(244,213,138,.55); padding-top:18px; color:#c6ad72; font-size:13px; line-height:1.85; }
+  #c .quote { color:#ffe6ad; font-family:"Noto Serif SC"; font-size:23px; line-height:1.55; margin-bottom:18px; }
+</style>
+</head>
+<body>
+<section id="a" class="board active">
+  <canvas id="particles"></canvas><div class="grid"></div><div class="orb"></div>
+  <i class="node n1"></i><i class="node n2"></i><i class="node n3"></i><i class="node n4"></i>
+  <div class="title"><h1>发光档案馆</h1><div class="sub">一座由光、量子、身体与宇宙尺度构成的沉浸式诺奖物理展厅。观众通过触发实验装置，进入物理改变“可见世界”的瞬间。</div></div>
+  <div class="hud mono"><div class="row"><span>OBSERVER</span><b>ACTIVE</b></div><div class="row"><span>SCALE</span><b>10^-9 → 10^26</b></div><div class="row"><span>MODE</span><b>MEASUREMENT</b></div><div class="row"><span>FIELD</span><b>PHOTON / QUBIT</b></div></div>
+  <div class="quote serif">“不是意识决定生命，而是生命决定意识。”<span>MARX · 展墙铭文示意</span></div>
+  <div class="dock mono"><div class="tile"><b>01</b>光之展区</div><div class="tile"><b>02</b>量子剧场</div><div class="tile"><b>03</b>身体成像</div></div>
+</section>
+<section id="b" class="board">
+  <div class="plinth"></div><div class="specimen"></div><div class="wave"></div>
+  <div class="title"><h1>可见性的博物馆</h1><div class="sub">展厅像一组精密陈列的科学装置。物理现象以低噪声、高留白的方式呈现，观众通过少量参数调节观看“世界如何变得可见”。</div></div>
+  <div class="caption mono">NOBEL PHYSICS COMMONS<br>SPECIMEN 09 / OPTICAL LIMIT<br>WAVELENGTH: 488 nm<br>RESOLUTION: VARIABLE<br>ANNOTATION: THEORY-LADEN OBSERVATION</div>
+  <div class="controls"><div><div class="dial"></div><div class="label mono">WAVELENGTH</div></div><div><div class="dial"></div><div class="label mono">NOISE</div></div><div><div class="dial"></div><div class="label mono">FOCUS</div></div></div>
+  <div class="quote">“我们从不观察自然本身，而只观察暴露在我们提问方式之下的自然。”<span>HEISENBERG · 展签示意</span></div>
+  <div class="mark mono">QUIET SCIENCE GALLERY</div>
+</section>
+<section id="c" class="board">
+  <div class="frame"></div><div class="topbar mono"><span>NOBEL PHYSICS ARCHIVAL TERMINAL</span><span>PUBLIC MODE / SESSION 07</span></div>
+  <div class="title"><h1>诺奖物理档案终端</h1><div class="sub mono">A navigable archive of experiments, instruments, equations and philosophical annotations. Each exhibition is indexed by year, phenomenon, device, scale and consequence.</div></div>
+  <div class="matrix mono"><div class="cell">1905</div><div class="cell">PHOTOELECTRIC EFFECT</div><div class="cell">LIGHT</div><div class="cell">1927</div><div class="cell">UNCERTAINTY / COMPLEMENTARITY</div><div class="cell">QUANTUM</div><div class="cell">1979</div><div class="cell">ELECTROWEAK UNIFICATION</div><div class="cell">FIELD</div><div class="cell">2017</div><div class="cell">GRAVITATIONAL WAVES</div><div class="cell">COSMOS</div></div>
+  <div class="scope"></div><div class="plot"><svg viewBox="0 0 405 230"><polyline points="0,180 38,166 72,190 104,116 144,138 188,72 232,94 274,44 326,67 405,18" fill="none" stroke="#ffe3a1" stroke-width="2"/><path d="M0 160 C80 120 120 180 190 110 S310 42 405 74" fill="none" stroke="#ff5a4e" stroke-width="1.5" opacity=".8"/><g fill="#f4d58a"><circle cx="104" cy="116" r="4"/><circle cx="232" cy="94" r="4"/><circle cx="326" cy="67" r="4"/></g></svg></div>
+  <div class="side"><div class="quote">“哲学的任务不是替科学立法，而是追问概念如何成为可能。”</div>ARCHIVE NOTE: 展区以编号、坐标、脚注和可操作图谱组织。适合强调课程关联、发展脉络与技术应用的精密可视化。</div>
+</section>
+<script>
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+canvas.width = 1440; canvas.height = 960;
+function draw(){
+  ctx.clearRect(0,0,1440,960);
+  ctx.fillStyle='rgba(143,231,255,.72)';
+  for(let i=0;i<180;i++){
+    const x=(Math.sin(i*47.1)*.5+.5)*1440;
+    const y=(Math.cos(i*31.7)*.5+.5)*960;
+    const r=(i%7===0)?1.7:.8;
+    ctx.globalAlpha=(i%5)/9+.18;
+    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+  }
+  ctx.globalAlpha=.18; ctx.strokeStyle='#8fe7ff';
+  for(let i=0;i<52;i++){
+    const x1=(Math.sin(i*17.3)*.5+.5)*1440, y1=(Math.cos(i*13.1)*.5+.5)*960;
+    const x2=(Math.sin((i+6)*17.3)*.5+.5)*1440, y2=(Math.cos((i+6)*13.1)*.5+.5)*960;
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  }
+}
+draw();
+</script>
+</body>
+</html>

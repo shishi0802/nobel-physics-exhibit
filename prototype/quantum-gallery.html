@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>量子展厅 · Measurement Chamber</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23020202'/%3E%3Cpath d='M8 32c12-18 36 18 48 0' fill='none' stroke='%238fddea' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23d8c07a'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #020202;
+      --ink: #eee9dc;
+      --muted: #8e887f;
+      --line: rgba(238,233,220,.14);
+      --gold: #d8c07a;
+      --cyan: #8fddea;
+      --red: #ff6b5f;
+      --mono: "IBM Plex Mono", monospace;
+      --serif: "Noto Serif SC", serif;
+      --sans: "Noto Sans SC", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); }
+    body { font-family: var(--sans); overflow: hidden; }
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+
+    .chamber {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      min-width: 1080px;
+      min-height: 720px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 52% 44%, rgba(143,221,234,.09), transparent 19%),
+        radial-gradient(circle at 44% 58%, rgba(216,192,122,.08), transparent 22%),
+        linear-gradient(180deg, #080807 0%, #020202 66%, #000 100%);
+      isolation: isolate;
+    }
+    .grain {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      opacity: .13;
+      mix-blend-mode: screen;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E");
+    }
+    .room {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      perspective: 1200px;
+      pointer-events: none;
+    }
+    .wall {
+      position: absolute;
+      left: 11vw;
+      right: 11vw;
+      top: 8vh;
+      height: 66vh;
+      background: linear-gradient(180deg, rgba(17,17,16,.94), rgba(4,4,4,.96));
+      border-top: 1px solid rgba(238,233,220,.07);
+      box-shadow: inset 0 0 160px rgba(255,255,255,.018), 0 46px 160px rgba(0,0,0,.72);
+      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    }
+    .floor {
+      position: absolute;
+      left: -16vw;
+      right: -16vw;
+      bottom: -34vh;
+      height: 58vh;
+      transform: rotateX(65deg);
+      transform-origin: 50% 0;
+      border-top: 1px solid rgba(238,233,220,.06);
+      background: linear-gradient(180deg, rgba(22,22,20,.48), #020202 68%);
+    }
+    .light {
+      position: absolute;
+      left: 50%;
+      top: 3vh;
+      width: 60vw;
+      height: 72vh;
+      transform: translateX(-50%);
+      background: conic-gradient(from 180deg at 50% 0%, transparent 0 35%, rgba(143,221,234,.12) 44%, rgba(238,233,220,.10) 50%, rgba(143,221,234,.12) 56%, transparent 65% 100%);
+      filter: blur(20px);
+      opacity: .70;
+      mix-blend-mode: screen;
+    }
+
+    .topline {
+      position: absolute;
+      left: clamp(40px, 5vw, 80px);
+      right: clamp(40px, 5vw, 80px);
+      top: 34px;
+      z-index: 9;
+      display: flex;
+      justify-content: space-between;
+      color: #8d887f;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .15em;
+    }
+    .topline a { color: #d9cfb2; }
+
+    .title {
+      position: absolute;
+      left: clamp(48px, 6vw, 90px);
+      top: clamp(88px, 14vh, 142px);
+      z-index: 8;
+      width: min(460px, 34vw);
+    }
+    .kicker {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .18em;
+      margin-bottom: 24px;
+    }
+    h1 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(48px, 5.5vw, 78px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+    .title p {
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.85;
+      text-wrap: pretty;
+    }
+
+    .experiment {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(64vw, 900px);
+      height: min(58vh, 590px);
+      transform: translate(-42%, -45%);
+      z-index: 4;
+      overflow: visible;
+      mask-image: radial-gradient(ellipse at 50% 50%, #000 0 64%, rgba(0,0,0,.68) 82%, transparent 100%);
+    }
+    #quantumCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .detector {
+      position: absolute;
+      right: 12%;
+      top: 50%;
+      width: 10px;
+      height: 44%;
+      transform: translateY(-50%);
+      border-left: 1px solid rgba(255,107,95,.48);
+      opacity: .4;
+      transition: opacity .3s, filter .3s;
+      filter: drop-shadow(0 0 20px rgba(255,107,95,.18));
+      pointer-events: none;
+    }
+    .detector.active { opacity: .95; }
+    .detector::before,
+    .detector::after {
+      content: "";
+      position: absolute;
+      left: -6px;
+      width: 12px;
+      height: 1px;
+      background: rgba(255,107,95,.65);
+    }
+    .detector::before { top: 0; }
+    .detector::after { bottom: 0; }
+
+    .controls {
+      position: absolute;
+      right: clamp(46px, 5vw, 86px);
+      bottom: clamp(44px, 7vh, 82px);
+      width: min(430px, 34vw);
+      z-index: 11;
+      border-top: 1px solid rgba(238,233,220,.18);
+      padding-top: 18px;
+    }
+    .control-row {
+      display: grid;
+      grid-template-columns: 118px 1fr;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+    .control-row label {
+      color: #777168;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .13em;
+    }
+    input[type=range] {
+      appearance: none;
+      width: 100%;
+      height: 30px;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan), rgba(238,233,220,.18), var(--red));
+    }
+    input[type=range]::-webkit-slider-thumb {
+      appearance: none;
+      width: 17px;
+      height: 17px;
+      margin-top: -7.5px;
+      border-radius: 50%;
+      border: 1px solid #050505;
+      background: var(--ink);
+      box-shadow: 0 0 26px rgba(238,233,220,.34);
+    }
+    .toggle {
+      border: 0;
+      border-top: 1px solid rgba(238,233,220,.22);
+      padding: 12px 0 0;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .13em;
+    }
+    .mode-readout {
+      margin-top: 20px;
+      color: #8f887d;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .mode-readout b {
+      color: #eee4c7;
+      font-weight: 500;
+    }
+
+    .inscription {
+      position: absolute;
+      left: clamp(48px, 6vw, 90px);
+      bottom: clamp(44px, 7vh, 82px);
+      z-index: 10;
+      width: min(430px, 34vw);
+      border-top: 1px solid rgba(216,192,122,.30);
+      padding-top: 16px;
+      min-height: 132px;
+    }
+    .inscription .label {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .16em;
+      margin-bottom: 13px;
+    }
+    .quote {
+      font-family: var(--serif);
+      color: #d8d1bf;
+      font-size: 18px;
+      line-height: 1.65;
+      transition: opacity .35s ease;
+    }
+    .quote.fade { opacity: 0; }
+    .source {
+      margin-top: 12px;
+      color: #777168;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .09em;
+      line-height: 1.55;
+      transition: opacity .35s ease;
+    }
+    .source.fade { opacity: 0; }
+
+    .navline {
+      position: absolute;
+      left: clamp(40px, 5vw, 80px);
+      right: clamp(40px, 5vw, 80px);
+      bottom: 28px;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      color: #6d675f;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .13em;
+    }
+    .navline a { color: #a79d86; }
+
+    .portal-transition {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0;
+      background: #000;
+    }
+    .portal-transition.active {
+      opacity: 1;
+      animation: walkBlackout .96s cubic-bezier(.76,0,.24,1) forwards;
+    }
+    .portal-transition::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 10vmin;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%) scale(.08);
+      border-radius: 50%;
+      border: 1px solid rgba(238,233,220,.72);
+      box-shadow: 0 0 90px rgba(238,233,220,.30), inset 0 0 38px rgba(143,221,234,.20);
+      opacity: 0;
+    }
+    .portal-transition.active::before { animation: portalOpen .82s cubic-bezier(.16,1,.3,1) forwards; }
+    @keyframes portalOpen {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(.08); }
+      18% { opacity: 1; }
+      100% { opacity: .18; transform: translate(-50%, -50%) scale(24); }
+    }
+    @keyframes portalBlackout {
+      0% { background: rgba(0,0,0,0); }
+      62% { background: rgba(0,0,0,.26); }
+      100% { background: rgba(0,0,0,1); }
+    }  </style>
+</head>
+<body class="is-entering">
+  <main class="chamber">
+    <div class="room" aria-hidden="true">
+      <div class="wall"></div>
+      <div class="floor"></div>
+      <div class="light"></div>
+    </div>
+    <div class="grain"></div>
+
+    <header class="topline">
+      <a href="./index.html" data-transition>← HOME</a>
+      <span>EXHIBIT 02 · MEASUREMENT CHAMBER</span>
+    </header>
+
+    <section class="title">
+      <div class="kicker">QUANTUM GALLERY</div>
+      <h1>测量之前</h1>
+      <p>同一个粒子实验，在是否获取路径信息时呈现出不同图样。这里不是解释量子世界的全部，只让观众亲手触发“测量改变可见结果”的核心经验。</p>
+    </section>
+
+    <section class="experiment" aria-label="双缝与测量可视化">
+      <canvas id="quantumCanvas"></canvas>
+      <div class="detector" id="detector"></div>
+    </section>
+
+    <section class="controls">
+      <div class="control-row">
+        <label for="measureSlider">MEASUREMENT</label>
+        <input id="measureSlider" type="range" min="0" max="1" value="0" step=".001" />
+      </div>
+      <div class="control-row">
+        <label for="phaseSlider">PHASE</label>
+        <input id="phaseSlider" type="range" min="-1" max="1" value="0" step=".001" />
+      </div>
+      <button class="toggle" id="detectorToggle" type="button">DETECTOR OFF</button>
+      <div class="mode-readout" id="modeReadout"><b>干涉模式</b>：路径信息未被记录，屏幕上出现稳定干涉条纹。</div>
+    </section>
+
+    <aside class="inscription">
+      <div class="label">PHILOSOPHICAL INSCRIPTION · TO VERIFY</div>
+      <div class="quote" id="quoteText"></div>
+      <div class="source" id="quoteSource"></div>
+    </aside>
+
+    <nav class="navline">
+      <a href="./scale-gallery.html" data-transition>← SCALE LENS</a>
+      <a href="./index.html" data-transition>BACK TO HOME</a>
+    </nav>
+    <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("quantumCanvas");
+    const ctx = canvas.getContext("2d");
+    const measureSlider = document.getElementById("measureSlider");
+    const phaseSlider = document.getElementById("phaseSlider");
+    const detectorToggle = document.getElementById("detectorToggle");
+    const detector = document.getElementById("detector");
+    const modeReadout = document.getElementById("modeReadout");
+    const quoteText = document.getElementById("quoteText");
+    const quoteSource = document.getElementById("quoteSource");
+
+    const inscriptions = [
+      {
+        text: "“凡是可说的，都可以说清楚；凡是不可说的，必须保持沉默。”",
+        source: "LUDWIG WITTGENSTEIN"
+      },
+      {
+        text: "“观察渗透着理论。”",
+        source: "N. R. HANSON"
+      },
+      {
+        text: "“知识始于问题。”",
+        source: "KARL POPPER"
+      }
+    ];
+
+    let measurement = 0;
+    let phase = 0;
+    let detectorOn = false;
+    let t = 0;
+    let quoteIndex = 0;
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = 1;
+      canvas.width = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function setMeasurement(value) {
+      measurement = Math.max(0, Math.min(1, value));
+      measureSlider.value = measurement.toFixed(3);
+      detector.classList.toggle("active", measurement > .55);
+      detectorToggle.textContent = measurement > .55 ? "DETECTOR ON" : "DETECTOR OFF";
+      if (measurement < .25) {
+        modeReadout.innerHTML = "<b>干涉模式</b>：路径信息未被记录，屏幕上出现稳定干涉条纹。";
+      } else if (measurement < .70) {
+        modeReadout.innerHTML = "<b>过渡区域</b>：测量强度增加，条纹可见度下降，粒子分布逐渐显现。";
+      } else {
+        modeReadout.innerHTML = "<b>路径模式</b>：探测器记录路径信息，干涉条纹被破坏，屏幕呈现两团粒子分布。";
+      }
+    }
+
+    function draw(now) {
+      t = now || 0;
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      ctx.clearRect(0, 0, w, h);
+      const cx = w * .48;
+      const cy = h * .50;
+
+      const glow = ctx.createRadialGradient(cx, cy, 20, cx, cy, w * .55);
+      glow.addColorStop(0, "rgba(238,233,220,.14)");
+      glow.addColorStop(.36, "rgba(143,221,234,.08)");
+      glow.addColorStop(.72, "rgba(216,192,122,.04)");
+      glow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, w, h);
+
+      drawApparatus(w, h);
+      drawWaveField(w, h);
+      drawScreenPattern(w, h);
+      requestAnimationFrame(draw);
+    }
+
+    function drawApparatus(w, h) {
+      const sourceX = w * .15;
+      const slitX = w * .37;
+      const screenX = w * .77;
+      const cy = h * .5;
+      ctx.save();
+      ctx.strokeStyle = "rgba(238,233,220,.16)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(sourceX, cy);
+      ctx.lineTo(slitX, cy - 52);
+      ctx.moveTo(sourceX, cy);
+      ctx.lineTo(slitX, cy + 52);
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(216,192,122,.44)";
+      ctx.beginPath();
+      ctx.arc(sourceX, cy, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = "rgba(238,233,220,.34)";
+      ctx.beginPath();
+      ctx.moveTo(slitX, cy - 150);
+      ctx.lineTo(slitX, cy - 72);
+      ctx.moveTo(slitX, cy - 34);
+      ctx.lineTo(slitX, cy + 34);
+      ctx.moveTo(slitX, cy + 72);
+      ctx.lineTo(slitX, cy + 150);
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(238,233,220,.22)";
+      ctx.beginPath();
+      ctx.moveTo(screenX, cy - 190);
+      ctx.lineTo(screenX, cy + 190);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawWaveField(w, h) {
+      const slitX = w * .37;
+      const screenX = w * .77;
+      const cy = h * .5;
+      const visibility = 1 - measurement;
+      ctx.save();
+      for (let i = 0; i < 12; i++) {
+        const r = 26 + i * 28 + (t * .035) % 28;
+        ctx.strokeStyle = `rgba(143,221,234,${(.10 + visibility * .12) * (1 - i / 15)})`;
+        ctx.beginPath();
+        ctx.arc(slitX, cy - 52, r, -Math.PI * .28, Math.PI * .28);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(slitX, cy + 52, r, -Math.PI * .28, Math.PI * .28);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = .20 + visibility * .42;
+      ctx.strokeStyle = "rgba(238,233,220,.20)";
+      for (let y = -160; y <= 160; y += 32) {
+        ctx.beginPath();
+        for (let x = slitX; x <= screenX; x += 9) {
+          const p = (x - slitX) / (screenX - slitX);
+          const yy = cy + y * (1 - p * .18) + Math.sin(x * .024 + y * .028 + phase * 4 + t * .002) * 6 * visibility;
+          if (x === slitX) ctx.moveTo(x, yy);
+          else ctx.lineTo(x, yy);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawScreenPattern(w, h) {
+      const screenX = w * .77;
+      const cy = h * .5;
+      const visibility = 1 - measurement;
+      ctx.save();
+      for (let i = 0; i < 150; i++) {
+        const y = -185 + i * (370 / 149);
+        const interference = Math.pow(Math.cos(y * .055 + phase * 2.5), 2);
+        const envelope = Math.exp(-Math.abs(y) / 150);
+        const particleBands = Math.exp(-Math.pow((y - 70) / 48, 2)) + Math.exp(-Math.pow((y + 70) / 48, 2));
+        const intensity = visibility * interference * envelope + measurement * particleBands * .55;
+        ctx.fillStyle = `rgba(238,233,220,${Math.min(.82, intensity * .48)})`;
+        ctx.fillRect(screenX + 8, cy + y, 90 + intensity * 120, 2.2);
+      }
+      for (let i = 0; i < 100; i++) {
+        const y = (Math.sin(i * 31.7 + phase * 4) * .5) * 330;
+        const x = screenX + 24 + (Math.sin(i * 17.1) * .5 + .5) * 160;
+        const dot = visibility * Math.pow(Math.cos(y * .055 + phase * 2.5), 2) + measurement * .55;
+        ctx.fillStyle = `rgba(143,221,234,${.05 + dot * .20})`;
+        ctx.fillRect(x, cy + y, 1.3, 1.3);
+      }
+      ctx.restore();
+    }
+
+    function rotateQuote() {
+      quoteText.classList.add("fade");
+      quoteSource.classList.add("fade");
+      window.setTimeout(() => {
+        const item = inscriptions[quoteIndex % inscriptions.length];
+        quoteText.textContent = item.text;
+        quoteSource.textContent = item.source;
+        quoteText.classList.remove("fade");
+        quoteSource.classList.remove("fade");
+        quoteIndex += 1;
+      }, 360);
+    }
+
+    measureSlider.addEventListener("input", () => {
+      detectorOn = parseFloat(measureSlider.value) > .55;
+      setMeasurement(parseFloat(measureSlider.value));
+    });
+    phaseSlider.addEventListener("input", () => { phase = parseFloat(phaseSlider.value); });
+    detectorToggle.addEventListener("click", () => {
+      detectorOn = !detectorOn;
+      setMeasurement(detectorOn ? 1 : 0);
+    });
+    document.querySelectorAll("[data-transition]").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        const href = link.getAttribute("href");
+        if (!href || href === "#") return;
+        event.preventDefault();
+          document.getElementById("portalTransition").classList.add("active");
+        sessionStorage.setItem("museumTransition", "soft");
+        window.setTimeout(() => { window.location.href = href; }, 360);
+      });
+    });
+
+    window.addEventListener("resize", resize);
+    resize();
+    setMeasurement(0);
+    rotateQuote();
+    window.setInterval(rotateQuote, 6200);
+    requestAnimationFrame(draw);
+    window.setTimeout(() => {
+      document.body.classList.remove("is-entering");
+    }, 760);
+  </script>
+</body>
+</html>

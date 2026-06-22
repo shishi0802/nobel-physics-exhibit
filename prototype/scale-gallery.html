@@ -1,0 +1,1285 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>尺度展厅 · Scale Lens</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23020202'/%3E%3Ccircle cx='32' cy='32' r='18' fill='none' stroke='%23d8c07a' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='4' fill='%238fddea'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #020202;
+      --ink: #eee9dc;
+      --muted: #8e897f;
+      --dim: #55514b;
+      --line: rgba(238, 233, 220, .12);
+      --line-strong: rgba(238, 233, 220, .28);
+      --gold: #d8c07a;
+      --cyan: #8fddea;
+      --red: #ff6b5f;
+      --panel: rgba(6, 6, 5, .72);
+      --mono: "IBM Plex Mono", monospace;
+      --serif: "Noto Serif SC", serif;
+      --sans: "Noto Sans SC", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); }
+    body { font-family: var(--sans); overflow: hidden; }
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+
+    .gallery {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      min-width: 1024px;
+      min-height: 680px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 52% 42%, rgba(216, 192, 122, .10), transparent 16%),
+        radial-gradient(circle at 62% 58%, rgba(143, 221, 234, .08), transparent 24%),
+        linear-gradient(180deg, #080807 0%, #020202 66%, #000 100%);
+      isolation: isolate;
+    }
+
+    .grain {
+      position: absolute;
+      inset: 0;
+      opacity: .14;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E");
+      z-index: 30;
+    }
+
+    .room { position: absolute; inset: 0; perspective: 1100px; z-index: 1; }
+    .back-wall {
+      position: absolute;
+      left: 14vw;
+      right: 14vw;
+      top: 8vh;
+      height: 68vh;
+      border: 1px solid rgba(255,255,255,.055);
+      background: linear-gradient(180deg, rgba(16,16,15,.98), rgba(5,5,5,.96));
+      box-shadow: inset 0 0 130px rgba(255,255,255,.025), 0 44px 150px rgba(0,0,0,.70);
+    }
+    .floor {
+      position: absolute;
+      left: -10vw;
+      right: -10vw;
+      bottom: -34vh;
+      height: 58vh;
+      transform: rotateX(65deg);
+      transform-origin: 50% 0;
+      border-top: 1px solid rgba(255,255,255,.06);
+      background: linear-gradient(180deg, rgba(18,18,17,.45), #020202 62%);
+    }
+    .floor::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 8vw 8vw;
+      mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
+    }
+
+    .light-cone {
+      position: absolute;
+      left: 50%;
+      top: 6vh;
+      width: min(55vw, 780px);
+      height: 76vh;
+      transform: translateX(-50%);
+      filter: blur(18px);
+      opacity: .62;
+      mix-blend-mode: screen;
+      z-index: 2;
+      background: conic-gradient(from 180deg at 50% 0%, transparent 0 34%, rgba(228,216,177,.12) 42%, rgba(143,221,234,.08) 50%, rgba(228,216,177,.12) 58%, transparent 66% 100%);
+      pointer-events: none;
+    }
+
+    .title {
+      position: absolute;
+      left: clamp(48px, 6vw, 92px);
+      top: clamp(38px, 7vh, 82px);
+      width: min(37vw, 560px);
+      z-index: 7;
+    }
+    .kicker {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .18em;
+      color: var(--gold);
+      margin-bottom: 22px;
+    }
+    h1 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(46px, 5.4vw, 76px);
+      line-height: 1.03;
+      letter-spacing: 0;
+      text-wrap: pretty;
+    }
+
+    .topline {
+      position: absolute;
+      left: clamp(40px, 5vw, 80px);
+      right: clamp(40px, 5vw, 80px);
+      top: 30px;
+      z-index: 12;
+      display: flex;
+      justify-content: space-between;
+      color: #8d887f;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .15em;
+      pointer-events: auto;
+    }
+    .topline a { color: #d9cfb2; }
+    .title p {
+      margin: 22px 0 0;
+      width: min(420px, 100%);
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.85;
+      text-wrap: pretty;
+    }
+
+    .lens-shell {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(72vw, 980px);
+      height: min(58vh, 620px);
+      transform: translate(-50%, -47%);
+      border: 0;
+      background: transparent;
+      box-shadow: 0 0 120px rgba(143, 221, 234, .045), inset 0 0 140px rgba(255,255,255,.010);
+      z-index: 4;
+      overflow: hidden;
+      mask-image: radial-gradient(ellipse at 50% 50%, #000 0 58%, rgba(0,0,0,.72) 76%, transparent 100%);
+    }
+    #scaleCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .measure {
+      position: absolute;
+      left: calc(50% + min(36vw, 490px) + 22px);
+      top: 50%;
+      width: 1px;
+      height: min(46vh, 460px);
+      transform: translateY(-48%);
+      background: linear-gradient(transparent, rgba(238,233,220,.36), transparent);
+      z-index: 6;
+    }
+    .measure i {
+      position: absolute;
+      left: -5px;
+      width: 11px;
+      height: 1px;
+      background: rgba(238,233,220,.42);
+    }
+    .measure i:nth-child(1){top:0}
+    .measure i:nth-child(2){top:25%}
+    .measure i:nth-child(3){top:50%}
+    .measure i:nth-child(4){top:75%}
+    .measure i:nth-child(5){top:100%}
+
+    .readout {
+      position: absolute;
+      right: clamp(38px, 5.4vw, 86px);
+      top: clamp(44px, 8vh, 92px);
+      width: 318px;
+      z-index: 8;
+      border-top: 1px solid var(--line-strong);
+      padding-top: 18px;
+      color: #aaa399;
+      font-size: 13px;
+      line-height: 1.75;
+    }
+    .readout .id {
+      display: block;
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .16em;
+      margin-bottom: 12px;
+    }
+    .scale-value {
+      margin-top: 24px;
+      font-family: var(--mono);
+      font-size: 42px;
+      line-height: 1;
+      color: #f1e8c5;
+      letter-spacing: -.02em;
+    }
+    .scale-label {
+      margin-top: 12px;
+      font-family: var(--serif);
+      font-size: 28px;
+      line-height: 1.2;
+      color: var(--ink);
+    }
+    .scale-desc { margin-top: 14px; color: #807b73; }
+
+    .controls {
+      position: absolute;
+      left: clamp(48px, 6vw, 92px);
+      right: clamp(48px, 6vw, 92px);
+      bottom: clamp(34px, 6vh, 72px);
+      z-index: 10;
+      display: grid;
+      grid-template-columns: minmax(380px, 1fr) auto;
+      gap: 30px;
+      align-items: end;
+    }
+    .slider-panel {
+      min-width: 0;
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+    }
+    .slider-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      color: #777168;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .12em;
+      margin-bottom: 18px;
+    }
+    input[type=range] {
+      appearance: none;
+      width: 100%;
+      height: 34px;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan), rgba(238,233,220,.22), var(--gold));
+    }
+    input[type=range]::-webkit-slider-thumb {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      margin-top: -8px;
+      border-radius: 50%;
+      background: #eee9dc;
+      border: 1px solid rgba(0,0,0,.9);
+      box-shadow: 0 0 28px rgba(238,233,220,.38);
+    }
+    input[type=range]::-moz-range-track {
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan), rgba(238,233,220,.22), var(--gold));
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #eee9dc;
+      border: 1px solid rgba(0,0,0,.9);
+      box-shadow: 0 0 28px rgba(238,233,220,.38);
+    }
+    .gesture-button {
+      width: 150px;
+      min-height: 44px;
+      border: 0;
+      border-top: 1px solid rgba(238,233,220,.22);
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      padding: 11px 0 0;
+      transition: transform .22s cubic-bezier(.16, 1, .3, 1), border-color .22s, color .22s;
+    }
+    .gesture-button:hover {
+      transform: translateY(-2px);
+      border-color: rgba(216,192,122,.58);
+      color: #fff7da;
+    }
+    .gesture-button b {
+      display: block;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.1;
+      letter-spacing: .14em;
+      font-weight: 500;
+      margin-bottom: 7px;
+    }
+    .gesture-button span {
+      display: block;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: .12em;
+    }
+
+    .ticks {
+      position: absolute;
+      left: 50%;
+      bottom: 18vh;
+      width: min(72vw, 980px);
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      z-index: 5;
+      pointer-events: none;
+      color: #5f5a53;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .08em;
+    }
+    .ticks div {
+      border-left: 1px solid rgba(238,233,220,.12);
+      padding-left: 8px;
+      height: 26px;
+    }
+
+    .gesture-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 40;
+      display: none;
+      pointer-events: none;
+    }
+    .gesture-overlay.active { display: block; }
+    .gesture-scrim {
+      position: absolute;
+      inset: 0;
+      background: transparent;
+      opacity: 1;
+      overflow: hidden;
+    }
+    .gesture-scrim::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 14vmin;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 1px solid rgba(238,233,220,.72);
+      box-shadow: 0 0 70px rgba(238,233,220,.35), inset 0 0 34px rgba(143,221,234,.28);
+      opacity: 0;
+      animation: aperturePulse 1.05s cubic-bezier(.16,1,.3,1) forwards;
+    }
+    .gesture-scrim::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .42;
+      background:
+        radial-gradient(circle at 0% 18%, rgba(238,233,220,.20), transparent 16%),
+        radial-gradient(circle at 100% 82%, rgba(143,221,234,.15), transparent 18%),
+        radial-gradient(circle at 50% 100%, rgba(216,192,122,.13), transparent 15%);
+      mask-image: radial-gradient(circle at 50% 50%, transparent 0 58%, #000 76%);
+      animation: edgeBreathe 4s ease-in-out infinite alternate;
+    }
+    .calibration-ring {
+      position: absolute;
+      inset: 0;
+      opacity: .54;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle at 11% 20%, rgba(238,233,220,.55) 0 1px, transparent 2px),
+        radial-gradient(circle at 88% 73%, rgba(143,221,234,.48) 0 1px, transparent 2px),
+        radial-gradient(circle at 72% 10%, rgba(238,233,220,.42) 0 1px, transparent 2px),
+        radial-gradient(circle at 4% 84%, rgba(216,192,122,.42) 0 1px, transparent 2px);
+      filter: blur(.1px);
+      animation: particleDrift 8s linear infinite;
+    }
+    .gesture-status {
+      position: absolute;
+      left: clamp(34px, 4vw, 70px);
+      top: clamp(34px, 4.6vh, 62px);
+      transform: none;
+      width: min(420px, 34vw);
+      text-align: left;
+      color: #d9d1bd;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .14em;
+      opacity: 0;
+      animation: statusIn .8s cubic-bezier(.16,1,.3,1) .28s forwards;
+    }
+    .gesture-hud {
+      position: absolute;
+      right: clamp(24px, 3vw, 44px);
+      top: clamp(24px, 3vw, 44px);
+      width: 176px;
+      pointer-events: auto;
+      opacity: 0;
+      animation: statusIn .8s cubic-bezier(.16,1,.3,1) .34s forwards;
+    }
+    .gesture-hud div { display: none; }
+    .gesture-hud button {
+      width: 100%;
+      border: 1px solid rgba(238,233,220,.20);
+      background: rgba(2,2,2,.34);
+      backdrop-filter: blur(16px);
+      color: var(--ink);
+      padding: 11px 12px;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .12em;
+    }
+    .gesture-video {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .paused .calibration-ring {
+      opacity: .22;
+      animation-play-state: paused;
+    }
+
+    .toast {
+      position: absolute;
+      left: 50%;
+      top: 42px;
+      transform: translateX(-50%);
+      z-index: 60;
+      padding: 12px 16px;
+      border: 1px solid rgba(238,233,220,.18);
+      background: rgba(0,0,0,.74);
+      color: #d8d1bf;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .08em;
+      opacity: 0;
+      transition: opacity .28s ease, transform .28s ease;
+      pointer-events: none;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(4px);
+    }
+
+    .navline {
+      position: absolute;
+      left: clamp(40px, 5vw, 80px);
+      right: clamp(40px, 5vw, 80px);
+      bottom: 22px;
+      z-index: 22;
+      display: flex;
+      justify-content: space-between;
+      gap: 22px;
+      color: #6d675f;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .13em;
+      pointer-events: auto;
+    }
+    .navline a { color: #a79d86; }
+
+    .portal-transition {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0;
+      background: #000;
+    }
+    .portal-transition.active {
+      opacity: 1;
+      animation: walkBlackout .96s cubic-bezier(.76,0,.24,1) forwards;
+    }
+    .portal-transition::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 10vmin;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%) scale(.08);
+      border-radius: 50%;
+      border: 1px solid rgba(238,233,220,.72);
+      box-shadow: 0 0 90px rgba(238,233,220,.30), inset 0 0 38px rgba(143,221,234,.20);
+      opacity: 0;
+    }
+    .portal-transition.active::before {
+      animation: portalOpen .82s cubic-bezier(.16,1,.3,1) forwards;
+    }
+
+    @keyframes aperturePulse {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(.18); }
+      18% { opacity: 1; }
+      72% { opacity: .45; }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(18); }
+    }
+    @keyframes statusIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes edgeBreathe {
+      from { opacity: .26; transform: scale(1); }
+      to { opacity: .52; transform: scale(1.03); }
+    }
+    @keyframes particleDrift {
+      from { transform: translate3d(0,0,0); }
+      to { transform: translate3d(18px,-12px,0); }
+    }
+    @keyframes portalOpen {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(.08); }
+      18% { opacity: 1; }
+      100% { opacity: .18; transform: translate(-50%, -50%) scale(24); }
+    }
+    @keyframes portalBlackout {
+      0% { background: rgba(0,0,0,0); }
+      62% { background: rgba(0,0,0,.26); }
+      100% { background: rgba(0,0,0,1); }
+    }
+
+    @media (max-width: 1100px) {
+      .gallery { min-width: 900px; }
+      .readout { width: 270px; }
+      .controls { grid-template-columns: 1fr auto; }
+    }
+      body.is-entering::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 99;
+      pointer-events: none;
+      background: rgba(238,233,220,.10);
+      animation: pageReveal .56s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    body.is-leaving main > :not(.portal-transition) {
+      opacity: .58;
+      filter: none !important;
+      transition: opacity .22s cubic-bezier(.22,1,.36,1);
+    }
+    .portal-transition.active { opacity: 1; animation: pageVeil .24s cubic-bezier(.22,1,.36,1) forwards !important; }
+    .portal-transition.active::before { animation: none !important; opacity: 0 !important; transform: none !important; }
+    @keyframes pageVeil {
+      0% { background: rgba(0,0,0,0); }
+      100% { background: rgba(238,233,220,.055); }
+    }
+     @keyframes pageReveal {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+  </style>
+</head>
+<body class="is-entering">
+  <main class="gallery" id="gallery">
+    <div class="grain"></div>
+    <div class="room" aria-hidden="true">
+      <div class="back-wall"></div>
+      <div class="floor"></div>
+    </div>
+    <div class="light-cone" aria-hidden="true"></div>
+
+    <header class="topline">
+      <a href="./index.html" data-transition>← HOME</a>
+      <span>EXHIBIT 03 · SCALE LENS</span>
+    </header>
+
+    <section class="title">
+      <div class="kicker">EXHIBIT 03 · SCALE LENS</div>
+      <h1>尺度透镜</h1>
+      <p>从原子核到宇宙边界，物理学把不可直观经验的尺度转化为可以操作的观测条件。</p>
+    </section>
+
+    <section class="readout" aria-live="polite">
+      <span class="id">CURRENT OBSERVATION</span>
+      <div>拖动尺度线或滚动鼠标。进入空间校准后，张开单手进入微观，五指合拢回到宏观；握拳暂停，握拳保持退出。</div>
+      <div class="scale-value" id="scaleValue">10<sup>0</sup> m</div>
+      <div class="scale-label" id="scaleLabel">人体尺度</div>
+      <div class="scale-desc" id="scaleDesc">这是日常经验最熟悉的尺度。展厅从这里出发，把“看见”扩展到不可见的微观与宇观。</div>
+    </section>
+
+    <section class="lens-shell" aria-label="尺度可视化窗口">
+      <canvas id="scaleCanvas"></canvas>
+    </section>
+    <div class="measure" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="ticks" aria-hidden="true">
+      <div>10^-15</div><div>10^-10</div><div>10^-6</div><div>10^0</div><div>10^6</div><div>10^12</div><div>10^27</div>
+    </div>
+
+    <section class="controls">
+      <div class="slider-panel">
+        <div class="slider-meta"><span>MICROSCOPIC</span><span>HUMAN SCALE</span><span>COSMIC</span></div>
+        <input id="scaleSlider" type="range" min="-15" max="27" step=".01" value="0" aria-label="尺度指数" />
+      </div>
+      <button class="gesture-button" id="gestureButton" type="button">
+        <b>空间校准</b>
+        <span>ENTER GESTURE MODE</span>
+      </button>
+    </section>
+
+    <section class="gesture-overlay" id="gestureOverlay" aria-hidden="true">
+      <div class="gesture-scrim"></div>
+      <div class="calibration-ring"></div>
+      <div class="gesture-status" id="gestureStatus">等待摄像头与手势识别模块</div>
+      <video class="gesture-video" id="gestureVideo" autoplay playsinline muted></video>
+      <aside class="gesture-hud">
+        <div><b>张开单手</b>：向微观缩放</div>
+        <div><b>五指合拢</b>：向宏观缩放</div>
+        <div><b>握拳</b>：暂停；保持退出</div>
+        <button id="exitGesture" type="button">EXIT CALIBRATION</button>
+      </aside>
+    </section>
+
+    <div class="toast" id="toast"></div>
+    <nav class="navline">
+      <a href="./physicist-corridor.html" data-transition>ATLAS CORRIDOR</a>
+      <a href="./index.html" data-transition>BACK TO HOME</a>
+      <a href="./quantum-gallery.html" data-transition>NEXT · MEASUREMENT</a>
+    </nav>
+    <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
+  </main>
+
+  <script type="module">
+    const points = [
+      { exp: -15, label: "原子核尺度", desc: "质子、中子等原子核结构所在的极端微观尺度。日常物体的坚实感在这里变成相互作用的结果。", kind: "nucleus" },
+      { exp: -10, label: "原子尺度", desc: "原子、化学键和电子云的尺度。量子规律在这里不再是修正项，而是世界的基本语法。", kind: "atom" },
+      { exp: -6, label: "细胞与微结构", desc: "显微技术把微米世界带入视野。结构色、材料纹理与生物组织都在这里显出形状。", kind: "micro" },
+      { exp: 0, label: "人体尺度", desc: "这是日常经验最熟悉的尺度。展厅从这里出发，把“看见”扩展到不可见的微观与宇观。", kind: "human" },
+      { exp: 6, label: "城市与地球表面", desc: "宏观工程、地球曲率和导航定位在这一尺度相遇。测量精度开始改变社会组织方式。", kind: "earth" },
+      { exp: 12, label: "行星轨道", desc: "地月距离、行星轨道和时间校准进入视野。原子钟与相对论共同维持现代定位系统。", kind: "orbit" },
+      { exp: 21, label: "银河尺度", desc: "恒星不再是点，而成为统计结构。物理学用光谱、引力和时间重建无法抵达的远方。", kind: "galaxy" },
+      { exp: 27, label: "可观测宇宙", desc: "尺度抵达宇宙学边界。物理学在这里从局部实验延伸为关于整体结构的推断。", kind: "cosmos" }
+    ];
+
+    const slider = document.getElementById("scaleSlider");
+    const scaleValue = document.getElementById("scaleValue");
+    const scaleLabel = document.getElementById("scaleLabel");
+    const scaleDesc = document.getElementById("scaleDesc");
+    const canvas = document.getElementById("scaleCanvas");
+    const ctx = canvas.getContext("2d");
+    const gallery = document.getElementById("gallery");
+    const gestureButton = document.getElementById("gestureButton");
+    const gestureOverlay = document.getElementById("gestureOverlay");
+    const gestureStatus = document.getElementById("gestureStatus");
+    const gestureVideo = document.getElementById("gestureVideo");
+    const exitGesture = document.getElementById("exitGesture");
+    const toast = document.getElementById("toast");
+
+    let exponent = 0;
+    let targetExponent = 0;
+    let previousTargetExponent = 0;
+    let zoomImpulse = 0;
+    let gestureMode = false;
+    let gesturePaused = false;
+    let recognizer = null;
+    let webcamStream = null;
+    let lastVideoTime = -1;
+    let lastFrameTime = performance.now();
+    let fistStartAt = 0;
+    let lastGestureLabel = "idle";
+    let lastActiveGesture = "neutral";
+    let lastActiveAt = 0;
+    let pseudoT = 0;
+    const gestureRuntime = {
+      bundle: "./vendor/mediapipe/tasks-vision/vision_bundle.mjs",
+      wasm: "./vendor/mediapipe/tasks-vision/wasm",
+      model: "./vendor/mediapipe/models/gesture_recognizer.task"
+    };
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw();
+    }
+
+    function nearestPoint(exp) {
+      return points.reduce((a, b) => Math.abs(b.exp - exp) < Math.abs(a.exp - exp) ? b : a);
+    }
+
+    function formatExp(exp) {
+      const rounded = Math.round(exp);
+      if (rounded === 0) return "10<sup>0</sup> m";
+      return `10<sup>${rounded}</sup> m`;
+    }
+
+    function setTarget(next, source = "ui") {
+      previousTargetExponent = targetExponent;
+      targetExponent = Math.max(-15, Math.min(27, next));
+      const delta = targetExponent - previousTargetExponent;
+      if (Math.abs(delta) > .001) {
+        zoomImpulse = Math.max(-1, Math.min(1, zoomImpulse + delta * .18));
+      }
+      slider.value = targetExponent.toFixed(2);
+      updateReadout();
+      if (source === "ui") draw();
+    }
+
+    function updateReadout() {
+      const p = nearestPoint(targetExponent);
+      scaleValue.innerHTML = formatExp(targetExponent);
+      scaleLabel.textContent = p.label;
+      scaleDesc.textContent = p.desc;
+    }
+
+    function draw() {
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const norm = (exponent + 15) / 42;
+      const micro = 1 - norm;
+      const cosmic = norm;
+      const centerX = w * .5;
+      const centerY = h * .49;
+
+      const bg = ctx.createRadialGradient(centerX, centerY, 20, centerX, centerY, w * .62);
+      bg.addColorStop(0, `rgba(238, 228, 190, ${.18 + .08 * Math.sin(pseudoT * .001)})`);
+      bg.addColorStop(.36, `rgba(143, 221, 234, ${.05 + micro * .09})`);
+      bg.addColorStop(.70, `rgba(216, 192, 122, ${.03 + cosmic * .05})`);
+      bg.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, w, h);
+
+      drawScaleGrid(w, h, norm);
+      drawContinuousScale(w, h);
+      drawZoomFlow(w, h, norm);
+    }
+
+    function layerWeight(center, width) {
+      const d = Math.abs(exponent - center);
+      return Math.max(0, 1 - d / width);
+    }
+
+    function drawContinuousScale(w, h) {
+      const layers = [
+        { fn: () => drawSubatomicField(w, h), weight: layerWeight(-15, 7) },
+        { fn: () => drawAtom(w, h, 1), weight: layerWeight(-10, 8) },
+        { fn: () => drawMicrostructure(w, h, 1), weight: layerWeight(-6, 7) },
+        { fn: () => drawHumanRoom(w, h), weight: layerWeight(0, 8) },
+        { fn: () => drawPlanetary(w, h, .6, "earth"), weight: layerWeight(6, 8) },
+        { fn: () => drawPlanetary(w, h, 1, "orbit"), weight: layerWeight(12, 9) },
+        { fn: () => drawCosmos(w, h, .8), weight: layerWeight(21, 10) },
+        { fn: () => drawCosmicWeb(w, h), weight: layerWeight(27, 8) }
+      ];
+      const total = layers.reduce((sum, layer) => sum + layer.weight, 0) || 1;
+      layers.forEach(layer => {
+        if (layer.weight <= 0) return;
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, (layer.weight / total) * 1.85);
+        layer.fn();
+        ctx.restore();
+      });
+      drawScaleTunnel(w, h);
+    }
+
+    function drawScaleGrid(w, h, norm) {
+      ctx.save();
+      ctx.globalAlpha = .18;
+      ctx.strokeStyle = "rgba(238,233,220,.32)";
+      ctx.lineWidth = 1;
+      const gap = 32 + norm * 48;
+      const shift = (pseudoT * .012) % gap;
+      for (let x = -gap; x < w + gap; x += gap) {
+        ctx.beginPath();
+        ctx.moveTo(x + shift, 0);
+        ctx.lineTo(x + shift, h);
+        ctx.stroke();
+      }
+      for (let y = -gap; y < h + gap; y += gap) {
+        ctx.beginPath();
+        ctx.moveTo(0, y + shift * .4);
+        ctx.lineTo(w, y + shift * .4);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawScaleTunnel(w, h) {
+      const cx = w * .5;
+      const cy = h * .5;
+      const norm = (exponent + 15) / 42;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate((norm - .5) * .18);
+      for (let i = 0; i < 14; i++) {
+        const t = i / 13;
+        const pulse = Math.abs(zoomImpulse) * 46;
+        const r = 36 + t * Math.max(w, h) * .62 + pulse * (1 - t);
+        const alpha = (1 - t) * (.10 + Math.abs(zoomImpulse) * .10) + .018;
+        ctx.strokeStyle = `rgba(238,233,220,${alpha})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, r * (1 + norm * .18), r * (.42 + (1 - norm) * .18), 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawZoomFlow(w, h, norm) {
+      const strength = Math.abs(zoomImpulse);
+      if (strength < .015) return;
+      const cx = w * .5;
+      const cy = h * .5;
+      const dir = Math.sign(zoomImpulse);
+      ctx.save();
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 72; i++) {
+        const a = i * 2.399 + pseudoT * .00008;
+        const base = 40 + ((i * 37 + pseudoT * .08) % Math.max(w, h) * .54);
+        const x1 = cx + Math.cos(a) * base;
+        const y1 = cy + Math.sin(a) * base * (.50 + norm * .12);
+        const len = (18 + (i % 9) * 4) * strength;
+        const x2 = x1 + Math.cos(a) * len * dir;
+        const y2 = y1 + Math.sin(a) * len * dir * (.50 + norm * .12);
+        ctx.strokeStyle = `rgba(238,233,220,${.04 + strength * .18})`;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawSubatomicField(w, h) {
+      const cx = w * .5, cy = h * .5;
+      ctx.save();
+      ctx.strokeStyle = "rgba(143,221,234,.34)";
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 9; i++) {
+        const phase = pseudoT * .0012 + i * .8;
+        ctx.beginPath();
+        for (let x = -w * .45; x <= w * .45; x += 8) {
+          const env = Math.exp(-Math.abs(x) / (w * .32));
+          const y = Math.sin(x * .028 + phase) * 46 * env + Math.sin(x * .011 - phase) * 22;
+          if (x === -w * .45) ctx.moveTo(cx + x, cy + y + (i - 4) * 18);
+          else ctx.lineTo(cx + x, cy + y + (i - 4) * 18);
+        }
+        ctx.stroke();
+      }
+      for (let i = 0; i < 120; i++) {
+        const a = i * 2.399 + pseudoT * .0006;
+        const r = Math.sqrt(i / 120) * w * .30;
+        ctx.fillStyle = i % 5 === 0 ? "rgba(216,192,122,.55)" : "rgba(143,221,234,.42)";
+        ctx.fillRect(cx + Math.cos(a) * r, cy + Math.sin(a * 1.3) * r * .56, 1.4, 1.4);
+      }
+      ctx.restore();
+    }
+
+    function drawAtom(w, h, micro) {
+      const cx = w * .5, cy = h * .5;
+      ctx.save();
+      for (let i = 0; i < 4; i++) {
+        ctx.strokeStyle = i % 2 ? "rgba(143,221,234,.40)" : "rgba(238,233,220,.26)";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, 112 + i * 34, 34 + i * 14, i * Math.PI / 4 + pseudoT * .00008, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      const nucleus = ctx.createRadialGradient(cx, cy, 2, cx, cy, 72);
+      nucleus.addColorStop(0, "rgba(255,246,215,.95)");
+      nucleus.addColorStop(.28, "rgba(216,192,122,.38)");
+      nucleus.addColorStop(1, "rgba(216,192,122,0)");
+      ctx.fillStyle = nucleus;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 78 * micro + 22, 0, Math.PI * 2);
+      ctx.fill();
+      for (let i = 0; i < 70; i++) {
+        const a = i * 2.399 + pseudoT * .0004;
+        const r = 40 + (i % 11) * 12 + micro * 60;
+        const x = cx + Math.cos(a) * r * (1 + (i % 3) * .18);
+        const y = cy + Math.sin(a * 1.7) * r * .42;
+        ctx.fillStyle = `rgba(143,221,234,${.10 + (i % 5) * .035})`;
+        ctx.fillRect(x, y, 1.6, 1.6);
+      }
+      ctx.restore();
+    }
+
+    function drawMicrostructure(w, h, micro) {
+      ctx.save();
+      ctx.translate(w * .5, h * .5);
+      ctx.rotate(-.2);
+      for (let y = -240; y < 260; y += 38) {
+        for (let x = -380; x < 400; x += 52) {
+          const r = 14 + Math.sin((x + y) * .02 + pseudoT * .001) * 4;
+          ctx.strokeStyle = "rgba(143,221,234,.22)";
+          ctx.fillStyle = "rgba(238,233,220,.045)";
+          ctx.beginPath();
+          ctx.arc(x + ((y / 38) % 2) * 26, y, r + micro * 8, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
+
+    function drawHumanRoom(w, h) {
+      ctx.save();
+      ctx.strokeStyle = "rgba(238,233,220,.26)";
+      ctx.lineWidth = 1;
+      const cx = w * .5, cy = h * .54;
+      const roomGrad = ctx.createLinearGradient(cx - 170, cy - 170, cx + 170, cy + 90);
+      roomGrad.addColorStop(0, "rgba(238,233,220,.08)");
+      roomGrad.addColorStop(1, "rgba(238,233,220,.01)");
+      ctx.fillStyle = roomGrad;
+      ctx.fillRect(cx - 130, cy - 160, 260, 220);
+      ctx.strokeRect(cx - 130, cy - 160, 260, 220);
+      ctx.beginPath();
+      ctx.moveTo(cx - 130, cy + 60);
+      ctx.lineTo(cx - 220, h);
+      ctx.moveTo(cx + 130, cy + 60);
+      ctx.lineTo(cx + 220, h);
+      ctx.stroke();
+      ctx.fillStyle = "rgba(216,192,122,.28)";
+      ctx.fillRect(cx - 18, cy + 12, 36, 54);
+      ctx.fillStyle = "rgba(238,233,220,.12)";
+      ctx.fillRect(cx - 74, cy + 64, 148, 18);
+      ctx.restore();
+    }
+
+    function drawPlanetary(w, h, cosmic, kind) {
+      const cx = w * .5, cy = h * .54;
+      ctx.save();
+      for (let i = 0; i < 4; i++) {
+        ctx.strokeStyle = `rgba(216,192,122,${.12 + i * .035})`;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, 120 + i * 70, 42 + i * 24, -.28, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      const earth = ctx.createRadialGradient(cx - 30, cy - 20, 4, cx, cy, 92);
+      earth.addColorStop(0, "rgba(210,236,232,.72)");
+      earth.addColorStop(.54, "rgba(72,132,145,.28)");
+      earth.addColorStop(1, "rgba(72,132,145,0)");
+      ctx.fillStyle = earth;
+      ctx.beginPath();
+      ctx.arc(cx, cy, kind === "earth" ? 120 : 44, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "rgba(238,233,220,.72)";
+      for (let i = 0; i < 36; i++) {
+        const a = i * .73 + pseudoT * .00012;
+        const r = 150 + (i % 5) * 48;
+        ctx.fillRect(cx + Math.cos(a) * r, cy + Math.sin(a) * r * .42, 1.4, 1.4);
+      }
+      ctx.restore();
+    }
+
+    function drawCosmos(w, h, cosmic) {
+      const cx = w * .5, cy = h * .5;
+      ctx.save();
+      for (let i = 0; i < 340; i++) {
+        const a = i * 2.399 + pseudoT * .000035;
+        const r = Math.sqrt(i / 340) * w * .46;
+        const arm = Math.sin(i * .17) * 36;
+        const x = cx + Math.cos(a) * (r + arm);
+        const y = cy + Math.sin(a) * (r * .46 + arm * .2);
+        ctx.fillStyle = i % 9 === 0 ? "rgba(216,192,122,.65)" : "rgba(238,233,220,.36)";
+        ctx.globalAlpha = .18 + cosmic * .55 * (i % 7) / 7;
+        ctx.fillRect(x, y, 1.5, 1.5);
+      }
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = "rgba(143,221,234,.12)";
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, w * .28, h * .13, -.18, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawCosmicWeb(w, h) {
+      const pts = [];
+      for (let i = 0; i < 90; i++) {
+        const x = (Math.sin(i * 41.13) * .5 + .5) * w;
+        const y = (Math.cos(i * 27.71) * .5 + .5) * h;
+        pts.push({ x, y });
+      }
+      ctx.save();
+      ctx.strokeStyle = "rgba(143,221,234,.12)";
+      ctx.fillStyle = "rgba(238,233,220,.45)";
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) {
+          const dx = pts[i].x - pts[j].x;
+          const dy = pts[i].y - pts[j].y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d < 112) {
+            ctx.globalAlpha = (112 - d) / 112 * .55;
+            ctx.beginPath();
+            ctx.moveTo(pts[i].x, pts[i].y);
+            ctx.lineTo(pts[j].x, pts[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      ctx.globalAlpha = 1;
+      pts.forEach((p, i) => {
+        ctx.globalAlpha = .2 + (i % 7) * .06;
+        ctx.fillRect(p.x, p.y, 1.4, 1.4);
+      });
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
+
+    function animate(now) {
+      const dt = Math.min(60, now - lastFrameTime);
+      lastFrameTime = now;
+      pseudoT = now;
+      exponent += (targetExponent - exponent) * Math.min(1, dt / 180);
+      zoomImpulse *= Math.pow(.90, dt / 16.67);
+      updateReadout();
+      draw();
+      requestAnimationFrame(animate);
+    }
+
+    slider.addEventListener("input", () => setTarget(parseFloat(slider.value)));
+    window.addEventListener("resize", resizeCanvas);
+    gallery.addEventListener("wheel", (event) => {
+      if (gestureMode) return;
+      event.preventDefault();
+      setTarget(targetExponent + (event.deltaY > 0 ? .55 : -.55));
+    }, { passive: false });
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 2400);
+    }
+
+    function setGestureStatus(text) {
+      gestureStatus.textContent = text;
+    }
+
+    function withTimeout(promise, ms, label) {
+      return Promise.race([
+        promise,
+        new Promise((_, reject) => {
+          setTimeout(() => reject(new Error(`${label} timeout`)), ms);
+        })
+      ]);
+    }
+
+    async function enterGestureMode() {
+      if (gestureMode) return;
+      if (location.protocol === "file:") {
+        showToast("请从 localhost 打开以启用摄像头手势模式");
+        setGestureStatus("本地 file 页面无法稳定启用摄像头，请使用 http://localhost:8787/prototype/scale-gallery.html");
+        return;
+      }
+      if (!navigator.mediaDevices?.getUserMedia) {
+        showToast("请从 localhost 或 https 页面打开，浏览器才允许摄像头手势模式");
+        setGestureStatus("当前页面不支持摄像头权限");
+        return;
+      }
+      gestureMode = true;
+      gesturePaused = false;
+      gestureOverlay.classList.add("active");
+      gestureOverlay.classList.remove("paused");
+      gestureOverlay.setAttribute("aria-hidden", "false");
+      setGestureStatus("正在启动空间校准");
+      try {
+        setGestureStatus("正在请求摄像头权限");
+        webcamStream = await withTimeout(
+          navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: "user" }, audio: false }),
+          12000,
+          "camera"
+        );
+        gestureVideo.srcObject = webcamStream;
+        await gestureVideo.play().catch(() => {});
+        setGestureStatus("摄像头已连接，正在加载手势识别模型");
+        await withTimeout(initGestureRecognizer(), 45000, "gesture recognizer");
+        if (!gestureMode) return;
+        setGestureStatus("校准完成：请将单手置于镜头前");
+        predictWebcam();
+      } catch (error) {
+        console.error(error);
+        const fileHint = location.protocol === "file:" ? "请从 http://localhost:8787/prototype/scale-gallery.html 打开" : "请检查摄像头权限或网络连接";
+        setGestureStatus(`无法进入手势模式：${fileHint}`);
+        showToast("手势模式启动失败，普通缩放仍可使用");
+        setTimeout(() => {
+          if (gestureMode) exitGestureMode("已返回普通尺度操作");
+        }, 2600);
+      }
+    }
+
+    async function initGestureRecognizer() {
+      if (recognizer) return recognizer;
+      setGestureStatus("正在加载手势识别模型");
+      const vision = await withTimeout(import(gestureRuntime.bundle), 16000, "MediaPipe bundle");
+      setGestureStatus("正在装配手势识别运行时");
+      const filesetResolver = await withTimeout(
+        vision.FilesetResolver.forVisionTasks(gestureRuntime.wasm),
+        16000,
+        "MediaPipe wasm"
+      );
+      setGestureStatus("正在装载手势识别模型，首次加载可能需要十几秒");
+      recognizer = await withTimeout(
+        vision.GestureRecognizer.createFromOptions(filesetResolver, {
+          baseOptions: {
+            modelAssetPath: gestureRuntime.model,
+            delegate: "CPU"
+          },
+          runningMode: "VIDEO",
+          numHands: 1
+        }),
+        30000,
+        "MediaPipe model"
+      );
+      return recognizer;
+    }
+
+    function exitGestureMode(reason = "已退出空间校准") {
+      gestureMode = false;
+      gesturePaused = false;
+      gestureOverlay.classList.remove("active", "paused");
+      gestureOverlay.setAttribute("aria-hidden", "true");
+      if (webcamStream) {
+        webcamStream.getTracks().forEach(track => track.stop());
+        webcamStream = null;
+      }
+      gestureVideo.srcObject = null;
+      showToast(reason);
+    }
+
+    function predictWebcam() {
+      if (!gestureMode || gestureVideo.readyState < 2) {
+        if (gestureMode) requestAnimationFrame(predictWebcam);
+        return;
+      }
+      const now = performance.now();
+      if (!recognizer) {
+        requestAnimationFrame(predictWebcam);
+        return;
+      }
+      if (gestureVideo.currentTime !== lastVideoTime) {
+        lastVideoTime = gestureVideo.currentTime;
+        const results = recognizer.recognizeForVideo(gestureVideo, now);
+        handleGestureResults(results, now);
+      }
+      requestAnimationFrame(predictWebcam);
+    }
+
+    function handleGestureResults(results, now) {
+      const hands = results.landmarks || [];
+      const gestures = (results.gestures || []).map(g => g?.[0]?.categoryName || "Unknown");
+      if (!hands.length) {
+        setGestureStatus("等待手部进入校准环");
+        fistStartAt = 0;
+        return;
+      }
+
+      if (!gestureMode) return;
+
+      const label = classifyHand(gestures[0], hands[0]);
+      lastGestureLabel = label;
+
+      if (label === "fist") {
+        if (!fistStartAt) fistStartAt = now;
+        const hold = now - fistStartAt;
+        if (hold > 2000) {
+          exitGestureMode("握拳保持：已退出空间校准");
+          return;
+        }
+        gesturePaused = true;
+        gestureOverlay.classList.add("paused");
+        setGestureStatus(`观察暂停：保持握拳 ${Math.max(0, 2.0 - hold / 1000).toFixed(1)} 秒退出`);
+        return;
+      }
+      fistStartAt = 0;
+
+      if (gesturePaused && (label === "open" || label === "closed")) {
+        gesturePaused = false;
+        gestureOverlay.classList.remove("paused");
+      }
+      if (gesturePaused) return;
+
+      if (label === "open") {
+        lastActiveGesture = "open";
+        lastActiveAt = now;
+        setTarget(targetExponent - .16, "gesture");
+        setGestureStatus("张开手掌：向微观尺度推进");
+      } else if (label === "closed") {
+        lastActiveGesture = "closed";
+        lastActiveAt = now;
+        setTarget(targetExponent + .16, "gesture");
+        setGestureStatus("五指合拢：向宏观尺度推进");
+      } else if (now - lastActiveAt < 520 && (lastActiveGesture === "open" || lastActiveGesture === "closed")) {
+        const direction = lastActiveGesture === "open" ? -1 : 1;
+        setTarget(targetExponent + direction * .075, "gesture");
+        setGestureStatus(lastActiveGesture === "open" ? "延续张开趋势：向微观尺度推进" : "延续合拢趋势：向宏观尺度推进");
+      } else {
+        setGestureStatus("张开进入微观，合拢进入宏观，握拳暂停，保持握拳退出");
+      }
+    }
+
+    function classifyHand(modelLabel, hand) {
+      if (modelLabel === "Closed_Fist") return "fist";
+      if (modelLabel === "Open_Palm") return "open";
+
+      const wrist = hand[0];
+      const tips = [4, 8, 12, 16, 20].map(i => hand[i]);
+      const mcps = [2, 5, 9, 13, 17].map(i => hand[i]);
+      const avgTipDist = tips.reduce((sum, p) => sum + dist(p, wrist), 0) / tips.length;
+      const avgMcpDist = mcps.reduce((sum, p) => sum + dist(p, wrist), 0) / mcps.length;
+      const spread = avgPairDistance(tips);
+      const openness = avgTipDist / Math.max(.001, avgMcpDist);
+
+      if (openness > 1.50 && spread > .130) return "open";
+      if (openness < 1.50 || spread < .145) return "closed";
+      return "neutral";
+    }
+
+    function dist(a, b) {
+      const dx = a.x - b.x;
+      const dy = a.y - b.y;
+      const dz = (a.z || 0) - (b.z || 0);
+      return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    function avgPairDistance(points) {
+      let total = 0;
+      let count = 0;
+      for (let i = 0; i < points.length; i++) {
+        for (let j = i + 1; j < points.length; j++) {
+          total += dist(points[i], points[j]);
+          count++;
+        }
+      }
+      return total / count;
+    }
+
+
+    gestureButton.addEventListener("click", enterGestureMode);
+    exitGesture.addEventListener("click", () => exitGestureMode());
+    window.addEventListener("keydown", event => {
+      if (event.key === "Escape" && gestureMode) exitGestureMode();
+    });
+    document.querySelectorAll("[data-transition]").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        const href = link.getAttribute("href");
+        if (!href || href === "#") return;
+        event.preventDefault();
+        document.body.classList.add("is-leaving");
+        document.getElementById("portalTransition").classList.add("active");
+        sessionStorage.setItem("museumTransition", "soft");
+        window.setTimeout(() => { window.location.href = href; }, 360);
+      });
+    });
+
+    setTarget(0);
+    resizeCanvas();
+    requestAnimationFrame(animate);
+    window.setTimeout(() => {
+      document.body.classList.remove("is-entering");
+    }, 760);
+  </script>
+</body>
+</html>

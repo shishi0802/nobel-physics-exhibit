@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Refined Dark Gallery Concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 100%; height: 100%; background: #020202; }
+  body { display: grid; place-items: start; }
+  .board {
+    width: 1440px;
+    height: 960px;
+    overflow: hidden;
+    position: relative;
+    color: #ece9df;
+    background:
+      radial-gradient(circle at 51% 46%, rgba(210, 194, 142, .10), transparent 18%),
+      radial-gradient(circle at 58% 60%, rgba(70, 154, 170, .08), transparent 28%),
+      linear-gradient(180deg, #070706 0%, #020202 64%, #000 100%);
+    font-family: "Noto Sans SC", sans-serif;
+  }
+  .grain {
+    position:absolute; inset:0; opacity:.18; mix-blend-mode: screen;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  }
+  .room {
+    position:absolute; inset:0;
+    perspective: 1200px;
+  }
+  .back-wall {
+    position:absolute; left:220px; top:94px; width:1000px; height:650px;
+    background: linear-gradient(180deg, rgba(16,16,15,.98), rgba(5,5,5,.96));
+    border:1px solid rgba(255,255,255,.055);
+    box-shadow: inset 0 0 120px rgba(255,255,255,.025), 0 40px 140px rgba(0,0,0,.65);
+  }
+  .floor {
+    position:absolute; left:-160px; right:-160px; bottom:-250px; height:520px;
+    background: linear-gradient(180deg, rgba(18,18,17,.45), #020202 62%);
+    transform: rotateX(65deg);
+    transform-origin: 50% 0;
+    border-top: 1px solid rgba(255,255,255,.06);
+  }
+  .floor:before {
+    content:""; position:absolute; inset:0;
+    background-image: linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: 120px 120px;
+    mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
+  }
+  .light-cone {
+    position:absolute; left:422px; top:80px; width:600px; height:650px;
+    background: conic-gradient(from 180deg at 50% 0%, transparent 0 33%, rgba(228,216,177,.13) 41%, rgba(180,225,232,.08) 50%, rgba(228,216,177,.13) 59%, transparent 67% 100%);
+    filter: blur(18px);
+    opacity:.82;
+    mix-blend-mode: screen;
+  }
+  .installation {
+    position:absolute; left:410px; top:228px; width:620px; height:360px;
+    border:1px solid rgba(236,233,223,.10);
+    background: linear-gradient(180deg, rgba(255,255,255,.018), rgba(255,255,255,.006));
+    box-shadow: 0 0 80px rgba(113,195,203,.05);
+  }
+  canvas { position:absolute; left:410px; top:228px; width:620px; height:360px; }
+  .installation:before, .installation:after {
+    content:""; position:absolute; left:42px; right:42px; height:1px; background:rgba(236,233,223,.16);
+  }
+  .installation:before { top:50%; }
+  .installation:after { top:calc(50% + 78px); opacity:.07; }
+  .measure {
+    position:absolute; left:1090px; top:230px; height:360px; width:1px;
+    background: linear-gradient(transparent, rgba(236,233,223,.36), transparent);
+  }
+  .measure i { position:absolute; left:-5px; width:11px; height:1px; background:rgba(236,233,223,.42); }
+  .measure i:nth-child(1){top:0}.measure i:nth-child(2){top:90px}.measure i:nth-child(3){top:180px}.measure i:nth-child(4){top:270px}.measure i:nth-child(5){top:360px}
+  .title {
+    position:absolute; left:78px; top:82px; width:520px;
+  }
+  .kicker { font: 500 12px/1 "IBM Plex Mono"; letter-spacing:.18em; color:#9f9474; margin-bottom:28px; }
+  h1 { margin:0; font:900 70px/1.04 "Noto Serif SC"; letter-spacing:0; color:#f2eee5; text-wrap:pretty; }
+  .dek { margin-top:24px; width:420px; color:#8f8b81; font-size:17px; line-height:1.85; }
+  .wall-label {
+    position:absolute; right:90px; top:88px; width:286px;
+    color:#aaa399; font-size:13px; line-height:1.9;
+    border-top:1px solid rgba(236,233,223,.28); padding-top:18px;
+  }
+  .wall-label b { display:block; color:#e9dfbc; font:500 12px/1.4 "IBM Plex Mono"; letter-spacing:.16em; margin-bottom:12px; }
+  .quote {
+    position:absolute; left:86px; bottom:98px; width:560px;
+    font:600 25px/1.6 "Noto Serif SC"; color:#d8d1bf;
+  }
+  .quote span { display:block; margin-top:18px; color:#716d66; font:500 12px/1.2 "IBM Plex Mono"; letter-spacing:.15em; }
+  .nav {
+    position:absolute; right:82px; bottom:82px; width:390px;
+    display:grid; grid-template-columns: repeat(3, 1fr); gap:1px;
+    border:1px solid rgba(236,233,223,.12); background:rgba(236,233,223,.12);
+  }
+  .nav div { min-height:86px; background:rgba(3,3,3,.82); padding:16px; color:#8e897f; font:500 11px/1.4 "IBM Plex Mono"; letter-spacing:.08em; }
+  .nav strong { display:block; color:#e6dcc0; font:500 22px/1 "Noto Serif SC"; letter-spacing:0; margin-bottom:10px; }
+  .cursor-hint {
+    position:absolute; left:690px; top:658px; width:62px; height:62px; border-radius:50%;
+    border:1px solid rgba(236,233,223,.16); color:#8a867c; display:grid; place-items:center;
+    font:400 10px/1 "IBM Plex Mono"; letter-spacing:.12em;
+  }
+</style>
+</head>
+<body>
+  <main class="board">
+    <div class="grain"></div>
+    <div class="room"><div class="back-wall"></div><div class="floor"></div></div>
+    <div class="light-cone"></div>
+    <section class="title">
+      <div class="kicker">NOBEL PHYSICS · INTERACTIVE GALLERY</div>
+      <h1>看见世界的方式</h1>
+      <p class="dek">一座黑盒展厅。每个展品都是一个可操作的物理现象：光如何成像，量子如何被测量，身体如何被仪器重新组织。</p>
+    </section>
+    <div class="wall-label"><b>EXHIBIT 00 / THRESHOLD</b>观众进入的不是知识目录，而是一组观测条件。拖动、测量、聚焦、放大，世界在不同尺度上改变它的显现方式。</div>
+    <div class="installation"></div>
+    <canvas id="interference" width="1240" height="720"></canvas>
+    <div class="measure"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="cursor-hint">DRAG</div>
+    <div class="quote">“我们并不是单纯地观看世界；我们学习以某种方式使世界出现。”<span>PHILOSOPHICAL WALL TEXT · DRAFT</span></div>
+    <nav class="nav"><div><strong>光</strong>VISIBLE</div><div><strong>量子</strong>MEASURE</div><div><strong>身体</strong>IMAGE</div></nav>
+  </main>
+<script>
+const canvas = document.getElementById('interference');
+const ctx = canvas.getContext('2d');
+const w = canvas.width, h = canvas.height;
+ctx.clearRect(0,0,w,h);
+const grad = ctx.createRadialGradient(w*.5,h*.5,20,w*.5,h*.5,w*.5);
+grad.addColorStop(0,'rgba(233,223,188,.20)');
+grad.addColorStop(.36,'rgba(110,191,202,.12)');
+grad.addColorStop(1,'rgba(0,0,0,0)');
+ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+for(let x=0; x<w; x+=2){
+  const dx = (x-w/2)/w;
+  const amp = Math.pow(Math.cos(dx*54),2) * Math.exp(-Math.abs(dx)*3.1);
+  const a = amp*.42;
+  ctx.fillStyle = `rgba(230,221,190,${a})`;
+  ctx.fillRect(x, 70, 1.4, h-140);
+}
+ctx.strokeStyle = 'rgba(236,233,223,.16)';
+ctx.lineWidth = 1;
+for(let i=0;i<9;i++){
+  const y = 96 + i*66;
+  ctx.beginPath();
+  for(let x=0;x<w;x+=8){
+    const yy = y + Math.sin(x*.018+i*.8)*6*Math.exp(-Math.abs(x-w/2)/520);
+    if(x===0) ctx.moveTo(x,yy); else ctx.lineTo(x,yy);
+  }
+  ctx.stroke();
+}
+ctx.fillStyle = 'rgba(240,235,218,.70)';
+for(let i=0;i<120;i++){
+  const x = Math.random()*w;
+  const y = 80 + Math.random()*(h-160);
+  const dx = Math.abs(x-w/2)/w;
+  const alpha = Math.max(0, .55-dx) * Math.random();
+  ctx.globalAlpha = alpha;
+  ctx.fillRect(x,y,1.2,1.2);
+}
+ctx.globalAlpha = 1;
+</script>
+</body>
+</html>
