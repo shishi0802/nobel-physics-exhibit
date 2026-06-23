@@ -330,7 +330,33 @@
       0% { background: rgba(0,0,0,0); }
       62% { background: rgba(0,0,0,.26); }
       100% { background: rgba(0,0,0,1); }
-    }  </style>
+    }
+      body.is-entering::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 99;
+      pointer-events: none;
+      background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.045) 34%, rgba(3,3,2,.28) 100%);
+      animation: pageReveal .72s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    body.is-leaving main > :not(.portal-transition) {
+      opacity: .72;
+      filter: none !important;
+      transition: opacity .52s cubic-bezier(.22,1,.36,1);
+    }
+    .portal-transition.active { opacity: 1; animation: pageVeil .52s cubic-bezier(.22,1,.36,1) forwards !important; }
+    .portal-transition.active::before { animation: none !important; opacity: 0 !important; transform: none !important; }
+    @keyframes pageVeil {
+      0% { background: rgba(0,0,0,0); }
+      100% { background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.050) 36%, rgba(3,3,2,.18) 100%); }
+    }
+     @keyframes pageReveal {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+  </style>
 </head>
 <body class="is-entering">
   <main class="chamber">
@@ -580,6 +606,7 @@
         const href = link.getAttribute("href");
         if (!href || href === "#") return;
         event.preventDefault();
+          document.body.classList.add("is-leaving");
           document.getElementById("portalTransition").classList.add("active");
         sessionStorage.setItem("museumTransition", "soft");
         window.setTimeout(() => { window.location.href = href; }, 360);
