@@ -50,7 +50,8 @@
       z-index: 2;
       pointer-events: none;
       perspective: 1300px;
-      transition: transform .8s cubic-bezier(.16,1,.3,1), opacity .8s;
+      transform-origin: 50% 54%;
+      transition: transform .88s cubic-bezier(.16,1,.3,1), opacity .76s ease, filter .76s ease;
     }
     .back-wall {
       position: absolute;
@@ -120,6 +121,7 @@
       font-family: var(--mono);
       font-size: 10px;
       letter-spacing: .15em;
+      transition: transform .78s cubic-bezier(.16,1,.3,1), opacity .62s ease, filter .62s ease;
     }
     .topline a { color: rgba(240,234,219,.70); }
     .title {
@@ -128,6 +130,7 @@
       top: clamp(104px, 15vh, 144px);
       z-index: 8;
       width: min(420px, 32vw);
+      transition: transform .82s cubic-bezier(.16,1,.3,1), opacity .66s ease, filter .66s ease;
     }
     .kicker {
       color: rgba(216,192,122,.84);
@@ -163,6 +166,7 @@
       grid-template-rows: repeat(7, minmax(0, 1fr));
       border-top: 1px solid rgba(238,233,220,.18);
       border-bottom: 1px solid rgba(238,233,220,.10);
+      transition: transform .82s cubic-bezier(.16,1,.3,1), opacity .66s ease, filter .66s ease;
     }
     .entry {
       position: relative;
@@ -232,6 +236,7 @@
       font-size: 10px;
       line-height: 1.8;
       letter-spacing: .10em;
+      transition: transform .78s cubic-bezier(.16,1,.3,1), opacity .62s ease, filter .62s ease;
     }
     .portal-transition {
       position: fixed;
@@ -239,23 +244,46 @@
       z-index: 100;
       pointer-events: none;
       opacity: 0;
-      background: #000;
+      background: transparent;
     }
-    .portal-transition.active { opacity: 1; animation: portalBlackout .72s cubic-bezier(.76,0,.24,1) forwards; }
+    .portal-transition.active { opacity: 1; animation: hallWalkVeil .64s cubic-bezier(.22,1,.36,1) forwards; }
     .portal-transition::before {
       content: "";
       position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 10vmin;
-      aspect-ratio: 1;
-      transform: translate(-50%, -50%) scale(.08);
-      border-radius: 50%;
-      border: 1px solid rgba(238,233,220,.72);
-      box-shadow: 0 0 90px rgba(238,233,220,.30), inset 0 0 38px rgba(143,221,234,.20);
+      inset: -10%;
+      transform: translateY(4vh) scale(1.02);
+      background:
+        linear-gradient(90deg, transparent 0 28%, rgba(238,233,220,.08) 47%, rgba(143,221,234,.045) 50%, rgba(238,233,220,.08) 53%, transparent 72% 100%),
+        radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.042) 32%, transparent 70%);
+      filter: blur(22px);
       opacity: 0;
     }
-    .portal-transition.active::before { animation: portalOpen .62s cubic-bezier(.16,1,.3,1) forwards; }
+    .portal-transition.active::before { animation: hallAirPassage .68s cubic-bezier(.16,1,.3,1) forwards; }
+    .hall.is-leaving .architecture {
+      transform: scale(1.08) translateY(1.6vh);
+      opacity: .84;
+      filter: saturate(.92);
+    }
+    .hall.is-leaving .title {
+      transform: translateX(-7vw) translateY(.8vh);
+      opacity: 0;
+      filter: blur(2px);
+    }
+    .hall.is-leaving .directory {
+      transform: translateX(7vw) translateY(.8vh);
+      opacity: 0;
+      filter: blur(2px);
+    }
+    .hall.is-leaving .topline {
+      transform: translateY(-18px);
+      opacity: 0;
+      filter: blur(1px);
+    }
+    .hall.is-leaving .note {
+      transform: translateY(18px);
+      opacity: 0;
+      filter: blur(1px);
+    }
     body.is-entering::before {
       content: "";
       position: fixed;
@@ -269,15 +297,14 @@
       from { opacity: .58; transform: translateX(-51%) scale(.98); }
       to { opacity: .76; transform: translateX(-49%) scale(1.04); }
     }
-    @keyframes portalOpen {
-      0% { opacity: 0; transform: translate(-50%, -50%) scale(.08); }
-      18% { opacity: 1; }
-      100% { opacity: .18; transform: translate(-50%, -50%) scale(24); }
+    @keyframes hallAirPassage {
+      0% { opacity: 0; transform: translateY(4vh) scale(1.02); }
+      34% { opacity: .82; }
+      100% { opacity: .32; transform: translateY(-2vh) scale(1.16); }
     }
-    @keyframes portalBlackout {
+    @keyframes hallWalkVeil {
       0% { background: rgba(0,0,0,0); }
-      62% { background: rgba(0,0,0,.26); }
-      100% { background: rgba(0,0,0,1); }
+      100% { background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.12), rgba(216,192,122,.042) 34%, rgba(3,3,2,.16) 100%); }
     }
     @keyframes pageReveal {
       from { opacity: 1; }
@@ -370,9 +397,10 @@
         const href = link.getAttribute("href");
         if (!href || href === "#") return;
         event.preventDefault();
+        document.getElementById("hall").classList.add("is-leaving");
         document.getElementById("portalTransition").classList.add("active");
         sessionStorage.setItem("museumTransition", "soft");
-        window.setTimeout(() => { window.location.href = href; }, 520);
+        window.setTimeout(() => { window.location.href = href; }, 620);
       });
     });
     window.addEventListener("resize", resize);
