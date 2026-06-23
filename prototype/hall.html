@@ -293,6 +293,10 @@
       background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.16), rgba(216,192,122,.050) 36%, rgba(3,3,2,.20) 100%);
       animation: pageReveal .78s cubic-bezier(.22,1,.36,1) forwards;
     }
+    body.is-entering .hall {
+      animation: hallSceneSettle .78s cubic-bezier(.16,1,.3,1) both;
+      transform-origin: 50% 54%;
+    }
     @keyframes hallLight {
       from { opacity: .58; transform: translateX(-51%) scale(.98); }
       to { opacity: .76; transform: translateX(-49%) scale(1.04); }
@@ -309,6 +313,19 @@
     @keyframes pageReveal {
       from { opacity: 1; }
       to { opacity: 0; }
+    }
+    @keyframes hallSceneSettle {
+      0% {
+        opacity: .72;
+        transform: translateY(16px) scale(1.014);
+        filter: saturate(.92);
+      }
+      42% { opacity: .94; }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: saturate(1);
+      }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; }
