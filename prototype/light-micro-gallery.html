@@ -121,8 +121,9 @@
       top: 50%;
       width: min(52vw, 760px);
       height: min(58vh, 590px);
-      transform: translate(-56%, -36%);
+      transform: translate(-56%, -41%);
       z-index: 4;
+      transition: width .55s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1), opacity .45s ease;
     }
     .bill-rig {
       position: absolute;
@@ -133,6 +134,7 @@
       transform: translate(-50%, -50%) rotateX(48deg) rotateZ(-8deg);
       transform-style: preserve-3d;
       filter: drop-shadow(0 56px 80px rgba(0,0,0,.64));
+      transition: width .55s cubic-bezier(.22,1,.36,1), filter .55s ease;
     }
     .bill {
       position: absolute;
@@ -328,25 +330,81 @@
       border-top: 1px solid rgba(238,233,220,.18);
       padding-top: 18px;
     }
+    .observe-launch {
+      width: 100%;
+      min-height: 42px;
+      margin: 0 0 20px;
+      border: 0;
+      border-top: 1px solid rgba(216,192,122,.30);
+      border-bottom: 1px solid rgba(238,233,220,.08);
+      background:
+        linear-gradient(90deg, transparent, rgba(216,192,122,.075) 46%, rgba(143,221,234,.035) 54%, transparent);
+      color: rgba(238,233,220,.82);
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      transition: background .24s ease, color .24s ease, transform .24s ease, border-color .24s ease;
+    }
+    .observe-launch:hover {
+      color: var(--ink);
+      border-top-color: rgba(238,233,220,.42);
+      background:
+        linear-gradient(90deg, transparent, rgba(216,192,122,.13) 46%, rgba(143,221,234,.055) 54%, transparent);
+      transform: translateY(-1px);
+    }
     .modes {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 1px;
-      background: rgba(238,233,220,.12);
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      background: transparent;
       margin-bottom: 22px;
+      border-top: 1px solid rgba(238,233,220,.16);
+      border-bottom: 1px solid rgba(238,233,220,.09);
     }
-    .mode {
+    .mode, .tool-toggle {
       border: 0;
-      background: rgba(4,4,3,.86);
-      color: #8f887d;
-      min-height: 54px;
+      background: rgba(238,233,220,.018);
+      color: rgba(238,233,220,.46);
+      min-height: 48px;
       cursor: pointer;
       font-size: 12px;
-      letter-spacing: .08em;
+      letter-spacing: .10em;
+      position: relative;
+      transition: color .22s ease, background .22s ease;
+    }
+    .mode + .mode { border-left: 1px solid rgba(238,233,220,.08); }
+    .mode::after, .tool-toggle::after {
+      content: "";
+      position: absolute;
+      left: 18%;
+      right: 18%;
+      bottom: 0;
+      height: 1px;
+      background: rgba(216,192,122,.70);
+      transform: scaleX(0);
+      transform-origin: 50% 50%;
+      transition: transform .24s ease;
     }
     .mode.active {
       color: var(--ink);
-      background: rgba(22,22,20,.95);
+      background: linear-gradient(180deg, rgba(238,233,220,.055), rgba(238,233,220,.018));
+    }
+    .mode.active::after, .tool-toggle.active::after {
+      transform: scaleX(1);
+    }
+    .tool-toggle {
+      width: 100%;
+      margin: -4px 0 18px;
+      border-top: 1px solid rgba(143,221,234,.25);
+      border-bottom: 1px solid rgba(143,221,234,.08);
+      color: rgba(184,215,217,.70);
+      background: linear-gradient(90deg, transparent, rgba(143,221,234,.050), transparent);
+    }
+    .tool-toggle.active {
+      color: var(--ink);
+      background: linear-gradient(90deg, transparent, rgba(143,221,234,.11), transparent);
     }
     .control-row {
       display: grid;
@@ -436,6 +494,71 @@
       letter-spacing: .13em;
     }
     .navline a { color: #a79d86; }
+    .topline, .title, .controls, .inscription, .navline {
+      transition: opacity .46s ease, filter .46s ease, transform .46s cubic-bezier(.22,1,.36,1);
+    }
+    .observe-tools {
+      position: absolute;
+      top: clamp(34px, 5vh, 54px);
+      right: clamp(42px, 5vw, 78px);
+      z-index: 32;
+      display: flex;
+      gap: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity .46s ease, transform .46s cubic-bezier(.22,1,.36,1);
+    }
+    .observe-tool.exit {
+      min-width: 82px;
+      color: rgba(238,233,220,.56);
+    }
+    .observe-tool {
+      min-width: 92px;
+      min-height: 38px;
+      border: 0;
+      border-top: 1px solid rgba(238,233,220,.18);
+      border-bottom: 1px solid rgba(238,233,220,.06);
+      background: linear-gradient(90deg, rgba(3,3,3,.12), rgba(238,233,220,.045), rgba(3,3,3,.12));
+      color: rgba(238,233,220,.72);
+      backdrop-filter: blur(14px);
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .08em;
+      transition: color .2s ease, background .2s ease, border-color .2s ease;
+    }
+    .observe-tool:hover,
+    .observe-tool.active {
+      color: var(--ink);
+      border-top-color: rgba(216,192,122,.40);
+      background: linear-gradient(90deg, rgba(3,3,3,.12), rgba(216,192,122,.10), rgba(3,3,3,.12));
+    }
+    .chamber.observing .topline,
+    .chamber.observing .title,
+    .chamber.observing .controls,
+    .chamber.observing .inscription,
+    .chamber.observing .navline {
+      opacity: 0;
+      filter: blur(8px);
+      pointer-events: none;
+    }
+    .chamber.observing .title { transform: translateY(-16px); }
+    .chamber.observing .controls { transform: translateY(16px); }
+    .chamber.observing .stage {
+      width: min(78vw, 1180px);
+      transform: translate(-50%, -52%);
+      z-index: 16;
+    }
+    .chamber.observing .bill-rig {
+      width: min(880px, 72vw);
+      filter: drop-shadow(0 70px 110px rgba(0,0,0,.74));
+    }
+    .chamber.observing .observe-tools {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
     .portal-transition {
       position: fixed;
       inset: 0;
@@ -470,20 +593,21 @@
       100% { background: rgba(0,0,0,1); }
     }
   </style>
+  <link rel="stylesheet" href="./gallery-transition.css" />
 </head>
-<body>
+<body class="is-entering">
   <main class="chamber" id="chamber">
     <div class="wall"></div>
     <div class="light"></div>
     <div class="grain"></div>
     <header class="topline">
-      <a href="./index.html" data-transition>← 返回入口</a>
-      <span>第六展厅 · 光与微缩</span>
+      <a href="./hall.html" data-transition>← HALL</a>
+      <span>EXHIBIT 06 · LIGHT & MICRO</span>
     </header>
     <section class="title">
-      <div class="kicker">第六展区 · 光与微缩</div>
+      <div class="kicker">EXHIBIT 06 · 光与微缩</div>
       <h1>防伪显微台</h1>
-      <p>一张纸币不是图案，而是一套微光学系统。移动镜头、倾斜角度、切换紫外与透光模式，观察复制机难以同时复现的材料、光谱和微结构。</p>
+      <p>纸币表面集合了微透镜、结构色、透光水印与材料荧光。移动镜头、改变倾斜角、切换紫外与透光条件，观察复制机难以同时复现的光谱和微结构。</p>
     </section>
     <section class="stage" id="stage">
       <div class="bill-rig" id="billRig">
@@ -503,14 +627,15 @@
       <div class="scope" id="scope"><div class="scope-view" id="scopeView"></div></div>
     </section>
     <section class="controls">
+      <button class="observe-launch" id="observeLaunch" type="button">进入观察模式</button>
       <div class="modes">
         <button class="mode active" data-mode="visible" type="button">可见光</button>
-        <button class="mode" data-mode="micro" type="button">显微</button>
         <button class="mode" data-mode="tilt" type="button">倾斜</button>
         <button class="mode" data-mode="uv" type="button">紫外</button>
         <button class="mode" data-mode="transmit" type="button">透光</button>
       </div>
-      <p class="panel-hint">点击纸币上的防伪区域，再切换观察方式。显微模式下移动鼠标查看局部线条、纤维和微结构；倾斜、紫外、透光会改变纸币上的响应层。</p>
+      <button class="tool-toggle" id="microscopeToggle" type="button">开启显微镜</button>
+      <p class="panel-hint">点击纸币上的防伪区域，再切换观察条件。显微镜是独立工具，开启后移动鼠标查看局部线条、纤维和微结构。</p>
       <div class="control-row">
         <label for="zoomSlider">放大倍率</label>
         <input id="zoomSlider" type="range" min="2" max="9" value="4.6" step=".01" />
@@ -526,10 +651,14 @@
       <span>约翰·洛克</span>
     </aside>
     <nav class="navline">
-      <a href="./imaging-gallery.html" data-transition>← 身体成像</a>
-      <a href="./time-resonance-gallery.html" data-transition>下一展厅 · 时间与共振</a>
-      <a href="./index.html" data-transition>返回入口</a>
+      <a href="./imaging-gallery.html" data-transition>← IMAGING</a>
+      <a href="./time-resonance-gallery.html" data-transition>NEXT · TIME</a>
+      <a href="./hall.html" data-transition>BACK TO HALL</a>
     </nav>
+    <div class="observe-tools" aria-label="观察模式工具">
+      <button class="observe-tool" id="observeMicroscope" type="button">显微镜</button>
+      <button class="observe-tool exit" id="observeExit" type="button">退出</button>
+    </div>
     <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
   </main>
 
@@ -543,6 +672,10 @@
     const zoomSlider = document.getElementById("zoomSlider");
     const angleSlider = document.getElementById("angleSlider");
     const readout = document.getElementById("readout");
+    const observeLaunch = document.getElementById("observeLaunch");
+    const observeExit = document.getElementById("observeExit");
+    const microscopeToggle = document.getElementById("microscopeToggle");
+    const observeMicroscope = document.getElementById("observeMicroscope");
     let mode = "visible";
     let feature = "ribbon";
     let zoom = 4.6;
@@ -553,12 +686,12 @@
     const features = {
       ribbon: {
         title: "3-D 安全条带",
-        copy: "蓝色安全条带不是普通印刷，而是微透镜阵列形成的运动视差。倾斜时，条带里的钟形图案和 100 字样会呈现相对移动。",
+        copy: "蓝色安全条带利用微透镜阵列制造运动视差。倾斜时，条带里的钟形图案和 100 字样会呈现相对移动。",
         physics: "微光学阵列 / 运动视差 / 角度选择"
       },
       ink: {
         title: "变色墨水",
-        copy: "右下角的墨水区域在不同观察角下改变颜色。这里的重点不是颜料本身，而是微结构和薄膜让不同波长被选择性反射。",
+        copy: "右下角的墨水区域在不同观察角下改变颜色。微结构和薄膜会选择性反射不同波长，让颜色随视角漂移。",
         physics: "结构色 / 薄膜干涉 / 波长选择"
       },
       watermark: {
@@ -580,12 +713,25 @@
 
     function setMode(next) {
       mode = next;
-      microscopeOn = mode === "micro";
       chamber.classList.toggle("uv", mode === "uv");
       chamber.classList.toggle("transmit", mode === "transmit");
       document.querySelectorAll(".mode").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === mode));
-      scope.classList.toggle("active", microscopeOn);
       updateView();
+    }
+
+    function setMicroscope(active) {
+      microscopeOn = active;
+      scope.classList.toggle("active", microscopeOn);
+      microscopeToggle.classList.toggle("active", microscopeOn);
+      observeMicroscope.classList.toggle("active", microscopeOn);
+      microscopeToggle.textContent = microscopeOn ? "关闭显微镜" : "开启显微镜";
+      observeMicroscope.textContent = microscopeOn ? "关闭显微镜" : "显微镜";
+      updateView();
+    }
+
+    function setObserving(active) {
+      chamber.classList.toggle("observing", active);
+      if (active) setMicroscope(false);
     }
 
     function setFeature(next) {
@@ -626,12 +772,12 @@
       const f = features[feature];
       const modeCopy = {
         visible: "可见光下先定位防伪区域。",
-        micro: "显微模式放大局部线条、纤维和微缩结构。",
         tilt: "倾斜模式改变观察角，突出角度依赖的光学效果。",
         uv: "紫外模式模拟安全线与材料荧光。",
         transmit: "透光模式模拟水印和埋入式安全线。"
       };
-      readout.innerHTML = `<b>${f.title}</b>：${f.copy}<br>${modeCopy[mode]}<span class="source">物理机制：${f.physics} · 图像来源：WIKIMEDIA COMMONS / 教育展示样张</span>`;
+      const toolCopy = microscopeOn ? "显微镜已开启，移动鼠标检查局部细节。" : "可开启显微镜作为附加观察工具。";
+      readout.innerHTML = `<b>${f.title}</b>：${f.copy}<br>${modeCopy[mode]}${toolCopy}<span class="source">物理机制：${f.physics} · 图像来源：WIKIMEDIA COMMONS / 教育展示样张</span>`;
     }
 
     stage.addEventListener("pointermove", (event) => {
@@ -645,6 +791,10 @@
     });
     document.querySelectorAll(".hotspot").forEach(btn => btn.addEventListener("click", () => setFeature(btn.dataset.feature)));
     document.querySelectorAll(".mode").forEach(btn => btn.addEventListener("click", () => setMode(btn.dataset.mode)));
+    microscopeToggle.addEventListener("click", () => setMicroscope(!microscopeOn));
+    observeMicroscope.addEventListener("click", () => setMicroscope(!microscopeOn));
+    observeLaunch.addEventListener("click", () => setObserving(true));
+    observeExit.addEventListener("click", () => setObserving(false));
     zoomSlider.addEventListener("input", updateView);
     angleSlider.addEventListener("input", updateView);
     document.querySelectorAll("[data-transition]").forEach((link) => {
@@ -652,12 +802,18 @@
         const href = link.getAttribute("href");
         if (!href || href === "#") return;
         event.preventDefault();
+        document.body.classList.add("is-leaving");
         document.getElementById("portalTransition").classList.add("active");
-        window.setTimeout(() => { window.location.href = href; }, 760);
+        sessionStorage.setItem("museumTransition", "soft");
+        window.setTimeout(() => { window.location.href = href; }, 640);
       });
     });
     setFeature("ribbon");
     setMode("visible");
+    setMicroscope(false);
+    window.setTimeout(() => {
+      document.body.classList.remove("is-entering");
+    }, 820);
   </script>
 </body>
 </html>
