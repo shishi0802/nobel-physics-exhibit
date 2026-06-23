@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>光与微缩展厅 · Light & Microfabrication</title>
+  <title>光与微缩展厅 · Anti-Counterfeit Microscope</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23020202'/%3E%3Cpath d='M10 40h44M18 24h28M24 12h16' stroke='%23d8c07a' stroke-width='3'/%3E%3Ccircle cx='32' cy='40' r='5' fill='%238fddea'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,8 @@
       --line: rgba(238,233,220,.14);
       --gold: #d8c07a;
       --cyan: #8fddea;
-      --red: #ff6b5f;
+      --green: #79d8a6;
+      --violet: #b89cff;
       --mono: "IBM Plex Mono", monospace;
       --serif: "Noto Serif SC", serif;
       --sans: "Noto Sans SC", sans-serif;
@@ -34,8 +35,8 @@
       min-height: 720px;
       overflow: hidden;
       background:
-        radial-gradient(circle at 56% 42%, rgba(216,192,122,.10), transparent 17%),
-        radial-gradient(circle at 47% 62%, rgba(143,221,234,.08), transparent 27%),
+        radial-gradient(circle at 54% 40%, rgba(216,192,122,.11), transparent 17%),
+        radial-gradient(circle at 45% 62%, rgba(143,221,234,.08), transparent 27%),
         linear-gradient(180deg, #080807 0%, #020202 66%, #000 100%);
     }
     .grain {
@@ -49,8 +50,8 @@
     }
     .wall {
       position: absolute;
-      left: 11vw;
-      right: 11vw;
+      left: 10vw;
+      right: 10vw;
       top: 8vh;
       height: 66vh;
       background: linear-gradient(180deg, rgba(17,17,16,.94), rgba(4,4,4,.96));
@@ -62,7 +63,7 @@
       position: absolute;
       left: 50%;
       top: 3vh;
-      width: 60vw;
+      width: 62vw;
       height: 72vh;
       transform: translateX(-50%);
       background: conic-gradient(from 180deg at 50% 0%, transparent 0 35%, rgba(216,192,122,.12) 44%, rgba(143,221,234,.09) 50%, rgba(216,192,122,.12) 56%, transparent 65% 100%);
@@ -90,7 +91,7 @@
       left: clamp(48px, 6vw, 90px);
       top: clamp(88px, 14vh, 142px);
       z-index: 8;
-      width: min(460px, 34vw);
+      width: min(410px, 31vw);
     }
     .kicker {
       color: var(--gold);
@@ -102,45 +103,234 @@
     h1 {
       margin: 0;
       font-family: var(--serif);
-      font-size: clamp(48px, 5.5vw, 78px);
+      font-size: clamp(38px, 4.2vw, 58px);
       line-height: 1.04;
       letter-spacing: 0;
+      text-wrap: pretty;
     }
     .title p {
       margin: 22px 0 0;
       color: var(--muted);
-      font-size: 16px;
+      font-size: 14px;
       line-height: 1.85;
       text-wrap: pretty;
     }
-    .viewer {
+    .stage {
       position: absolute;
       left: 50%;
       top: 50%;
-      width: min(62vw, 860px);
-      height: min(58vh, 580px);
-      transform: translate(-41%, -45%);
+      width: min(52vw, 760px);
+      height: min(58vh, 590px);
+      transform: translate(-56%, -36%);
       z-index: 4;
-      mask-image: radial-gradient(ellipse at 50% 50%, #000 0 64%, rgba(0,0,0,.70) 82%, transparent 100%);
     }
-    #microCanvas {
+    .bill-rig {
+      position: absolute;
+      left: 50%;
+      top: 52%;
+      width: min(540px, 42vw);
+      aspect-ratio: 1200 / 505;
+      transform: translate(-50%, -50%) rotateX(48deg) rotateZ(-8deg);
+      transform-style: preserve-3d;
+      filter: drop-shadow(0 56px 80px rgba(0,0,0,.64));
+    }
+    .bill {
       position: absolute;
       inset: 0;
-      width: 100%;
-      height: 100%;
+      background-image: url("./assets/currency/usd-100-front.jpg");
+      background-size: 100% 100%;
+      background-position: center;
+      overflow: hidden;
+      opacity: .88;
+      filter: saturate(.72) contrast(1.05) brightness(.86);
+    }
+    .bill::before {
+      content: "SPECIMEN · EDUCATIONAL DISPLAY";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: rgba(80, 20, 20, .36);
+      font-family: var(--mono);
+      font-size: clamp(24px, 4vw, 58px);
+      letter-spacing: .12em;
+      transform: rotate(-17deg);
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+    .bill::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: var(--overlay-opacity, .12);
+      background:
+        linear-gradient(100deg, transparent 0 43%, rgba(143,221,234,.45) 47%, rgba(216,192,122,.20) 50%, rgba(143,221,234,.36) 53%, transparent 57%),
+        radial-gradient(circle at 79% 67%, rgba(121,216,166,.38), transparent 12%);
+      mix-blend-mode: screen;
+      transform: translateX(var(--tilt-shift, 0));
+      transition: opacity .25s;
+    }
+    .bill-mark {
+      position: absolute;
+      pointer-events: none;
+      opacity: var(--mark-opacity, .18);
+      mix-blend-mode: screen;
+      transition: opacity .25s ease, transform .25s ease, filter .25s ease;
+    }
+    .mark-ribbon {
+      left: 46.2%;
+      top: 17%;
+      width: 7.2%;
+      height: 66%;
+      background:
+        repeating-linear-gradient(180deg, rgba(143,221,234,.84) 0 7px, rgba(216,192,122,.22) 7px 14px),
+        linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+      filter: blur(.15px) drop-shadow(0 0 16px rgba(143,221,234,.42));
+      transform: translateX(calc(var(--tilt-shift, 0) * .55)) skewX(calc(var(--angle-skew, 0deg)));
+    }
+    .mark-ink {
+      right: 13.5%;
+      bottom: 21%;
+      width: 10%;
+      height: 13%;
+      border-radius: 42%;
+      background: radial-gradient(circle, rgba(121,216,166,.80), rgba(216,192,122,.30) 48%, transparent 72%);
+      transform: translateX(calc(var(--tilt-shift, 0) * -.35)) scale(calc(1 + var(--angle-abs, 0) * .08));
+      filter: hue-rotate(calc(var(--angle-hue, 0deg))) drop-shadow(0 0 18px rgba(121,216,166,.36));
+    }
+    .mark-watermark {
+      left: 18%;
+      top: 25%;
+      width: 17%;
+      height: 38%;
+      border-radius: 50%;
+      background:
+        radial-gradient(ellipse at 48% 38%, rgba(238,233,220,.56), transparent 38%),
+        radial-gradient(ellipse at 52% 70%, rgba(238,233,220,.25), transparent 44%);
+      opacity: var(--watermark-opacity, .08);
+      filter: blur(1.2px);
+    }
+    .mark-thread {
+      left: 53.8%;
+      top: 16%;
+      width: 1.4%;
+      height: 70%;
+      background: linear-gradient(180deg, transparent, rgba(184,156,255,.88), rgba(143,221,234,.58), transparent);
+      opacity: var(--thread-opacity, .10);
+      filter: drop-shadow(0 0 12px rgba(184,156,255,.70));
+    }
+    .mark-microprint {
+      left: 50%;
+      top: 59%;
+      width: 19%;
+      height: 7%;
+      background:
+        repeating-linear-gradient(90deg, rgba(238,233,220,.62) 0 2px, transparent 2px 5px),
+        repeating-linear-gradient(0deg, transparent 0 7px, rgba(143,221,234,.22) 7px 8px);
+      opacity: var(--microprint-opacity, .12);
+      transform: translateX(calc(var(--tilt-shift, 0) * .12));
+    }
+    .uv .bill {
+      filter: saturate(.35) contrast(1.25) brightness(.46);
+    }
+    .uv .bill::after {
+      opacity: .82;
+      background:
+        linear-gradient(90deg, transparent 0 47%, rgba(184,156,255,.78) 49%, transparent 51%),
+        radial-gradient(circle at 80% 66%, rgba(121,216,166,.62), transparent 14%);
+      mix-blend-mode: screen;
+    }
+    .transmit .bill {
+      filter: saturate(.45) contrast(.92) brightness(1.12);
+      opacity: .66;
+    }
+    .transmit .bill::after {
+      opacity: .72;
+      background:
+        radial-gradient(ellipse at 24% 47%, rgba(238,233,220,.50), transparent 18%),
+        linear-gradient(90deg, transparent 0 50%, rgba(238,233,220,.34) 51%, transparent 54%);
+      mix-blend-mode: screen;
+    }
+    .hotspot {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border: 1px solid rgba(238,233,220,.55);
+      border-radius: 50%;
+      background: rgba(0,0,0,.18);
+      box-shadow: 0 0 26px rgba(216,192,122,.30);
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      z-index: 4;
+    }
+    .hotspot.active {
+      border-color: var(--gold);
+      background: rgba(216,192,122,.20);
+    }
+    .scope {
+      position: absolute;
+      left: var(--mx, 52%);
+      top: var(--my, 48%);
+      width: 142px;
+      height: 142px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 12;
+      pointer-events: none;
+      border: 0;
+      box-shadow: 0 18px 70px rgba(0,0,0,.42), inset 0 0 26px rgba(0,0,0,.20);
+      overflow: hidden;
+      opacity: 0;
+      clip-path: circle(48% at 50% 50%);
+      transition: opacity .22s ease;
+    }
+    .scope.active { opacity: .88; }
+    .scope-view {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(238,233,220,.10) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(238,233,220,.10) 1px, transparent 1px),
+        url("./assets/currency/usd-100-front.jpg");
+      background-size:
+        18px 18px,
+        18px 18px,
+        calc(760px * var(--zoom, 3.5)) calc(319.833px * var(--zoom, 3.5));
+      background-position:
+        center,
+        center,
+        var(--bx, 50%) var(--by, 50%);
+      filter: contrast(1.25) saturate(.72) brightness(.94);
+    }
+    .scope-view::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, transparent 0 58%, rgba(0,0,0,.42) 100%);
+      pointer-events: none;
+    }
+    .scope-view::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(16deg, rgba(238,233,220,.24) 0 1px, transparent 1px 8px),
+        radial-gradient(circle at 45% 42%, rgba(143,221,234,.24), transparent 36%);
+      mix-blend-mode: screen;
+      opacity: .55;
     }
     .controls {
       position: absolute;
       right: clamp(46px, 5vw, 86px);
-      bottom: clamp(44px, 7vh, 82px);
-      width: min(430px, 34vw);
+      bottom: clamp(78px, 11vh, 118px);
+      width: min(420px, 31vw);
       z-index: 11;
       border-top: 1px solid rgba(238,233,220,.18);
       padding-top: 18px;
     }
     .modes {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 1px;
       background: rgba(238,233,220,.12);
       margin-bottom: 22px;
@@ -149,11 +339,10 @@
       border: 0;
       background: rgba(4,4,3,.86);
       color: #8f887d;
-      min-height: 58px;
+      min-height: 54px;
       cursor: pointer;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: .12em;
+      font-size: 12px;
+      letter-spacing: .08em;
     }
     .mode.active {
       color: var(--ink);
@@ -164,13 +353,18 @@
       grid-template-columns: 118px 1fr;
       gap: 20px;
       align-items: center;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
     .control-row label {
       color: #777168;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: .13em;
+      font-size: 12px;
+      letter-spacing: .08em;
+    }
+    .panel-hint {
+      margin: -4px 0 18px;
+      color: #807970;
+      font-size: 12px;
+      line-height: 1.7;
     }
     input[type=range] {
       appearance: none;
@@ -199,6 +393,14 @@
       line-height: 1.75;
     }
     .readout b { color: #eee4c7; font-weight: 500; }
+    .readout .source {
+      display: block;
+      margin-top: 10px;
+      color: #6e675f;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .08em;
+    }
     .inscription {
       position: absolute;
       left: clamp(48px, 6vw, 90px);
@@ -212,22 +414,14 @@
       font-size: 13px;
       line-height: 1.85;
     }
-    .inscription .label {
-      color: var(--gold);
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: .14em;
-      margin-bottom: 10px;
-    }
-    .quote, .source { transition: opacity .35s ease; }
-    .source {
+    .inscription span {
+      display: block;
       margin-top: 10px;
       color: #6f685f;
       font-family: var(--mono);
       font-size: 10px;
       letter-spacing: .12em;
     }
-    .quote.fade, .source.fade { opacity: 0; }
     .navline {
       position: absolute;
       left: clamp(40px, 5vw, 80px);
@@ -250,7 +444,7 @@
       opacity: 0;
       background: #000;
     }
-    .portal-transition.active { opacity: 1; animation: walkBlackout .96s cubic-bezier(.76,0,.24,1) forwards; }
+    .portal-transition.active { opacity: 1; animation: portalBlackout .92s cubic-bezier(.76,0,.24,1) forwards; }
     .portal-transition::before {
       content: "";
       position: absolute;
@@ -275,235 +469,195 @@
       62% { background: rgba(0,0,0,.26); }
       100% { background: rgba(0,0,0,1); }
     }
-      body.is-entering::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: 99;
-      pointer-events: none;
-      background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.045) 34%, rgba(3,3,2,.28) 100%);
-      animation: pageReveal .72s cubic-bezier(.22,1,.36,1) forwards;
-    }
-    body.is-leaving main > :not(.portal-transition) {
-      opacity: .72;
-      filter: none !important;
-      transition: opacity .52s cubic-bezier(.22,1,.36,1);
-    }
-    .portal-transition.active { opacity: 1; animation: pageVeil .52s cubic-bezier(.22,1,.36,1) forwards !important; }
-    .portal-transition.active::before { animation: none !important; opacity: 0 !important; transform: none !important; }
-    @keyframes pageVeil {
-      0% { background: rgba(0,0,0,0); }
-      100% { background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.050) 36%, rgba(3,3,2,.18) 100%); }
-    }
-     @keyframes pageReveal {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
-
   </style>
-  <link rel="stylesheet" href="./gallery-transition.css" />
-  <link rel="stylesheet" href="./ambient-audio.css" />
 </head>
-<body class="is-entering" data-ambient-scene="light">
-  <main class="chamber">
+<body>
+  <main class="chamber" id="chamber">
     <div class="wall"></div>
     <div class="light"></div>
     <div class="grain"></div>
     <header class="topline">
-      <a href="./hall.html" data-transition>← HALL</a>
-      <span>EXHIBIT 04 · LIGHT & MICRO</span>
+      <a href="./index.html" data-transition>← 返回入口</a>
+      <span>第六展厅 · 光与微缩</span>
     </header>
     <section class="title">
-      <div class="kicker">LIGHT / LED / CHIP</div>
-      <h1>光与微缩</h1>
-      <p>从结构色到蓝光 LED，再到晶体管微缩，物理学把光、材料和制造工艺编织成现代技术的底层景观。</p>
+      <div class="kicker">第六展区 · 光与微缩</div>
+      <h1>防伪显微台</h1>
+      <p>一张纸币不是图案，而是一套微光学系统。移动镜头、倾斜角度、切换紫外与透光模式，观察复制机难以同时复现的材料、光谱和微结构。</p>
     </section>
-    <section class="viewer">
-      <canvas id="microCanvas"></canvas>
+    <section class="stage" id="stage">
+      <div class="bill-rig" id="billRig">
+        <div class="bill" id="bill">
+          <i class="bill-mark mark-ribbon" aria-hidden="true"></i>
+          <i class="bill-mark mark-ink" aria-hidden="true"></i>
+          <i class="bill-mark mark-watermark" aria-hidden="true"></i>
+          <i class="bill-mark mark-thread" aria-hidden="true"></i>
+          <i class="bill-mark mark-microprint" aria-hidden="true"></i>
+        </div>
+        <button class="hotspot active" style="left:50%;top:45%" data-feature="ribbon" type="button" aria-label="安全条带"></button>
+        <button class="hotspot" style="left:80%;top:68%" data-feature="ink" type="button" aria-label="变色墨水"></button>
+        <button class="hotspot" style="left:31%;top:43%" data-feature="watermark" type="button" aria-label="水印"></button>
+        <button class="hotspot" style="left:57%;top:63%" data-feature="microprint" type="button" aria-label="微缩文字"></button>
+        <button class="hotspot" style="left:55%;top:28%" data-feature="thread" type="button" aria-label="安全线"></button>
+      </div>
+      <div class="scope" id="scope"><div class="scope-view" id="scopeView"></div></div>
     </section>
     <section class="controls">
       <div class="modes">
-        <button class="mode active" data-mode="color" type="button">COLOR</button>
-        <button class="mode" data-mode="led" type="button">LED</button>
-        <button class="mode" data-mode="chip" type="button">CHIP</button>
+        <button class="mode active" data-mode="visible" type="button">可见光</button>
+        <button class="mode" data-mode="micro" type="button">显微</button>
+        <button class="mode" data-mode="tilt" type="button">倾斜</button>
+        <button class="mode" data-mode="uv" type="button">紫外</button>
+        <button class="mode" data-mode="transmit" type="button">透光</button>
+      </div>
+      <p class="panel-hint">点击纸币上的防伪区域，再切换观察方式。显微模式下移动鼠标查看局部线条、纤维和微结构；倾斜、紫外、透光会改变纸币上的响应层。</p>
+      <div class="control-row">
+        <label for="zoomSlider">放大倍率</label>
+        <input id="zoomSlider" type="range" min="2" max="9" value="4.6" step=".01" />
       </div>
       <div class="control-row">
-        <label for="primarySlider">PARAM A</label>
-        <input id="primarySlider" type="range" min="0" max="1" value=".46" step=".001" />
+        <label for="angleSlider">倾斜角度</label>
+        <input id="angleSlider" type="range" min="-2" max="2" value="0" step=".001" />
       </div>
-      <div class="control-row">
-        <label for="secondarySlider">PARAM B</label>
-        <input id="secondarySlider" type="range" min="0" max="1" value=".62" step=".001" />
-      </div>
-      <div class="readout" id="readout"><b>结构色模式</b>：改变入射角和微结构间距，特定波长在干涉中被强化。</div>
+      <div class="readout" id="readout"></div>
     </section>
-    <aside class="inscription" data-inscription-topic="light">
-      <div class="label">PHILOSOPHICAL INSCRIPTION</div>
-      <div class="quote"></div>
-      <div class="source"></div>
+    <aside class="inscription">
+      物体的颜色并不在物体之中，而在光与眼的关系之中。
+      <span>约翰·洛克</span>
     </aside>
     <nav class="navline">
-      <a href="./imaging-gallery.html" data-transition>← IMAGING</a>
-      <a href="./time-resonance-gallery.html" data-transition>NEXT · TIME</a>
-      <a href="./hall.html" data-transition>BACK TO HALL</a>
+      <a href="./imaging-gallery.html" data-transition>← 身体成像</a>
+      <a href="./time-resonance-gallery.html" data-transition>下一展厅 · 时间与共振</a>
+      <a href="./index.html" data-transition>返回入口</a>
     </nav>
     <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
   </main>
 
-  <script src="./philosophy-inscriptions.js"></script>
-  <script src="./ambient-audio.js"></script>
   <script>
-    const canvas = document.getElementById("microCanvas");
-    const ctx = canvas.getContext("2d");
-    const primarySlider = document.getElementById("primarySlider");
-    const secondarySlider = document.getElementById("secondarySlider");
+    const chamber = document.getElementById("chamber");
+    const stage = document.getElementById("stage");
+    const billRig = document.getElementById("billRig");
+    const bill = document.getElementById("bill");
+    const scope = document.getElementById("scope");
+    const scopeView = document.getElementById("scopeView");
+    const zoomSlider = document.getElementById("zoomSlider");
+    const angleSlider = document.getElementById("angleSlider");
     const readout = document.getElementById("readout");
-    let mode = "color";
-    let a = .46;
-    let b = .62;
-    let t = 0;
+    let mode = "visible";
+    let feature = "ribbon";
+    let zoom = 4.6;
+    let angle = 0;
+    let microscopeOn = false;
+    let pointer = { x: .52, y: .48 };
 
-    function resize() {
-      const rect = canvas.getBoundingClientRect();
-      const dpr = 1;
-      canvas.width = Math.floor(rect.width * dpr);
-      canvas.height = Math.floor(rect.height * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    function draw(now) {
-      t = now || 0;
-      const rect = canvas.getBoundingClientRect();
-      const w = rect.width;
-      const h = rect.height;
-      ctx.clearRect(0, 0, w, h);
-      const glow = ctx.createRadialGradient(w * .5, h * .5, 20, w * .5, h * .5, w * .50);
-      glow.addColorStop(0, "rgba(238,233,220,.13)");
-      glow.addColorStop(.38, mode === "led" ? "rgba(143,221,234,.12)" : "rgba(216,192,122,.08)");
-      glow.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = glow;
-      ctx.fillRect(0, 0, w, h);
-      if (mode === "color") drawStructureColor(w, h);
-      if (mode === "led") drawLED(w, h);
-      if (mode === "chip") drawChip(w, h);
-      requestAnimationFrame(draw);
-    }
-
-    function drawStructureColor(w, h) {
-      ctx.save();
-      ctx.translate(w * .5, h * .54);
-      ctx.rotate(-.18 + a * .36);
-      for (let i = -6; i <= 6; i++) {
-        const y = i * (18 + b * 22);
-        const hue = 190 + Math.sin(i + a * 4) * 70;
-        ctx.strokeStyle = `hsla(${hue}, 82%, 68%, ${.16 + b * .25})`;
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.moveTo(-300, y);
-        ctx.bezierCurveTo(-120, y - 26, 120, y + 26, 300, y);
-        ctx.stroke();
+    const features = {
+      ribbon: {
+        title: "3-D 安全条带",
+        copy: "蓝色安全条带不是普通印刷，而是微透镜阵列形成的运动视差。倾斜时，条带里的钟形图案和 100 字样会呈现相对移动。",
+        physics: "微光学阵列 / 运动视差 / 角度选择"
+      },
+      ink: {
+        title: "变色墨水",
+        copy: "右下角的墨水区域在不同观察角下改变颜色。这里的重点不是颜料本身，而是微结构和薄膜让不同波长被选择性反射。",
+        physics: "结构色 / 薄膜干涉 / 波长选择"
+      },
+      watermark: {
+        title: "水印与透光",
+        copy: "把纸币放到透光环境下，纸张厚度和纤维密度差异会显出隐约图像。它利用的是吸收、散射和透射强度的空间分布。",
+        physics: "透射成像 / 散射 / 材料密度"
+      },
+      microprint: {
+        title: "微缩文字",
+        copy: "微缩文字依赖高精度制版和印刷。扫描复制会损失边缘锐度，显微镜下能看到普通打印难以保留的线条和断裂特征。",
+        physics: "显微成像 / 分辨率 / 调制传递"
+      },
+      thread: {
+        title: "安全线",
+        copy: "安全线埋入纸张内部，在透光或紫外环境下显现。它把光谱响应、材料位置和纸张结构绑定在一起。",
+        physics: "荧光响应 / 透光检测 / 材料防伪"
       }
-      for (let i = 0; i < 6; i++) {
-        ctx.strokeStyle = `rgba(238,233,220,${.08 + i * .025})`;
-        ctx.beginPath();
-        ctx.moveTo(-330, -140 + i * 48);
-        ctx.lineTo(340, -112 + i * 48);
-        ctx.stroke();
-      }
-      ctx.restore();
-    }
-
-    function drawLED(w, h) {
-      const cx = w * .5;
-      const cy = h * .53;
-      ctx.save();
-      ctx.strokeStyle = "rgba(238,233,220,.18)";
-      ctx.beginPath();
-      ctx.moveTo(cx - 260, cy);
-      ctx.lineTo(cx - 80, cy);
-      ctx.moveTo(cx + 80, cy);
-      ctx.lineTo(cx + 260, cy);
-      ctx.stroke();
-      const gap = 44 + a * 120;
-      ctx.fillStyle = "rgba(143,221,234,.12)";
-      ctx.fillRect(cx - 80, cy - gap / 2, 160, gap);
-      ctx.strokeStyle = "rgba(143,221,234,.32)";
-      ctx.strokeRect(cx - 80, cy - gap / 2, 160, gap);
-      for (let i = 0; i < 60; i++) {
-        const side = i % 2 ? -1 : 1;
-        const x = cx + side * (90 + (i % 9) * 18 - ((t * .05 + i * 7) % 70));
-        const y = cy + Math.sin(i * 2.1 + t * .003) * 80 * b;
-        ctx.fillStyle = side > 0 ? "rgba(143,221,234,.55)" : "rgba(216,192,122,.50)";
-        ctx.beginPath();
-        ctx.arc(x, y, 2.2, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      const photons = Math.floor(10 + b * 36);
-      for (let i = 0; i < photons; i++) {
-        const ang = -Math.PI / 2 + (i / photons - .5) * Math.PI * .72;
-        const r = 70 + ((t * .08 + i * 16) % 190);
-        ctx.fillStyle = `rgba(143,221,234,${.15 + b * .35})`;
-        ctx.fillRect(cx + Math.cos(ang) * r, cy + Math.sin(ang) * r, 2, 2);
-      }
-      ctx.restore();
-    }
-
-    function drawChip(w, h) {
-      const cx = w * .5;
-      const cy = h * .53;
-      const layers = Math.floor(2 + a * 7);
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(-.16);
-      for (let z = 0; z < layers; z++) {
-        const y = -120 + z * 32;
-        ctx.fillStyle = `rgba(238,233,220,${.035 + z * .008})`;
-        ctx.fillRect(-280 + z * 10, y, 560 - z * 20, 18);
-        ctx.strokeStyle = "rgba(216,192,122,.18)";
-        ctx.strokeRect(-280 + z * 10, y, 560 - z * 20, 18);
-        for (let x = -250; x < 250; x += 42 - b * 18) {
-          ctx.strokeStyle = "rgba(143,221,234,.20)";
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-          ctx.lineTo(x + 16, y - 42);
-          ctx.stroke();
-        }
-      }
-      ctx.restore();
-    }
+    };
 
     function setMode(next) {
       mode = next;
+      microscopeOn = mode === "micro";
+      chamber.classList.toggle("uv", mode === "uv");
+      chamber.classList.toggle("transmit", mode === "transmit");
       document.querySelectorAll(".mode").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === mode));
-      const copy = {
-        color: "<b>结构色模式</b>：改变入射角和微结构间距，特定波长在干涉中被强化。",
-        led: "<b>LED 模式</b>：电子与空穴复合，能隙差以光子的形式释放。",
-        chip: "<b>芯片模式</b>：从平面到三维包裹，晶体管微缩变成空间结构设计。"
-      };
-      readout.innerHTML = copy[mode];
+      scope.classList.toggle("active", microscopeOn);
+      updateView();
     }
 
+    function setFeature(next) {
+      feature = next;
+      document.querySelectorAll(".hotspot").forEach(btn => btn.classList.toggle("active", btn.dataset.feature === feature));
+      const target = {
+        ribbon: [.50, .45],
+        ink: [.80, .68],
+        watermark: [.31, .43],
+        microprint: [.57, .63],
+        thread: [.55, .28]
+      }[feature];
+      pointer = { x: target[0], y: target[1] };
+      updateView();
+    }
+
+    function updateView() {
+      zoom = parseFloat(zoomSlider.value);
+      angle = parseFloat(angleSlider.value);
+      const x = pointer.x * 100;
+      const y = pointer.y * 100;
+      const absAngle = Math.abs(angle);
+      scope.style.setProperty("--mx", `${x}%`);
+      scope.style.setProperty("--my", `${y}%`);
+      scopeView.style.setProperty("--zoom", zoom.toFixed(2));
+      scopeView.style.setProperty("--bx", `${x}%`);
+      scopeView.style.setProperty("--by", `${y}%`);
+      bill.style.setProperty("--tilt-shift", `${angle * 46}px`);
+      bill.style.setProperty("--angle-skew", `${angle * 7}deg`);
+      bill.style.setProperty("--angle-hue", `${angle * 54}deg`);
+      bill.style.setProperty("--angle-abs", absAngle.toFixed(3));
+      bill.style.setProperty("--overlay-opacity", mode === "tilt" ? .68 : mode === "visible" ? .10 : .30);
+      bill.style.setProperty("--mark-opacity", mode === "visible" ? .12 : .34 + absAngle * .10);
+      bill.style.setProperty("--watermark-opacity", mode === "transmit" ? .62 : mode === "visible" ? .06 : .18);
+      bill.style.setProperty("--thread-opacity", mode === "uv" || mode === "transmit" ? .82 : .12);
+      bill.style.setProperty("--microprint-opacity", microscopeOn ? Math.min(.72, .22 + zoom * .065) : .12);
+      billRig.style.transform = `translate(-50%, -50%) rotateX(${48 - angle * 14}deg) rotateY(${angle * 14}deg) rotateZ(${-8 + angle * 8}deg)`;
+      const f = features[feature];
+      const modeCopy = {
+        visible: "可见光下先定位防伪区域。",
+        micro: "显微模式放大局部线条、纤维和微缩结构。",
+        tilt: "倾斜模式改变观察角，突出角度依赖的光学效果。",
+        uv: "紫外模式模拟安全线与材料荧光。",
+        transmit: "透光模式模拟水印和埋入式安全线。"
+      };
+      readout.innerHTML = `<b>${f.title}</b>：${f.copy}<br>${modeCopy[mode]}<span class="source">物理机制：${f.physics} · 图像来源：WIKIMEDIA COMMONS / 教育展示样张</span>`;
+    }
+
+    stage.addEventListener("pointermove", (event) => {
+      if (!microscopeOn) return;
+      const rect = stage.getBoundingClientRect();
+      pointer = {
+        x: Math.max(.08, Math.min(.92, (event.clientX - rect.left) / rect.width)),
+        y: Math.max(.12, Math.min(.86, (event.clientY - rect.top) / rect.height))
+      };
+      updateView();
+    });
+    document.querySelectorAll(".hotspot").forEach(btn => btn.addEventListener("click", () => setFeature(btn.dataset.feature)));
     document.querySelectorAll(".mode").forEach(btn => btn.addEventListener("click", () => setMode(btn.dataset.mode)));
-    primarySlider.addEventListener("input", () => { a = parseFloat(primarySlider.value); });
-    secondarySlider.addEventListener("input", () => { b = parseFloat(secondarySlider.value); });
+    zoomSlider.addEventListener("input", updateView);
+    angleSlider.addEventListener("input", updateView);
     document.querySelectorAll("[data-transition]").forEach((link) => {
       link.addEventListener("click", (event) => {
         const href = link.getAttribute("href");
         if (!href || href === "#") return;
         event.preventDefault();
-          document.body.classList.add("is-leaving");
-          document.getElementById("portalTransition").classList.add("active");
-        sessionStorage.setItem("museumTransition", "soft");
-        window.setTimeout(() => { window.location.href = href; }, 640);
+        document.getElementById("portalTransition").classList.add("active");
+        window.setTimeout(() => { window.location.href = href; }, 760);
       });
     });
-    window.addEventListener("resize", resize);
-    resize();
-    setMode("color");
-    requestAnimationFrame(draw);
-    window.setTimeout(() => {
-      document.body.classList.remove("is-entering");
-    }, 820);
+    setFeature("ribbon");
+    setMode("visible");
   </script>
 </body>
 </html>
