@@ -470,6 +470,35 @@
       opacity: 1;
       transform: translateX(-50%) translateY(4px);
     }
+    .inscription {
+      position: absolute;
+      left: clamp(48px, 6vw, 92px);
+      bottom: clamp(92px, 12vh, 138px);
+      width: min(430px, 34vw);
+      z-index: 9;
+      border-top: 1px solid rgba(238,233,220,.16);
+      padding-top: 16px;
+      color: #827b71;
+      font-family: var(--serif);
+      font-size: 13px;
+      line-height: 1.85;
+    }
+    .inscription .label {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      margin-bottom: 10px;
+    }
+    .quote, .source { transition: opacity .35s ease; }
+    .source {
+      margin-top: 10px;
+      color: #6f685f;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .12em;
+    }
+    .quote.fade, .source.fade { opacity: 0; }
 
     .navline {
       position: absolute;
@@ -640,6 +669,11 @@
     </section>
 
     <div class="toast" id="toast"></div>
+    <aside class="inscription" data-inscription-topic="scale">
+      <div class="label">PHILOSOPHICAL INSCRIPTION</div>
+      <div class="quote"></div>
+      <div class="source"></div>
+    </aside>
     <nav class="navline">
       <a href="./physicist-corridor.html" data-transition>ATLAS CORRIDOR</a>
       <a href="./hall.html" data-transition>BACK TO HALL</a>
@@ -648,6 +682,7 @@
     <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
   </main>
 
+  <script src="./philosophy-inscriptions.js"></script>
   <script type="module">
     const points = [
       { exp: -15, label: "原子核尺度", desc: "质子、中子等原子核结构所在的极端微观尺度。日常物体的坚实感在这里变成相互作用的结果。", kind: "nucleus" },

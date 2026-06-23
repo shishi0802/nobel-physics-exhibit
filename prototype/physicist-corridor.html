@@ -155,53 +155,99 @@
     }
     .rail-wrap {
       position: absolute;
-      left: 31vw;
+      left: 0;
       right: 0;
-      top: 16vh;
-      bottom: 22vh;
+      top: 12vh;
+      bottom: 18vh;
       z-index: 7;
       overflow: hidden;
-      mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 88%, transparent 100%);
+      pointer-events: none;
+      mask-image: linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
     }
     .rail {
       height: 100%;
-      display: flex;
-      align-items: center;
-      gap: 30px;
-      padding: 0 14vw 0 4vw;
-      transform: translateX(var(--offset, 0px));
-      transition: transform .55s cubic-bezier(.16,1,.3,1);
+      position: relative;
+      display: grid;
+      place-items: center;
+      transform: translateX(0);
+      transition: none;
     }
     .portrait {
-      width: 166px;
-      flex: 0 0 166px;
+      position: absolute;
+      width: clamp(132px, 12vw, 166px);
       border: 0;
       background: transparent;
       color: inherit;
       cursor: pointer;
       text-align: left;
-      transform: translateY(0);
-      transition: transform .35s cubic-bezier(.16,1,.3,1), opacity .35s, filter .35s;
-      opacity: .48;
+      transform: translateX(calc(var(--distance, 0) * 44vw)) translateY(28px) scale(.66);
+      transition: transform .58s cubic-bezier(.16,1,.3,1), opacity .42s, filter .42s;
+      opacity: 0;
+      filter: blur(2px) grayscale(1);
+      pointer-events: auto;
     }
     .portrait.active {
-      transform: translateY(-18px);
+      width: clamp(218px, 19vw, 286px);
+      transform: translateX(0) translateY(-18px) scale(1);
       opacity: 1;
+      filter: grayscale(1);
+      z-index: 4;
     }
-    .portrait.locked { opacity: .66; }
+    .portrait.near {
+      opacity: .58;
+      filter: blur(.2px) grayscale(1);
+      z-index: 2;
+    }
+    .portrait.locked { opacity: 0; }
+    .portrait.locked.active { opacity: 1; }
+    .portrait.locked.near { opacity: .58; }
     .photo {
       position: relative;
-      width: 166px;
-      height: 238px;
+      width: 100%;
+      height: clamp(206px, 26vw, 384px);
       background:
         radial-gradient(circle at 50% 26%, rgba(238,233,220,.50), rgba(238,233,220,.10) 22%, transparent 40%),
         linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.02)),
         #080808;
-      box-shadow: 0 34px 80px rgba(0,0,0,.45), inset 0 0 70px rgba(255,255,255,.025);
+      border: 1px solid rgba(216,192,122,.34);
+      outline: 1px solid rgba(238,233,220,.075);
+      outline-offset: 8px;
+      box-shadow:
+        0 34px 80px rgba(0,0,0,.45),
+        0 0 0 9px rgba(8,8,7,.72),
+        0 0 0 10px rgba(216,192,122,.11),
+        inset 0 0 70px rgba(255,255,255,.025);
       overflow: hidden;
       filter: grayscale(1);
     }
-    .locked .photo {
+    .photo img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: var(--photo-pos, 50% 50%);
+      opacity: .78;
+      filter: grayscale(1) contrast(.88) brightness(.76) sepia(.08);
+      transform: scale(1.025);
+    }
+    .photo.has-image::before {
+      opacity: 0;
+    }
+    .photo.has-image::after {
+      background:
+        linear-gradient(180deg, rgba(238,233,220,.08), transparent 24%, rgba(0,0,0,.28) 100%),
+        linear-gradient(115deg, transparent 0 44%, rgba(255,255,255,.13) 48%, transparent 52% 100%);
+    }
+    .portrait.active .photo {
+      box-shadow:
+        0 42px 130px rgba(0,0,0,.58),
+        0 0 0 10px rgba(8,8,7,.82),
+        0 0 0 11px rgba(216,192,122,.18),
+        0 0 0 18px rgba(238,233,220,.035),
+        inset 0 0 90px rgba(255,255,255,.032);
+    }
+    .portrait:not(.active).locked .photo {
       background:
         radial-gradient(circle at 50% 28%, rgba(238,233,220,.28), rgba(238,233,220,.07) 24%, transparent 44%),
         linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01)),
@@ -215,16 +261,18 @@
       place-items: center;
       color: rgba(238,233,220,.24);
       font-family: var(--serif);
-      font-size: 72px;
+      font-size: clamp(66px, 8vw, 132px);
       letter-spacing: -.08em;
     }
-    .locked .photo::before { color: rgba(238,233,220,.16); }
+    .portrait:not(.active).locked .photo::before { color: rgba(238,233,220,.16); }
     .photo::after {
       content: "";
       position: absolute;
-      inset: 0;
+      inset: 12px;
+      border: 1px solid rgba(238,233,220,.10);
       background-image: linear-gradient(115deg, transparent 0 44%, rgba(255,255,255,.13) 48%, transparent 52% 100%);
-      opacity: .18;
+      background-clip: padding-box;
+      opacity: .24;
     }
     .portrait small {
       display: block;
@@ -239,22 +287,40 @@
       margin-top: 7px;
       color: var(--ink);
       font-family: var(--serif);
-      font-size: 22px;
+      font-size: clamp(18px, 1.7vw, 28px);
       font-weight: 600;
       line-height: 1.1;
     }
-    .locked strong { color: #c7bfae; }
+    .photo-credit {
+      display: block;
+      margin-top: 7px;
+      color: #59534b;
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: .12em;
+    }
+    .portrait.near small,
+    .portrait.near strong { opacity: 0; }
+    .portrait:not(.active).locked strong { color: #c7bfae; }
     .detail {
       position: absolute;
-      right: clamp(46px, 5vw, 86px);
-      bottom: clamp(44px, 7vh, 82px);
+      right: clamp(54px, 7vw, 112px);
+      top: clamp(128px, 18vh, 178px);
       z-index: 12;
-      width: min(540px, 40vw);
-      max-height: 42vh;
+      width: min(390px, 29vw);
+      max-height: 58vh;
       overflow: auto;
       border-top: 1px solid rgba(216,192,122,.30);
-      padding-top: 18px;
+      padding-top: 20px;
       scrollbar-color: rgba(216,192,122,.42) transparent;
+      animation: detailRise .48s cubic-bezier(.16,1,.3,1);
+      transition: opacity .2s ease, transform .2s ease;
+      background: linear-gradient(90deg, rgba(2,2,2,.88), rgba(2,2,2,.58) 62%, rgba(2,2,2,0));
+      box-shadow: -34px 0 80px rgba(0,0,0,.24);
+    }
+    .detail.is-swapping {
+      opacity: 0;
+      transform: translateY(18px);
     }
     .detail .tag {
       color: var(--gold);
@@ -264,7 +330,7 @@
       margin-bottom: 13px;
     }
     .detail h2 {
-      font-size: 34px;
+      font-size: clamp(32px, 3vw, 48px);
       font-weight: 600;
     }
     .detail p {
@@ -273,6 +339,29 @@
       font-size: 14px;
       line-height: 1.75;
       text-wrap: pretty;
+    }
+    .bio-meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 18px;
+      margin: 18px 0 2px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(238,233,220,.13);
+    }
+    .bio-meta span {
+      color: #bdb39d;
+      font-family: var(--mono);
+      font-size: 10px;
+      line-height: 1.45;
+      letter-spacing: .10em;
+    }
+    .bio-meta b {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--gold);
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: .14em;
     }
     .relic {
       margin-top: 16px;
@@ -313,6 +402,12 @@
       letter-spacing: .12em;
       margin-bottom: 8px;
     }
+    .relic p {
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
     .chips {
       display: flex;
       flex-wrap: wrap;
@@ -326,6 +421,17 @@
       font-family: var(--mono);
       font-size: 10px;
       letter-spacing: .10em;
+    }
+    .intro {
+      width: min(310px, 23vw);
+      top: clamp(96px, 15vh, 150px);
+    }
+    .intro h1 { font-size: clamp(38px, 3.8vw, 58px); }
+    .intro p { font-size: 14px; line-height: 1.78; }
+    .progress-panel { margin-top: 22px; }
+    @keyframes detailRise {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .controls {
       position: absolute;
@@ -348,6 +454,31 @@
       font-size: 11px;
       letter-spacing: .13em;
     }
+    .inscription {
+      margin-top: 24px;
+      border-top: 1px solid rgba(238,233,220,.16);
+      padding-top: 15px;
+      color: #827b71;
+      font-family: var(--serif);
+      font-size: 13px;
+      line-height: 1.85;
+    }
+    .inscription .label {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      margin-bottom: 10px;
+    }
+    .quote, .source { transition: opacity .35s ease; }
+    .source {
+      margin-top: 10px;
+      color: #6f685f;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .12em;
+    }
+    .quote.fade, .source.fade { opacity: 0; }
     .portal-transition {
       position: fixed;
       inset: 0;
@@ -426,6 +557,11 @@
         <div class="progress-bar"><i id="progressBar"></i></div>
         <div class="hint">人物可直接浏览；信物需要测试结果触发。</div>
       </div>
+      <aside class="inscription" data-inscription-topic="corridor">
+        <div class="label">PHILOSOPHICAL INSCRIPTION</div>
+        <div class="quote"></div>
+        <div class="source"></div>
+      </aside>
     </section>
     <section class="rail-wrap" aria-label="物理学家图鉴走廊">
       <div class="rail" id="rail"></div>
@@ -440,8 +576,54 @@
   </main>
 
   <script src="./physicist-data.js"></script>
+  <script src="./physicist-portraits.js"></script>
+  <script src="./philosophy-inscriptions.js"></script>
   <script>
     const people = window.PhysicistAtlasData.people;
+    const portraitPhotos = window.PhysicistPortraits || {
+      feynman: { src: "https://upload.wikimedia.org/wikipedia/en/thumb/4/42/Richard_Feynman_Nobel.jpg/330px-Richard_Feynman_Nobel.jpg", pos: "50% 38%", credit: "WIKIMEDIA" },
+      bohr: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Niels_Bohr.jpg/330px-Niels_Bohr.jpg", pos: "50% 35%", credit: "WIKIMEDIA" },
+      einstein: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Albert_Einstein_Head_cleaned.jpg/330px-Albert_Einstein_Head_cleaned.jpg", pos: "50% 42%", credit: "WIKIMEDIA" },
+      fermi: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Enrico_Fermi_1943-49.jpg/330px-Enrico_Fermi_1943-49.jpg", pos: "50% 38%", credit: "WIKIMEDIA" },
+      pauli: { src: "https://upload.wikimedia.org/wikipedia/commons/4/43/Pauli.jpg", pos: "50% 34%", credit: "WIKIMEDIA" },
+      millikan: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Millikan.jpg/330px-Millikan.jpg", pos: "50% 38%", credit: "WIKIMEDIA" },
+      schrodinger: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Erwin_Schr%C3%B6dinger_-_Narodowe_Archiwum_Cyfrowe_%281-E-939%29.jpg/330px-Erwin_Schr%C3%B6dinger_-_Narodowe_Archiwum_Cyfrowe_%281-E-939%29.jpg", pos: "50% 37%", credit: "WIKIMEDIA" },
+      franklin: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Rosalind_Franklin_%28retouched%29.jpg/330px-Rosalind_Franklin_%28retouched%29.jpg", pos: "50% 40%", credit: "WIKIMEDIA" },
+      maxwell: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/James-Clerk-Maxwell-1831-1879.jpg/330px-James-Clerk-Maxwell-1831-1879.jpg", pos: "50% 34%", credit: "WIKIMEDIA" },
+      dirac: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Paul_Dirac%2C_1933.jpg/330px-Paul_Dirac%2C_1933.jpg", pos: "50% 36%", credit: "WIKIMEDIA" },
+      curie: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Marie_Curie_c._1920s.jpg/330px-Marie_Curie_c._1920s.jpg", pos: "50% 36%", credit: "WIKIMEDIA" },
+      vonneumann: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/JohnvonNeumann-LosAlamos.gif/330px-JohnvonNeumann-LosAlamos.gif", pos: "50% 38%", credit: "WIKIMEDIA" },
+      wood: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Robert_Williams_Wood.jpg/250px-Robert_Williams_Wood.jpg", pos: "50% 40%", credit: "WIKIMEDIA" },
+      lorentz: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Nobelprijswinnaars._H.A._Lorentz_%28cropped%29.jpg/330px-Nobelprijswinnaars._H.A._Lorentz_%28cropped%29.jpg", pos: "50% 34%", credit: "WIKIMEDIA" },
+      planck: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Max_Planck_by_Hugo_Erfurth_1938cr_-_restoration1.jpg/330px-Max_Planck_by_Hugo_Erfurth_1938cr_-_restoration1.jpg", pos: "50% 38%", credit: "WIKIMEDIA" },
+      galileo: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Galileo_Galilei_%281564-1642%29_RMG_BHC2700.tiff/lossy-page1-330px-Galileo_Galilei_%281564-1642%29_RMG_BHC2700.tiff.jpg", pos: "50% 33%", credit: "WIKIMEDIA" },
+      sagan: { src: "https://upload.wikimedia.org/wikipedia/commons/b/be/Carl_Sagan_Planetary_Society.JPG", pos: "50% 36%", credit: "WIKIMEDIA" },
+      wu: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Chien-shiung_Wu_%281912-1997%29_C.jpg/330px-Chien-shiung_Wu_%281912-1997%29_C.jpg", pos: "50% 38%", credit: "WIKIMEDIA" },
+      hawking: { src: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Stephen_Hawking.StarChild.jpg", pos: "50% 36%", credit: "WIKIMEDIA" },
+      heisenberg: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Werner_Heisenberg_Portrait_%283x4_cropped%29.jpg/330px-Werner_Heisenberg_Portrait_%283x4_cropped%29.jpg", pos: "50% 36%", credit: "WIKIMEDIA" }
+    };
+    const corridorBios = {
+      feynman: { field: "量子电动力学", period: "1918-1988", intro: "费曼以路径积分和费曼图重塑了量子电动力学的计算语言，也把复杂物理讲成了几乎能被直觉看见的图像。他的展签重点不在顽皮轶事，而在一种罕见能力：把抽象理论、计算技巧和实验判断压缩成清晰的物理图景。", work: "路径积分、费曼图、量子电动力学重整化" },
+      bohr: { field: "量子论", period: "1885-1962", intro: "玻尔提出原子结构模型，并在哥本哈根学派中塑造了互补性与量子测量的解释框架。他的走廊位置像一间讨论室：不是单个公式，而是一整代物理学家围绕原子、测量与现实展开辩论的中心。", work: "玻尔原子模型、互补原理、哥本哈根解释" },
+      einstein: { field: "相对论 / 光量子", period: "1879-1955", intro: "爱因斯坦用相对论改变了空间、时间与引力的含义，也用光电效应解释推动了量子论的成立。他在这条走廊里代表一种宏观秩序感：从简单原则出发，重新规定宇宙的基本语法。", work: "狭义相对论、广义相对论、光电效应解释" },
+      fermi: { field: "核物理 / 统计物理", period: "1901-1954", intro: "费米兼具理论判断和实验手感，是二十世纪少见的全能型物理学家。他从费米统计到核反应堆，把微观粒子规律推向可操作的工程现实，也让“估算”成为一种强大的科学方法。", work: "费米-狄拉克统计、弱相互作用理论、首座核反应堆" },
+      pauli: { field: "量子力学", period: "1900-1958", intro: "泡利提出不相容原理，解释了电子壳层结构和物质稳定性的深层原因。他的展签强调严格性：一个简洁的禁令如何支撑周期表、化学键以及普通物质的秩序。", work: "泡利不相容原理、自旋理论、泡利矩阵" },
+      millikan: { field: "实验物理", period: "1868-1953", intro: "密立根通过油滴实验测定基本电荷，给电子电荷提供了精确数值。他适合放在实验方法展段：微小液滴、强电场和长期重复测量共同构成现代精密实验的经典场景。", work: "油滴实验、基本电荷测定、光电效应实验研究" },
+      schrodinger: { field: "波动力学", period: "1887-1961", intro: "薛定谔用波动方程为量子力学提供了另一种数学表达，使微观粒子的状态可以作为波函数演化。他的走廊简介应突出波函数、方程与量子叠加，而不是停留在人格测试里的传奇外号。", work: "薛定谔方程、波动力学、量子叠加思想实验" },
+      franklin: { field: "X 射线晶体学", period: "1920-1958", intro: "富兰克林以高质量 X 射线衍射图像推进了 DNA 结构研究。她在物理学家走廊中连接成像技术与生命结构：看见不可见的分子秩序，本身就是现代物理方法的胜利。", work: "DNA X 射线衍射、Photo 51、晶体学成像" },
+      maxwell: { field: "电磁理论", period: "1831-1879", intro: "麦克斯韦把电、磁与光统一在一组方程中，预言电磁波存在。他的展位是整条走廊的古典支柱：世界第一次显得可以由场、方程和传播速度共同组织起来。", work: "麦克斯韦方程组、电磁场理论、光的电磁理论" },
+      dirac: { field: "相对论量子力学", period: "1902-1984", intro: "狄拉克方程把量子力学与狭义相对论结合，并预言了反物质。他的简介适合极简处理：少量符号、极高密度，一个方程直接打开了电子自旋与正电子的世界。", work: "狄拉克方程、反物质预言、量子场论基础" },
+      curie: { field: "放射性研究", period: "1867-1934", intro: "居里夫人开创性研究放射性，并发现钋和镭。她的展签应带有材料感：矿渣、暗光、长期分离与测量，显示现代物理如何在艰苦实验中辨认新的自然过程。", work: "放射性研究、钋和镭的发现、放射化学" },
+      vonneumann: { field: "数学物理 / 计算", period: "1903-1957", intro: "冯·诺依曼为量子力学数学基础、博弈论和现代计算机体系结构作出关键贡献。他在走廊中像一座桥：从抽象公理到计算机器，连接理论物理和信息时代。", work: "量子力学数学基础、冯·诺依曼结构、博弈论" },
+      wood: { field: "光学实验", period: "1868-1955", intro: "伍德以光学实验和反伪科学调查闻名，展示了物理学家的另一种公共角色：用实验拆穿幻象，用光谱、偏振和仪器判断现象是否真实。", work: "伍德灯、紫外摄影、光学实验与科学辨伪" },
+      lorentz: { field: "经典电子论", period: "1853-1928", intro: "洛伦兹提出电子论和洛伦兹变换，为狭义相对论铺设数学道路。他的展位适合放在经典到现代的门槛处：旧理论的精密结构如何逼近新时空观。", work: "洛伦兹变换、电子论、洛伦兹力" },
+      planck: { field: "量子论起点", period: "1858-1947", intro: "普朗克在黑体辐射问题中引入能量量子，打开量子物理的大门。他的简介不是“突然革命”，而是一次被实验逼出来的谨慎改写：连续世界第一次出现离散刻度。", work: "能量量子假设、黑体辐射公式、普朗克常数" },
+      galileo: { field: "近代科学方法", period: "1564-1642", intro: "伽利略把观察、实验和数学描述结合起来，为近代物理奠定方法基础。他的走廊位置像序章：从望远镜、斜面和运动研究开始，自然被转化为可测量的对象。", work: "自由落体研究、惯性思想、天文观测" },
+      sagan: { field: "行星科学 / 科学传播", period: "1934-1996", intro: "萨根研究行星大气和宇宙生命可能性，也以科学传播塑造公众的宇宙想象。他的展签提醒观众：物理学不只发生在实验室，也改变人类理解自身位置的方式。", work: "行星科学、宇宙生命讨论、旅行者金唱片" },
+      wu: { field: "实验核物理", period: "1912-1997", intro: "吴健雄通过精密实验验证弱相互作用中宇称不守恒，改变了物理学对对称性的理解。她的展位应突出低温装置、钴-60 衰变和一个被实验推翻的基本直觉。", work: "吴实验、宇称不守恒验证、β 衰变研究" },
+      hawking: { field: "黑洞 / 宇宙学", period: "1942-2018", intro: "霍金把广义相对论、量子场论和热力学带入黑洞研究，提出黑洞辐射。他的简介适合处理为一段深色宇宙展签：边界、熵、奇点和信息问题彼此交错。", work: "霍金辐射、奇点定理、黑洞热力学" },
+      heisenberg: { field: "矩阵力学", period: "1901-1976", intro: "海森堡建立矩阵力学并提出不确定性原理，使微观世界不再服从经典可视化图像。他的展签可以像一道雾墙：物理学不是缺少精度，而是在原则上重新定义可知。", work: "矩阵力学、不确定性原理、量子理论基础" }
+    };
     const storageKey = "physicistAtlas:v1";
     const rail = document.getElementById("rail");
     const detail = document.getElementById("detail");
@@ -479,13 +661,19 @@
     function renderRail() {
       rail.innerHTML = people.map((p, index) => {
         const unlocked = isUnlocked(p);
-        return `<button class="portrait ${index === active ? "active" : ""} ${unlocked ? "unlocked" : "locked"}" type="button" data-index="${index}">
-          <div class="photo" data-initials="${p.initials}"></div>
+        const photo = portraitPhotos[p.id];
+        const rawDistance = index - active;
+        const wrappedDistance = rawDistance > people.length / 2 ? rawDistance - people.length : rawDistance < -people.length / 2 ? rawDistance + people.length : rawDistance;
+        const near = Math.abs(wrappedDistance) === 1;
+        return `<button class="portrait ${index === active ? "active" : ""} ${near ? "near" : ""} ${unlocked ? "unlocked" : "locked"}" type="button" data-index="${index}" style="--distance:${wrappedDistance}">
+          <div class="photo ${photo ? "has-image" : ""}" data-initials="${p.initials}" style="${photo ? `--photo-pos:${photo.pos}` : ""}">
+            ${photo ? `<img src="${photo.src}" alt="${p.name}肖像" loading="${index === active || near ? "eager" : "lazy"}" referrerpolicy="no-referrer" onerror="this.remove(); this.parentElement.classList.remove('has-image');">` : ""}
+          </div>
           <small>${unlocked ? "RELIC LIT" : "RELIC DARK"} · NO.${String(p.index).padStart(2, "0")}</small>
           <strong>${p.name}</strong>
+          ${photo ? `<span class="photo-credit">PORTRAIT · ${photo.credit}</span>` : ""}
         </button>`;
       }).join("");
-      rail.style.setProperty("--offset", `${-active * 196}px`);
       rail.querySelectorAll(".portrait").forEach(btn => {
         btn.addEventListener("click", () => setActive(Number(btn.dataset.index)));
       });
@@ -497,11 +685,16 @@
       const unlocked = isUnlocked(p);
       const totem = renderTotem(p, unlocked);
       const prompt = buildPrompt(p);
+      const bio = corridorBios[p.id] || { field: "物理学", period: "", intro: p.analysis[0] || "", work: p.title };
       detail.innerHTML = `
         <div class="tag">${p.id.toUpperCase()} · ${unlocked ? `RELIC UNLOCKED ${dateLabel(state.unlockedAt?.[p.id])}` : "RELIC NOT YET UNLOCKED"}</div>
         <h2>${p.name}</h2>
-        <p><b>${p.title}</b></p>
-        <p>${p.analysis[0] || ""}</p>
+        <p><b>${bio.field}</b></p>
+        <p>${bio.intro}</p>
+        <div class="bio-meta">
+          <span><b>PERIOD</b>${bio.period}</span>
+          <span><b>KEY WORK</b>${bio.work}</span>
+        </div>
         <div class="relic ${unlocked ? "unlocked" : "locked"}">
           ${totem}
           <div>
@@ -510,7 +703,7 @@
           </div>
         </div>
         <p><b>更容易测到这个结果：</b>${prompt}</p>
-        <div class="chips"><span class="chip">${p.feature}</span><span class="chip">${unlocked ? "RELIC STORED" : "TEST TO LIGHT RELIC"}</span></div>`;
+        <div class="chips"><span class="chip">${bio.field}</span><span class="chip">${unlocked ? "RELIC STORED" : "TEST TO LIGHT RELIC"}</span></div>`;
     }
 
     function renderTotem(person, unlocked) {
@@ -553,9 +746,15 @@
     }
 
     function setActive(index) {
-      active = (index + people.length) % people.length;
-      renderRail();
-      renderDetail();
+      const next = (index + people.length) % people.length;
+      if (next === active) return;
+      detail.classList.add("is-swapping");
+      window.setTimeout(() => {
+        active = next;
+        renderRail();
+        renderDetail();
+        detail.classList.remove("is-swapping");
+      }, 180);
     }
 
     function attachTransitions(root = document) {

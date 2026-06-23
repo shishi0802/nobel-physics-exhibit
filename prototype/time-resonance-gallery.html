@@ -191,14 +191,19 @@
       font-size: 13px;
       line-height: 1.85;
     }
-    .inscription span {
+    .quote {
+      transition: opacity .35s ease;
+    }
+    .source {
       display: block;
       margin-top: 10px;
       color: #6f685f;
       font-family: var(--mono);
       font-size: 10px;
       letter-spacing: .12em;
+      transition: opacity .35s ease;
     }
+    .quote.fade, .source.fade { opacity: 0; }
     .navline {
       position: absolute;
       left: clamp(40px, 5vw, 80px);
@@ -306,9 +311,9 @@
       </div>
       <div class="readout" id="readout"></div>
     </section>
-    <aside class="inscription" id="inscription">
-      时间并不是运动之外的某种东西；时间只是运动的数。
-      <span>亚里士多德</span>
+    <aside class="inscription" id="inscription" data-inscription-topic="time">
+      <div class="quote"></div>
+      <div class="source"></div>
     </aside>
     <nav class="navline">
       <a href="./light-micro-gallery.html" data-transition>← LIGHT & MICRO</a>
@@ -317,6 +322,7 @@
     <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
   </main>
 
+  <script src="./philosophy-inscriptions.js"></script>
   <script>
     const canvas = document.getElementById("timeCanvas");
     const ctx = canvas.getContext("2d");

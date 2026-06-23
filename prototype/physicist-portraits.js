@@ -1,0 +1,22 @@
+window.PhysicistPortraits = {
+  feynman: { src: "https://upload.wikimedia.org/wikipedia/en/thumb/4/42/Richard_Feynman_Nobel.jpg/330px-Richard_Feynman_Nobel.jpg", pos: "50% 38%", credit: "WIKIMEDIA" },
+  bohr: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Niels_Bohr.jpg/330px-Niels_Bohr.jpg", pos: "50% 35%", credit: "WIKIMEDIA" },
+  einstein: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Albert_Einstein_Head_cleaned.jpg/330px-Albert_Einstein_Head_cleaned.jpg", pos: "50% 42%", credit: "WIKIMEDIA" },
+  fermi: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Enrico_Fermi_1943-49.jpg/330px-Enrico_Fermi_1943-49.jpg", pos: "50% 38%", credit: "WIKIMEDIA" },
+  pauli: { src: "https://upload.wikimedia.org/wikipedia/commons/4/43/Pauli.jpg", pos: "50% 34%", credit: "WIKIMEDIA" },
+  millikan: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Millikan.jpg/330px-Millikan.jpg", pos: "50% 38%", credit: "WIKIMEDIA" },
+  schrodinger: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Erwin_Schr%C3%B6dinger_-_Narodowe_Archiwum_Cyfrowe_%281-E-939%29.jpg/330px-Erwin_Schr%C3%B6dinger_-_Narodowe_Archiwum_Cyfrowe_%281-E-939%29.jpg", pos: "50% 37%", credit: "WIKIMEDIA" },
+  franklin: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Rosalind_Franklin_%28retouched%29.jpg/330px-Rosalind_Franklin_%28retouched%29.jpg", pos: "50% 40%", credit: "WIKIMEDIA" },
+  maxwell: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/James-Clerk-Maxwell-1831-1879.jpg/330px-James-Clerk-Maxwell-1831-1879.jpg", pos: "50% 34%", credit: "WIKIMEDIA" },
+  dirac: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Paul_Dirac%2C_1933.jpg/330px-Paul_Dirac%2C_1933.jpg", pos: "50% 36%", credit: "WIKIMEDIA" },
+  curie: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Marie_Curie_c._1920s.jpg/330px-Marie_Curie_c._1920s.jpg", pos: "50% 36%", credit: "WIKIMEDIA" },
+  vonneumann: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/JohnvonNeumann-LosAlamos.gif/330px-JohnvonNeumann-LosAlamos.gif", pos: "50% 38%", credit: "WIKIMEDIA" },
+  wood: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Robert_Williams_Wood.jpg/250px-Robert_Williams_Wood.jpg", pos: "50% 40%", credit: "WIKIMEDIA" },
+  lorentz: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Nobelprijswinnaars._H.A._Lorentz_%28cropped%29.jpg/330px-Nobelprijswinnaars._H.A._Lorentz_%28cropped%29.jpg", pos: "50% 34%", credit: "WIKIMEDIA" },
+  planck: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Max_Planck_by_Hugo_Erfurth_1938cr_-_restoration1.jpg/330px-Max_Planck_by_Hugo_Erfurth_1938cr_-_restoration1.jpg", pos: "50% 38%", credit: "WIKIMEDIA" },
+  galileo: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Galileo_Galilei_%281564-1642%29_RMG_BHC2700.tiff/lossy-page1-330px-Galileo_Galilei_%281564-1642%29_RMG_BHC2700.tiff.jpg", pos: "50% 33%", credit: "WIKIMEDIA" },
+  sagan: { src: "https://upload.wikimedia.org/wikipedia/commons/b/be/Carl_Sagan_Planetary_Society.JPG", pos: "50% 36%", credit: "WIKIMEDIA" },
+  wu: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Chien-shiung_Wu_%281912-1997%29_C.jpg/330px-Chien-shiung_Wu_%281912-1997%29_C.jpg", pos: "50% 38%", credit: "WIKIMEDIA" },
+  hawking: { src: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Stephen_Hawking.StarChild.jpg", pos: "50% 36%", credit: "WIKIMEDIA" },
+  heisenberg: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Werner_Heisenberg_Portrait_%283x4_cropped%29.jpg/330px-Werner_Heisenberg_Portrait_%283x4_cropped%29.jpg", pos: "50% 36%", credit: "WIKIMEDIA" }
+};

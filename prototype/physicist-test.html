@@ -69,6 +69,15 @@
       width: min(690px, 48vw);
       transition: transform .42s cubic-bezier(.16,1,.3,1), opacity .32s;
     }
+    .stage.question-mode {
+      top: clamp(88px, 12vh, 118px);
+      bottom: 86px;
+      display: grid;
+      grid-template-rows: auto minmax(92px, 128px) minmax(330px, 1fr);
+      align-content: start;
+      row-gap: 22px;
+      overflow: hidden;
+    }
     .stage.switching { transform: translateX(-22px); opacity: 0; }
     .kicker {
       color: var(--gold);
@@ -86,6 +95,17 @@
     }
     h1 { font-size: clamp(54px, 5.8vw, 84px); }
     h2 { font-size: clamp(36px, 4.2vw, 60px); }
+    .question-title {
+      align-self: start;
+      max-width: 660px;
+      overflow: hidden;
+      color: var(--ink);
+      font-size: clamp(27px, 2.35vw, 34px);
+      line-height: 1.24;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
     .lead, .question-text {
       margin: 24px 0 0;
       color: var(--muted);
@@ -114,6 +134,16 @@
       background: rgba(238,233,220,.10);
       border-top: 1px solid rgba(238,233,220,.16);
     }
+    .stage.question-mode .kicker { margin-bottom: 0; }
+    .stage.question-mode .answers {
+      margin-top: 0;
+      height: 100%;
+      min-height: 318px;
+      max-height: 390px;
+      grid-template-rows: repeat(4, minmax(76px, 1fr));
+      align-self: start;
+      overflow: hidden;
+    }
     .answer {
       min-height: 74px;
       border: 0;
@@ -123,6 +153,11 @@
       text-align: left;
       padding: 17px 20px;
       transition: transform .22s cubic-bezier(.16,1,.3,1), background .22s;
+    }
+    .stage.question-mode .answer {
+      min-height: 0;
+      padding: 13px 18px 12px;
+      overflow: hidden;
     }
     .answer:hover, .answer:focus-visible {
       transform: translateX(6px);
@@ -135,12 +170,20 @@
       font-family: var(--mono);
       font-size: 10px;
       letter-spacing: .12em;
-      margin-bottom: 7px;
+      margin-bottom: 6px;
     }
     .answer span {
       font-size: 15px;
       line-height: 1.55;
       color: #d8d1bf;
+    }
+    .stage.question-mode .answer span {
+      display: -webkit-box;
+      overflow: hidden;
+      font-size: 14px;
+      line-height: 1.48;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
     }
     .panel {
       position: absolute;
@@ -248,19 +291,30 @@
       inset: 86px clamp(46px, 5vw, 86px) 72px clamp(54px, 6vw, 92px);
       z-index: 9;
       display: grid;
-      grid-template-columns: minmax(380px, 37vw) minmax(460px, 1fr);
-      gap: clamp(36px, 5vw, 76px);
+      grid-template-columns: minmax(310px, 31vw) minmax(520px, 1fr);
+      gap: clamp(30px, 4vw, 56px);
     }
     .result-view[hidden] { display: none; }
     .result-hero {
-      align-self: end;
+      align-self: stretch;
       border-top: 1px solid rgba(216,192,122,.30);
-      padding-top: 20px;
+      padding-top: 18px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      align-content: start;
+      overflow: hidden;
+    }
+    .result-id {
+      display: grid;
+      grid-template-columns: 112px 1fr;
+      gap: 18px;
+      align-items: start;
     }
     .result-portrait {
-      width: 210px;
-      height: 286px;
-      margin-bottom: 28px;
+      position: relative;
+      width: 112px;
+      height: 148px;
+      margin-bottom: 0;
       background:
         radial-gradient(circle at 50% 27%, rgba(238,233,220,.58), rgba(238,233,220,.12) 24%, transparent 43%),
         linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.02)),
@@ -271,7 +325,115 @@
       place-items: center;
       color: rgba(238,233,220,.24);
       font-family: var(--serif);
-      font-size: 78px;
+      font-size: 42px;
+      overflow: hidden;
+    }
+    .result-portrait img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: var(--photo-pos, 50% 50%);
+      opacity: .82;
+      filter: grayscale(1) contrast(.88) brightness(.76) sepia(.08);
+      transform: scale(1.035);
+    }
+    .result-portrait.has-image::after {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border: 1px solid rgba(238,233,220,.10);
+      background: linear-gradient(180deg, rgba(238,233,220,.08), transparent 25%, rgba(0,0,0,.26) 100%);
+    }
+    .result-hero h1 {
+      font-size: clamp(30px, 3vw, 44px);
+      line-height: 1.05;
+      margin-bottom: 8px;
+    }
+    .result-hero .lead {
+      margin-top: 0;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .result-totem {
+      margin: 14px 0 0;
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 13px;
+      align-items: center;
+      border-top: 1px solid rgba(238,233,220,.15);
+      padding-top: 12px;
+    }
+    .totem {
+      width: 48px;
+      height: 48px;
+      color: var(--gold);
+      filter: drop-shadow(0 0 22px rgba(216,192,122,.20));
+    }
+    .totem svg { width: 100%; height: 100%; display: block; }
+    .result-totem b {
+      display: block;
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .12em;
+      margin-bottom: 6px;
+    }
+    .result-totem span {
+      display: block;
+      color: #91887b;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .result-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      align-self: end;
+      margin-top: 12px;
+    }
+    .result-actions .restart,
+    .result-actions .corridor-link {
+      margin-top: 0;
+      width: 100%;
+      min-width: 0;
+      padding-inline: 12px;
+      letter-spacing: .12em;
+    }
+    .result-summary {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      align-content: stretch;
+      margin-top: 16px;
+    }
+    .summary-chip {
+      display: grid;
+      grid-template-columns: minmax(128px, .8fr) 1fr;
+      gap: 14px;
+      align-items: center;
+      color: #cfc4ad;
+      border-top: 1px solid rgba(238,233,220,.15);
+      padding: 8px 0 0;
+      font-family: var(--sans);
+      font-size: 13px;
+      line-height: 1.3;
+    }
+    .summary-chip b {
+      color: var(--gold);
+      font-family: var(--serif);
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.1;
+    }
+    .summary-chip small {
+      display: block;
+      margin-top: 0;
+      color: #726b62;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .08em;
     }
     .result-copy {
       align-self: stretch;
@@ -313,6 +475,50 @@
       font-size: 10px;
       letter-spacing: .10em;
     }
+    .axis-copy {
+      display: block;
+      color: #c8beaa;
+      font-family: var(--sans);
+      font-size: 12px;
+      letter-spacing: 0;
+    }
+    .axis-copy small {
+      display: block;
+      margin-top: 3px;
+      color: #746e65;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: .08em;
+    }
+    .inscription {
+      position: absolute;
+      left: clamp(54px, 6vw, 92px);
+      bottom: clamp(62px, 10vh, 110px);
+      z-index: 8;
+      width: min(430px, 34vw);
+      border-top: 1px solid rgba(238,233,220,.16);
+      padding-top: 16px;
+      color: #827b71;
+      font-family: var(--serif);
+      font-size: 13px;
+      line-height: 1.85;
+    }
+    .inscription .label {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      margin-bottom: 10px;
+    }
+    .quote, .source { transition: opacity .35s ease; }
+    .source {
+      margin-top: 10px;
+      color: #6f685f;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .12em;
+    }
+    .quote.fade, .source.fade { opacity: 0; }
     .navline {
       position: absolute;
       left: clamp(40px, 5vw, 80px);
@@ -402,6 +608,11 @@
     <section class="loading" id="loading" hidden>
       <div class="loading-core" id="loadingText">正在观测你的叠加态……</div>
     </section>
+    <aside class="inscription" data-inscription-topic="test">
+      <div class="label">PHILOSOPHICAL INSCRIPTION</div>
+      <div class="quote"></div>
+      <div class="source"></div>
+    </aside>
     <nav class="navline">
       <a href="./physicist-corridor.html" data-transition>ATLAS CORRIDOR</a>
       <a href="./hall.html" data-transition>BACK TO HALL</a>
@@ -410,15 +621,18 @@
   </main>
 
   <script src="./physicist-data.js"></script>
+  <script src="./physicist-portraits.js"></script>
+  <script src="./philosophy-inscriptions.js"></script>
   <script>
     const atlas = window.PhysicistAtlasData;
+    const portraitPhotos = window.PhysicistPortraits || {};
     const storageKey = "physicistAtlas:v1";
     const axes = [
-      { id: "method", left: "E", right: "T", label: "THEORY / EXPERIMENT", cn: "理论推演 / 实验操作" },
-      { id: "style", left: "L", right: "I", label: "INTUITION / LOGIC", cn: "直觉飞跃 / 严谨逻辑" },
-      { id: "world", left: "C", right: "Q", label: "QUANTUM / CLASSICAL", cn: "概率宇宙 / 决定秩序" },
-      { id: "ecology", left: "S", right: "Le", label: "LEADER / SOLO", cn: "团队领袖 / 孤狼学者" },
-      { id: "life", left: "R", right: "A", label: "ABSTRACT / RIGOR", cn: "跨界整活 / 传统刻苦" }
+      { id: "method", left: "E", right: "T", label: "方法论", pair: "实验操作 / 理论推演", en: "EXPERIMENT / THEORY", leftName: "实验操作", rightName: "理论推演" },
+      { id: "style", left: "L", right: "I", label: "思维流派", pair: "严谨逻辑 / 直觉飞跃", en: "LOGIC / INTUITION", leftName: "严谨逻辑", rightName: "直觉飞跃" },
+      { id: "world", left: "C", right: "Q", label: "宇宙观", pair: "决定秩序 / 概率宇宙", en: "CLASSICAL / QUANTUM", leftName: "决定秩序", rightName: "概率宇宙" },
+      { id: "ecology", left: "S", right: "Le", label: "工作生态", pair: "孤狼学者 / 团队领袖", en: "SOLO / LEADER", leftName: "孤狼学者", rightName: "团队领袖" },
+      { id: "life", left: "R", right: "A", label: "生活做派", pair: "传统刻苦 / 跨界整活", en: "RIGOR / ABSTRACT", leftName: "传统刻苦", rightName: "跨界整活" }
     ];
     const scoreKeys = ["T", "E", "I", "L", "Q", "C", "S", "Le", "A", "R"];
     const loadingLines = [
@@ -472,12 +686,27 @@
       return Math.max(8, Math.min(92, 50 + signedAxis(axis, source) * 5));
     }
 
+    function axisLeaning(axis, source = scores) {
+      const value = signedAxis(axis, source);
+      if (Math.abs(value) <= 1) return "两端均衡";
+      const name = value >= 0 ? axis.rightName : axis.leftName;
+      const strength = Math.abs(value) >= 5 ? "极高" : Math.abs(value) >= 3 ? "偏高" : "中等";
+      return `${name}${strength}`;
+    }
+
+    function axisDisplay(axis, source = scores) {
+      const value = signedAxis(axis, source);
+      if (Math.abs(value) <= 1) return "两端均衡";
+      return value >= 0 ? axis.rightName : axis.leftName;
+    }
+
     function renderIntro() {
       step = -1;
       scores = freshScores();
       resultView.hidden = true;
       stage.hidden = false;
       panel.hidden = false;
+      stage.classList.remove("question-mode");
       stage.innerHTML = `<div class="kicker">MEASUREMENT TEST</div><h1>你是哪位物理学家</h1><p class="lead">这是一台展厅里的风格测量仪。20 个选择会把你投影到理论、实验、直觉、概率、协作与生活做派的坐标中。</p><button class="start" id="startBtn" type="button">BEGIN TEST</button>`;
       document.getElementById("startBtn").addEventListener("click", () => { step = 0; renderQuestion(); });
       renderPanel();
@@ -486,7 +715,8 @@
     function renderQuestion() {
       const q = atlas.questions[step];
       stage.classList.remove("switching");
-      stage.innerHTML = `<div class="kicker">QUESTION ${String(step + 1).padStart(2, "0")} / ${String(atlas.questions.length).padStart(2, "0")}</div><h2>${q.title}</h2><div class="answers">${q.answers.map((a, i) => `<button class="answer" type="button" data-index="${i}"><small>OPTION ${a.key}</small><span>${a.text}</span></button>`).join("")}</div>`;
+      stage.classList.add("question-mode");
+      stage.innerHTML = `<div class="kicker">QUESTION ${String(step + 1).padStart(2, "0")} / ${String(atlas.questions.length).padStart(2, "0")}</div><h2 class="question-title">${q.title}</h2><div class="answers">${q.answers.map((a, i) => `<button class="answer" type="button" data-index="${i}"><small>OPTION ${a.key}</small><span>${a.text}</span></button>`).join("")}</div>`;
       stage.querySelectorAll(".answer").forEach(btn => {
         btn.addEventListener("click", () => chooseAnswer(Number(btn.dataset.index)));
       });
@@ -511,12 +741,13 @@
       panel.innerHTML = `<div class="progress">${step < 0 ? "WAITING" : `PROGRESS ${progress}/${atlas.questions.length}`}</div><div class="meter"><i style="--w:${(progress / atlas.questions.length) * 100}%"></i></div>${axes.map(axis => {
         const pct = axisPercent(axis);
         const delta = pct - 50;
-        return `<div class="axis-row"><label><span>${axis.label}</span><span>${axis.cn}</span></label><div class="axis-bar"><i style="--pos:${Math.min(pct, 50)}%; --delta:${Math.abs(delta)}%"></i></div></div>`;
+        return `<div class="axis-row"><label><span>${axis.label}</span><span>${axis.pair}</span></label><div class="axis-bar"><i style="--pos:${Math.min(pct, 50)}%; --delta:${Math.abs(delta)}%"></i></div></div>`;
       }).join("")}`;
     }
 
     function renderLoading() {
       stage.hidden = true;
+      stage.classList.remove("question-mode");
       panel.hidden = true;
       loading.hidden = false;
       let i = 0;
@@ -549,20 +780,31 @@
 
     function renderResult(person) {
       const isNew = writeAtlasState(person.id);
+      const photo = portraitPhotos[person.id];
       const bars = axes.map(axis => {
         const pct = axisPercent(axis);
-        return `<div class="axis-row"><label><span>${axis.label}</span><span>${Math.round(pct)}%</span></label><div class="axis-bar"><i style="--pos:${Math.min(pct, 50)}%; --delta:${Math.abs(pct - 50)}%"></i></div></div>`;
+        return `<div class="axis-row"><label><span class="axis-copy">${axis.label}：${axisDisplay(axis)}<small>${axis.pair} · ${axis.en}</small></span><span>${Math.round(pct)}%</span></label><div class="axis-bar"><i style="--pos:${Math.min(pct, 50)}%; --delta:${Math.abs(pct - 50)}%"></i></div></div>`;
       }).join("");
+      const summary = axes.map(axis => `<span class="summary-chip"><b>${axis.label}</b><span>${axisLeaning(axis)}<small>${axis.pair}</small></span></span>`).join("");
       resultView.hidden = false;
       resultView.innerHTML = `
         <section class="result-hero">
-          <div class="result-portrait">${person.initials}</div>
-          <div class="kicker">${isNew ? "RELIC UNLOCKED" : "RELIC ALREADY STORED"}</div>
-          <h1>${person.name}</h1>
-          <p class="lead">${person.title}</p>
-          <div class="chips"><span class="chip">${person.feature}</span></div>
-          <button class="restart" id="restartBtn" type="button">RESTART MEASUREMENT</button>
-          <a class="corridor-link" href="./physicist-corridor.html" data-transition>VIEW IN CORRIDOR</a>
+          <div class="result-id">
+            <div class="result-portrait ${photo ? "has-image" : ""}" style="${photo ? `--photo-pos:${photo.pos}` : ""}">
+              ${photo ? `<img src="${photo.src}" alt="${person.name}肖像" referrerpolicy="no-referrer" onerror="this.remove(); this.parentElement.classList.remove('has-image'); this.parentElement.textContent='${person.initials}';">` : person.initials}
+            </div>
+            <div>
+              <div class="kicker">${isNew ? "RELIC UNLOCKED" : "RELIC ALREADY STORED"}</div>
+              <h1>${person.name}</h1>
+              <p class="lead">${person.title}</p>
+              <div class="result-totem">${renderTotem(person)}<div><b>专属信物已点亮</b><span>${person.relic.name}</span></div></div>
+            </div>
+          </div>
+          <div class="result-summary">${summary}</div>
+          <div class="result-actions">
+            <button class="restart" id="restartBtn" type="button">重新测量</button>
+            <a class="corridor-link" href="./physicist-corridor.html" data-transition>进入走廊</a>
+          </div>
         </section>
         <section class="result-copy">
           ${bars}
@@ -571,6 +813,29 @@
         </section>`;
       document.getElementById("restartBtn").addEventListener("click", renderIntro);
       attachTransitions(resultView);
+    }
+
+    function renderTotem(person) {
+      const n = person.index;
+      const rotation = (n * 17) % 180;
+      const sides = 3 + (n % 6);
+      const inner = 18 + (n % 5) * 3;
+      const points = Array.from({ length: sides }, (_, i) => {
+        const a = -Math.PI / 2 + i * Math.PI * 2 / sides;
+        return `${50 + Math.cos(a) * 29},${50 + Math.sin(a) * 29}`;
+      }).join(" ");
+      const small = Array.from({ length: 4 + (n % 4) }, (_, i) => {
+        const a = i * Math.PI * 2 / (4 + (n % 4)) + n;
+        return `<circle cx="${50 + Math.cos(a) * inner}" cy="${50 + Math.sin(a) * inner}" r="1.8" fill="currentColor" opacity=".9"/>`;
+      }).join("");
+      return `<div class="totem" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <polygon points="${points}" fill="none" stroke="currentColor" stroke-width="2.2" opacity=".86" transform="rotate(${rotation} 50 50)"/>
+          <circle cx="50" cy="50" r="${12 + (n % 4) * 4}" fill="none" stroke="currentColor" stroke-width="1.8" opacity=".72"/>
+          <path d="M50 16 L50 84 M16 50 L84 50" stroke="currentColor" stroke-width="1.4" opacity=".36"/>
+          ${small}
+        </svg>
+      </div>`;
     }
 
     function resize() {

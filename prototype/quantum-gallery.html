@@ -397,8 +397,8 @@
       <div class="mode-readout" id="modeReadout"><b>干涉模式</b>：路径信息未被记录，屏幕上出现稳定干涉条纹。</div>
     </section>
 
-    <aside class="inscription">
-      <div class="label">PHILOSOPHICAL INSCRIPTION · TO VERIFY</div>
+    <aside class="inscription" data-inscription-topic="quantum">
+      <div class="label">PHILOSOPHICAL INSCRIPTION</div>
       <div class="quote" id="quoteText"></div>
       <div class="source" id="quoteSource"></div>
     </aside>
@@ -410,6 +410,7 @@
     <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
   </main>
 
+  <script src="./philosophy-inscriptions.js"></script>
   <script>
     const canvas = document.getElementById("quantumCanvas");
     const ctx = canvas.getContext("2d");
@@ -418,29 +419,10 @@
     const detectorToggle = document.getElementById("detectorToggle");
     const detector = document.getElementById("detector");
     const modeReadout = document.getElementById("modeReadout");
-    const quoteText = document.getElementById("quoteText");
-    const quoteSource = document.getElementById("quoteSource");
-
-    const inscriptions = [
-      {
-        text: "“凡是可说的，都可以说清楚；凡是不可说的，必须保持沉默。”",
-        source: "LUDWIG WITTGENSTEIN"
-      },
-      {
-        text: "“观察渗透着理论。”",
-        source: "N. R. HANSON"
-      },
-      {
-        text: "“知识始于问题。”",
-        source: "KARL POPPER"
-      }
-    ];
-
     let measurement = 0;
     let phase = 0;
     let detectorOn = false;
     let t = 0;
-    let quoteIndex = 0;
 
     function resize() {
       const rect = canvas.getBoundingClientRect();
@@ -580,19 +562,6 @@
       ctx.restore();
     }
 
-    function rotateQuote() {
-      quoteText.classList.add("fade");
-      quoteSource.classList.add("fade");
-      window.setTimeout(() => {
-        const item = inscriptions[quoteIndex % inscriptions.length];
-        quoteText.textContent = item.text;
-        quoteSource.textContent = item.source;
-        quoteText.classList.remove("fade");
-        quoteSource.classList.remove("fade");
-        quoteIndex += 1;
-      }, 360);
-    }
-
     measureSlider.addEventListener("input", () => {
       detectorOn = parseFloat(measureSlider.value) > .55;
       setMeasurement(parseFloat(measureSlider.value));
@@ -617,8 +586,6 @@
     window.addEventListener("resize", resize);
     resize();
     setMeasurement(0);
-    rotateQuote();
-    window.setInterval(rotateQuote, 6200);
     requestAnimationFrame(draw);
     window.setTimeout(() => {
       document.body.classList.remove("is-entering");

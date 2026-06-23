@@ -366,7 +366,7 @@
       </div>
       <div class="readout" id="readout"><b>X 光模式</b>：高密度结构更清晰，骨骼成为身体内部最先显影的层次。</div>
     </section>
-    <aside class="inscription">
+    <aside class="inscription" data-inscription-topic="imaging">
       <div class="label">PHILOSOPHICAL INSCRIPTION</div>
       <div class="quote" id="quoteText"></div>
       <div class="source" id="quoteSource"></div>
@@ -378,6 +378,7 @@
     <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
   </main>
 
+  <script src="./philosophy-inscriptions.js"></script>
   <script>
     const canvas = document.getElementById("imageCanvas");
     const ctx = canvas.getContext("2d");
@@ -385,18 +386,10 @@
     const contrastSlider = document.getElementById("contrastSlider");
     const readout = document.getElementById("readout");
     const scanline = document.getElementById("scanline");
-    const quoteText = document.getElementById("quoteText");
-    const quoteSource = document.getElementById("quoteSource");
     let mode = "xray";
     let slice = .45;
     let contrast = .62;
     let t = 0;
-    let quoteIndex = 0;
-    const inscriptions = [
-      { text: "“身体是我们拥有一个世界的总方式。”", source: "MAURICE MERLEAU-PONTY" },
-      { text: "“技术不是单纯的工具；它也是一种揭示方式。”", source: "MARTIN HEIDEGGER" },
-      { text: "“凝视并不只是看见，它组织了可见之物。”", source: "MICHEL FOUCAULT" }
-    ];
 
     function resize() {
       const rect = canvas.getBoundingClientRect();
@@ -514,19 +507,6 @@
       readout.innerHTML = copy[mode];
     }
 
-    function rotateQuote() {
-      quoteText.classList.add("fade");
-      quoteSource.classList.add("fade");
-      window.setTimeout(() => {
-        const item = inscriptions[quoteIndex % inscriptions.length];
-        quoteText.textContent = item.text;
-        quoteSource.textContent = item.source;
-        quoteText.classList.remove("fade");
-        quoteSource.classList.remove("fade");
-        quoteIndex += 1;
-      }, 350);
-    }
-
     document.querySelectorAll(".mode").forEach(btn => btn.addEventListener("click", () => setMode(btn.dataset.mode)));
     sliceSlider.addEventListener("input", () => {
       slice = parseFloat(sliceSlider.value);
@@ -547,8 +527,6 @@
     window.addEventListener("resize", resize);
     resize();
     setMode("xray");
-    rotateQuote();
-    window.setInterval(rotateQuote, 6200);
     requestAnimationFrame(draw);
     window.setTimeout(() => {
       document.body.classList.remove("is-entering");

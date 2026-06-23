@@ -199,6 +199,35 @@
       line-height: 1.75;
     }
     .readout b { color: #eee4c7; font-weight: 500; }
+    .inscription {
+      position: absolute;
+      left: clamp(48px, 6vw, 90px);
+      bottom: clamp(44px, 7vh, 82px);
+      width: min(430px, 34vw);
+      z-index: 9;
+      border-top: 1px solid rgba(238,233,220,.16);
+      padding-top: 16px;
+      color: #827b71;
+      font-family: var(--serif);
+      font-size: 13px;
+      line-height: 1.85;
+    }
+    .inscription .label {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      margin-bottom: 10px;
+    }
+    .quote, .source { transition: opacity .35s ease; }
+    .source {
+      margin-top: 10px;
+      color: #6f685f;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .12em;
+    }
+    .quote.fade, .source.fade { opacity: 0; }
     .navline {
       position: absolute;
       left: clamp(40px, 5vw, 80px);
@@ -307,6 +336,11 @@
       </div>
       <div class="readout" id="readout"><b>结构色模式</b>：改变入射角和微结构间距，特定波长在干涉中被强化。</div>
     </section>
+    <aside class="inscription" data-inscription-topic="light">
+      <div class="label">PHILOSOPHICAL INSCRIPTION</div>
+      <div class="quote"></div>
+      <div class="source"></div>
+    </aside>
     <nav class="navline">
       <a href="./imaging-gallery.html" data-transition>← IMAGING</a>
       <a href="./time-resonance-gallery.html" data-transition>NEXT · TIME</a>
@@ -315,6 +349,7 @@
     <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
   </main>
 
+  <script src="./philosophy-inscriptions.js"></script>
   <script>
     const canvas = document.getElementById("microCanvas");
     const ctx = canvas.getContext("2d");
