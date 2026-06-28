@@ -743,6 +743,8 @@
       canvas.width = Math.max(1, Math.floor(rect.width * dpr));
       canvas.height = Math.max(1, Math.floor(rect.height * dpr));
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cachedFrame = null;
+      idleFrames = 0;
       draw();
     }
 
@@ -764,6 +766,8 @@
         zoomImpulse = Math.max(-1, Math.min(1, zoomImpulse + delta * .18));
       }
       slider.value = targetExponent.toFixed(2);
+      cachedFrame = null;
+      idleFrames = 0;
       updateReadout();
       if (source === "ui") draw();
     }
@@ -819,12 +823,14 @@
         { center: 21, fn: () => drawCosmos(w, h, .8), weight: layerWeight(21, 7.8) },
         { center: 27, fn: () => drawCosmicWeb(w, h), weight: layerWeight(27, 6.4) }
       ];
-      const total = layers.reduce((sum, layer) => sum + layer.weight, 0) || 1;
-      layers.forEach(layer => {
-        if (layer.weight <= 0) return;
+      // Only draw layers with meaningful visibility
+      const visibleLayers = layers.filter(l => l.weight > 0.08);
+      const total = visibleLayers.reduce((sum, layer) => sum + layer.weight, 0) || 1;
+      visibleLayers.forEach(layer => {
         drawLayerThroughLens(layer, total, w, h);
       });
-      drawScaleTunnel(w, h);
+      // Only draw tunnel when zooming
+      if (Math.abs(zoomImpulse) > .02) drawScaleTunnel(w, h);
     }
 
     function drawLayerThroughLens(layer, total, w, h) {
@@ -845,11 +851,13 @@
     }
 
     function drawOpticalDepth(w, h, norm) {
+      // Only draw when actively zooming for performance
+      if (Math.abs(zoomImpulse) < .015) return;
       const cx = w * .5;
       const cy = h * .5;
       ctx.save();
       ctx.globalCompositeOperation = "screen";
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 3; i++) {
         const r = (i + 1) * Math.max(w, h) * .13 + ((pseudoT * .018) % 60);
         const alpha = .035 * (1 - i / 6);
         ctx.strokeStyle = `rgba(238,233,220,${alpha})`;
@@ -868,8 +876,11 @@
     }
 
     function drawScaleGrid(w, h, norm) {
+      // Only visible during zoom to reduce idle cost
+      const gridAlpha = Math.min(.08, Math.abs(zoomImpulse) * .5);
+      if (gridAlpha < .005) return;
       ctx.save();
-      ctx.globalAlpha = .08;
+      ctx.globalAlpha = gridAlpha;
       ctx.strokeStyle = "rgba(238,233,220,.32)";
       ctx.lineWidth = 1;
       const gap = 44 + norm * 72;
@@ -896,8 +907,8 @@
       ctx.save();
       ctx.translate(cx, cy);
       ctx.rotate((norm - .5) * .18);
-      for (let i = 0; i < 14; i++) {
-        const t = i / 13;
+      for (let i = 0; i < 8; i++) {
+        const t = i / 7;
         const pulse = Math.abs(zoomImpulse) * 46;
         const r = 36 + t * Math.max(w, h) * .62 + pulse * (1 - t);
         const alpha = (1 - t) * (.10 + Math.abs(zoomImpulse) * .10) + .018;
@@ -1007,7 +1018,7 @@
       const dir = Math.sign(zoomImpulse);
       ctx.save();
       ctx.lineWidth = 1;
-      for (let i = 0; i < 72; i++) {
+      for (let i = 0; i < 36; i++) {
         const a = i * 2.399 + pseudoT * .00008;
         const base = 40 + ((i * 37 + pseudoT * .08) % Math.max(w, h) * .54);
         const x1 = cx + Math.cos(a) * base;
@@ -1065,10 +1076,10 @@
       ctx.fill();
       ctx.strokeStyle = "rgba(143,221,234,.34)";
       ctx.lineWidth = 1;
-      for (let i = 0; i < 9; i++) {
+      for (let i = 0; i < 6; i++) {
         const phase = pseudoT * .0012 + i * .8;
         ctx.beginPath();
-        for (let x = -w * .45; x <= w * .45; x += 8) {
+        for (let x = -w * .45; x <= w * .45; x += 12) {
           const env = Math.exp(-Math.abs(x) / (w * .32));
           const y = Math.sin(x * .028 + phase) * 46 * env + Math.sin(x * .011 - phase) * 22;
           if (x === -w * .45) ctx.moveTo(cx + x, cy + y + (i - 4) * 18);
@@ -1076,9 +1087,9 @@
         }
         ctx.stroke();
       }
-      for (let i = 0; i < 120; i++) {
+      for (let i = 0; i < 72; i++) {
         const a = i * 2.399 + pseudoT * .0006;
-        const r = Math.sqrt(i / 120) * w * .30;
+        const r = Math.sqrt(i / 72) * w * .30;
         const x = cx + Math.cos(a) * r;
         const y = cy + Math.sin(a * 1.3) * r * .56;
         ctx.fillStyle = i % 5 === 0 ? "rgba(216,192,122,.70)" : "rgba(143,221,234,.48)";
@@ -1124,7 +1135,7 @@
       ctx.beginPath();
       ctx.arc(cx, cy, 78 * micro + 22, 0, Math.PI * 2);
       ctx.fill();
-      for (let i = 0; i < 70; i++) {
+      for (let i = 0; i < 40; i++) {
         const a = i * 2.399 + pseudoT * .0004;
         const r = 40 + (i % 11) * 12 + micro * 60;
         const x = cx + Math.cos(a) * r * (1 + (i % 3) * .18);
@@ -1408,12 +1419,40 @@
       const dt = Math.min(60, now - lastFrameTime);
       lastFrameTime = now;
       pseudoT = now;
+
+      const prevExponent = exponent;
       exponent += (targetExponent - exponent) * Math.min(1, dt / 180);
       zoomImpulse *= Math.pow(.90, dt / 16.67);
-      updateReadout();
-      draw();
+
+      // Check if we're effectively idle (no zoom movement)
+      const isMoving = Math.abs(exponent - targetExponent) > .005 || Math.abs(zoomImpulse) > .01;
+
+      if (isMoving) {
+        idleFrames = 0;
+        cachedFrame = null;
+        updateReadout();
+        draw();
+      } else if (idleFrames < 3) {
+        // Draw a few final frames to settle, then cache
+        idleFrames++;
+        zoomImpulse = 0;
+        exponent = targetExponent;
+        updateReadout();
+        draw();
+        if (idleFrames === 3) {
+          // Cache current frame as bitmap
+          cachedFrame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        }
+      } else if (cachedFrame && document.hidden) {
+        // Page hidden, do nothing
+      }
+      // else: idle with cachedFrame — no draw needed, GPU rests
+
       requestAnimationFrame(animate);
     }
+
+    let idleFrames = 0;
+    let cachedFrame = null;
 
     slider.addEventListener("input", () => setTarget(parseFloat(slider.value)));
     window.addEventListener("resize", resizeCanvas);
