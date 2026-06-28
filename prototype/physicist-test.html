@@ -8,24 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./base.css" />
   <style>
-    :root {
-      --bg: #020202;
-      --ink: #eee9dc;
-      --muted: #8e887f;
-      --line: rgba(238,233,220,.14);
-      --gold: #d8c07a;
-      --cyan: #8fddea;
-      --mono: "IBM Plex Mono", monospace;
-      --serif: "Noto Serif SC", serif;
-      --sans: "Noto Sans SC", sans-serif;
-    }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); }
-    body { font-family: var(--sans); overflow: hidden; }
-    a { color: inherit; text-decoration: none; }
-    button { font: inherit; }
-    .test {
+.test {
       position: relative;
       width: 100vw;
       height: 100vh;
@@ -871,28 +856,11 @@
       requestAnimationFrame(draw);
     }
 
-    function attachTransitions(root = document) {
-      root.querySelectorAll("[data-transition]").forEach((link) => {
-        link.addEventListener("click", (event) => {
-          const href = link.getAttribute("href");
-          if (!href || href === "#") return;
-          event.preventDefault();
-          document.body.classList.add("is-leaving");
-          document.getElementById("portalTransition").classList.add("active");
-        sessionStorage.setItem("museumTransition", "soft");
-        window.setTimeout(() => { window.location.href = href; }, 640);
-        });
-      });
-    }
-
-    attachTransitions();
     window.addEventListener("resize", resize);
     resize();
     renderIntro();
     requestAnimationFrame(draw);
-    window.setTimeout(() => {
-      document.body.classList.remove("is-entering");
-    }, 820);
   </script>
+  <script src="./transition-nav.js"></script>
 </body>
 </html>

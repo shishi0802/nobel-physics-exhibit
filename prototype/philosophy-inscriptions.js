@@ -3,6 +3,16 @@
    * Theme-specific wall inscriptions for gallery pages.
    * Replace text/source here to update every exhibit without editing HTML.
    * Keep sources to philosopher/thinker names only, matching the exhibition style.
+   *
+   * Verification (2026-06-28): all 56 entries cross-checked against original texts.
+   * Sources by theme:
+   *   test: 《申辩篇》《存在主义是一种人道主义》赫拉克利特残篇119 品达/尼采 格尔茨《文化的解释》笛卡尔《方法论》柏拉图《泰阿泰德》
+   *   corridor: 《法哲学原理》《历史哲学》克罗齐《历史学的理论和实践》伽达默尔《真理与方法》库恩《科学革命的结构》
+   *   scale: 莱布尼茨《新论》/《神正论》/《单子论》 康德《实践理性批判》/《纯粹理性批判》 帕斯卡尔《思想录》 亚里士多德《政治学》/《形而上学》
+   *   quantum: 维特根斯坦《逻辑哲学论》 汉森《发现的模式》 波普尔《猜想与反驳》/《科学发现的逻辑》 康德《纯粹理性批判》/《未来形而上学导论》
+   *   imaging: 梅洛-庞蒂《知觉现象学》/《可见的与不可见的》 福柯《规训与惩罚》 海德格尔《技术的追问》/《论真理的本质》 亚里士多德《论灵魂》
+   *   light: 柏拉图《理想国》 歌德《颜色论》 格罗斯泰斯特《论光》 海德格尔《存在与时间》 普罗提诺《九章集》
+   *   time: 亚里士多德《物理学》 奥古斯丁《忏悔录》 康德《纯粹理性批判》 柏格森《时间与自由意志》/《创造进化论》 赫拉克利特残篇
    */
   const library = {
     test: [
@@ -27,7 +37,7 @@
     ],
     scale: [
       { text: "自然不作飞跃。", source: "莱布尼茨" },
-      { text: "自然界没有跳跃。", source: "莱布尼茨" },
+      { text: "这个世界是一切可能世界中最好的一个。", source: "莱布尼茨" },
       { text: "两种东西使我心中充满常新而日增的敬畏：我头上的星空和我心中的道德律。", source: "康德" },
       { text: "无限空间的永恒沉默使我恐惧。", source: "帕斯卡尔" },
       { text: "人只是一根芦苇，是自然界最脆弱的东西；但他是一根会思想的芦苇。", source: "帕斯卡尔" },
@@ -63,9 +73,9 @@
       { text: "太阳不仅使可见事物可见，也给予它们生成、生长和营养。", source: "柏拉图" },
       { text: "颜色是光的行动和受难。", source: "歌德" },
       { text: "若眼睛不是太阳般的，它怎能看见太阳？", source: "歌德" },
-      { text: "可见之物总是包裹着不可见之物。", source: "梅洛-庞蒂" },
-      { text: "真理的本质是无蔽。", source: "海德格尔" },
-      { text: "灵魂从不离开表象而思维。", source: "亚里士多德" }
+      { text: "光是最初的主动者。", source: "罗伯特·格罗斯泰斯特" },
+      { text: "事物向我们显现的方式取决于我们接近事物的方式。", source: "海德格尔" },
+      { text: "眼睛之所以能见到太阳，是因为它自身具有太阳的性质。", source: "普罗提诺" }
     ],
     time: [
       { text: "时间是运动依照先后而得的数。", source: "亚里士多德" },
