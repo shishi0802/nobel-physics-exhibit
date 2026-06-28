@@ -17,6 +17,7 @@
       min-width: 1080px;
       min-height: 720px;
       overflow: hidden;
+      isolation: isolate;
       background:
         radial-gradient(circle at 54% 40%, rgba(216,192,122,.11), transparent 17%),
         radial-gradient(circle at 45% 62%, rgba(143,221,234,.08), transparent 27%),
@@ -69,12 +70,12 @@
       letter-spacing: .15em;
     }
     .topline a { color: #d9cfb2; }
-    .title {
+    .title-panel {
       position: absolute;
       left: clamp(48px, 6vw, 90px);
       top: clamp(88px, 14vh, 142px);
       z-index: 8;
-      width: min(410px, 31vw);
+      width: min(360px, 27vw);
     }
     .kicker {
       color: var(--gold);
@@ -91,13 +92,17 @@
       letter-spacing: 0;
       text-wrap: pretty;
     }
-    .title p {
+    .title-panel p {
       margin: 22px 0 0;
       color: var(--muted);
       font-size: 14px;
       line-height: 1.85;
       text-wrap: pretty;
     }
+    .guide { margin-top: 24px; padding-top: 14px; border-top: 1px solid rgba(238,233,220,.14); }
+    .guide-title { color: var(--gold); font-family: var(--mono); font-size: 10px; letter-spacing: .14em; margin-bottom: 10px; }
+    .guide ol { margin: 0; padding-left: 18px; color: #928b80; font-size: 13px; line-height: 2.0; }
+    .guide ol li::marker { color: var(--cyan); }
     .stage {
       position: absolute;
       left: 50%;
@@ -238,19 +243,48 @@
     }
     .hotspot {
       position: absolute;
-      width: 22px;
-      height: 22px;
-      border: 1px solid rgba(238,233,220,.55);
+      width: 20px;
+      height: 20px;
+      border: 1.5px solid rgba(216,192,122,.60);
       border-radius: 50%;
-      background: rgba(0,0,0,.18);
-      box-shadow: 0 0 26px rgba(216,192,122,.30);
+      background: rgba(216,192,122,.12);
+      box-shadow: 0 0 16px rgba(216,192,122,.22), inset 0 0 6px rgba(216,192,122,.08);
       transform: translate(-50%, -50%);
       cursor: pointer;
       z-index: 4;
+      transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .hotspot::before {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      border: 1px solid rgba(216,192,122,.18);
+      animation: hotspotPulse 2.4s ease-in-out infinite;
+    }
+    .hotspot-label {
+      position: absolute;
+      left: 50%;
+      top: calc(100% + 6px);
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: .10em;
+      color: rgba(216,192,122,.55);
+      pointer-events: none;
+      transition: color .2s ease, opacity .2s ease;
     }
     .hotspot.active {
       border-color: var(--gold);
-      background: rgba(216,192,122,.20);
+      background: rgba(216,192,122,.28);
+      box-shadow: 0 0 28px rgba(216,192,122,.48), 0 0 10px rgba(216,192,122,.30), inset 0 0 8px rgba(216,192,122,.16);
+    }
+    .hotspot.active .hotspot-label { color: var(--gold); }
+    .hotspot.active::before { animation: none; border-color: rgba(216,192,122,.30); }
+    @keyframes hotspotPulse {
+      0%, 100% { opacity: .5; transform: scale(1); }
+      50% { opacity: 0; transform: scale(1.55); }
     }
     .scope {
       position: absolute;
@@ -442,6 +476,15 @@
       font-size: 10px;
       letter-spacing: .08em;
     }
+    .readout .physics-tag {
+      display: block;
+      margin-top: 8px;
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .07em;
+      opacity: .80;
+    }
     .inscription {
       position: absolute;
       left: clamp(48px, 6vw, 90px);
@@ -477,7 +520,7 @@
       letter-spacing: .13em;
     }
     .navline a { color: #a79d86; }
-    .topline, .title, .controls, .inscription, .navline {
+    .topline, .title-panel, .controls, .inscription, .navline {
       transition: opacity .46s ease, filter .46s ease, transform .46s cubic-bezier(.22,1,.36,1);
     }
     .observe-tools {
@@ -518,7 +561,7 @@
       background: linear-gradient(90deg, rgba(3,3,3,.12), rgba(216,192,122,.10), rgba(3,3,3,.12));
     }
     .chamber.observing .topline,
-    .chamber.observing .title,
+    .chamber.observing .title-panel,
     .chamber.observing .controls,
     .chamber.observing .inscription,
     .chamber.observing .navline {
@@ -526,7 +569,7 @@
       filter: blur(8px);
       pointer-events: none;
     }
-    .chamber.observing .title { transform: translateY(-16px); }
+    .chamber.observing .title-panel { transform: translateY(-16px); }
     .chamber.observing .controls { transform: translateY(16px); }
     .chamber.observing .stage {
       width: min(78vw, 1180px);
@@ -577,20 +620,30 @@
     }
   </style>
   <link rel="stylesheet" href="./gallery-transition.css" />
+  <link rel="stylesheet" href="./ambient-audio.css" />
 </head>
-<body class="is-entering">
+<body class="is-entering" data-ambient-scene="light">
   <main class="chamber" id="chamber">
     <div class="wall"></div>
     <div class="light"></div>
     <div class="grain"></div>
     <header class="topline">
       <a href="./hall.html" data-transition>← HALL</a>
-      <span>EXHIBIT 06 · LIGHT & MICRO</span>
+      <span>EXHIBIT 06 · LIGHT &amp; SECURITY</span>
     </header>
-    <section class="title">
-      <div class="kicker">EXHIBIT 06 · 光与微缩</div>
+    <section class="title-panel">
+      <div class="kicker">LIGHT &amp; SECURITY GALLERY</div>
       <h1>防伪显微台</h1>
       <p>纸币表面集合了微透镜、结构色、透光水印与材料荧光。移动镜头、改变倾斜角、切换紫外与透光条件，观察复制机难以同时复现的光谱和微结构。</p>
+      <div class="guide">
+        <div class="guide-title">OBSERVATION GUIDE</div>
+        <ol>
+          <li>点击纸币上的热点标记，选择一处防伪区域</li>
+          <li>依次切换四种观察条件，对比视觉变化</li>
+          <li>开启显微镜后移动鼠标，检查局部微结构</li>
+          <li>拖动角度滑杆，模拟真实倾斜观察效果</li>
+        </ol>
+      </div>
     </section>
     <section class="stage" id="stage">
       <div class="bill-rig" id="billRig">
@@ -601,11 +654,11 @@
           <i class="bill-mark mark-thread" aria-hidden="true"></i>
           <i class="bill-mark mark-microprint" aria-hidden="true"></i>
         </div>
-        <button class="hotspot active" style="left:50%;top:45%" data-feature="ribbon" type="button" aria-label="安全条带"></button>
-        <button class="hotspot" style="left:80%;top:68%" data-feature="ink" type="button" aria-label="变色墨水"></button>
-        <button class="hotspot" style="left:31%;top:43%" data-feature="watermark" type="button" aria-label="水印"></button>
-        <button class="hotspot" style="left:57%;top:63%" data-feature="microprint" type="button" aria-label="微缩文字"></button>
-        <button class="hotspot" style="left:55%;top:28%" data-feature="thread" type="button" aria-label="安全线"></button>
+        <button class="hotspot active" style="left:50%;top:45%" data-feature="ribbon" type="button" aria-label="安全条带"><span class="hotspot-label">安全条带</span></button>
+        <button class="hotspot" style="left:80%;top:68%" data-feature="ink" type="button" aria-label="变色墨水"><span class="hotspot-label">变色墨水</span></button>
+        <button class="hotspot" style="left:31%;top:43%" data-feature="watermark" type="button" aria-label="水印"><span class="hotspot-label">水印</span></button>
+        <button class="hotspot" style="left:57%;top:63%" data-feature="microprint" type="button" aria-label="微缩文字"><span class="hotspot-label">微缩文字</span></button>
+        <button class="hotspot" style="left:55%;top:28%" data-feature="thread" type="button" aria-label="安全线"><span class="hotspot-label">安全线</span></button>
       </div>
       <div class="scope" id="scope"><div class="scope-view" id="scopeView"></div></div>
     </section>
@@ -634,8 +687,7 @@
       <span>约翰·洛克</span>
     </aside>
     <nav class="navline">
-      <a href="./imaging-gallery.html" data-transition>← IMAGING</a>
-      <a href="./time-resonance-gallery.html" data-transition>NEXT · TIME</a>
+      <a href="./time-resonance-gallery.html" data-transition>← TIME RESONANCE</a>
       <a href="./hall.html" data-transition>BACK TO HALL</a>
     </nav>
     <div class="observe-tools" aria-label="观察模式工具">
@@ -753,14 +805,20 @@
       bill.style.setProperty("--microprint-opacity", microscopeOn ? Math.min(.72, .22 + zoom * .065) : .12);
       billRig.style.transform = `translate(-50%, -50%) rotateX(${48 - angle * 14}deg) rotateY(${angle * 14}deg) rotateZ(${-8 + angle * 8}deg)`;
       const f = features[feature];
+      const modePhysics = {
+        visible: "可见光反射 · 人眼可见波段 380–700 nm",
+        tilt:    "结构色 / 薄膜干涉 · 3-D 安全条带角度依赖",
+        uv:      "荧光效应 · 材料在紫外线照射下发射可见光",
+        transmit: "透射成像 · 水印和安全线在透射光下可见"
+      };
       const modeCopy = {
-        visible: "可见光下先定位防伪区域。",
-        tilt: "倾斜模式改变观察角，突出角度依赖的光学效果。",
-        uv: "紫外模式模拟安全线与材料荧光。",
-        transmit: "透光模式模拟水印和埋入式安全线。"
+        visible: "可见光下先定位防伪区域，确认整体布局。",
+        tilt: "倾斜角改变光程差，角度依赖的光学结构此时最明显。",
+        uv: "紫外光激发特定材料的荧光响应，安全线和印刷油墨发光。",
+        transmit: "透光条件下纸张厚度差异成像，水印与安全线轮廓浮现。"
       };
       const toolCopy = microscopeOn ? "显微镜已开启，移动鼠标检查局部细节。" : "可开启显微镜作为附加观察工具。";
-      readout.innerHTML = `<b>${f.title}</b>：${f.copy}<br>${modeCopy[mode]}${toolCopy}<span class="source">物理机制：${f.physics} · 图像来源：WIKIMEDIA COMMONS / 教育展示样张</span>`;
+      readout.innerHTML = `<b>${f.title}</b>：${f.copy}<br>${modeCopy[mode]}${toolCopy}<span class="physics-tag">物理原理：${modePhysics[mode]}</span><span class="source">图像来源：WIKIMEDIA COMMONS / 教育展示样张 · ${f.physics}</span>`;
     }
 
     stage.addEventListener("pointermove", (event) => {
@@ -784,6 +842,7 @@ setFeature("ribbon");
     setMode("visible");
     setMicroscope(false);
   </script>
+  <script src="./ambient-audio.js"></script>
   <script src="./transition-nav.js"></script>
 </body>
 </html>
