@@ -841,6 +841,10 @@
       const cy = h * (.5 + drift * .028);
       ctx.save();
       ctx.globalAlpha = Math.min(1, (layer.weight / total) * 2.35);
+      // Clip to ellipse to prevent rectangular edges from zoomed layers
+      ctx.beginPath();
+      ctx.ellipse(w * .5, h * .5, w * .48, h * .47, 0, 0, Math.PI * 2);
+      ctx.clip();
       ctx.translate(w * .5, h * .5);
       ctx.scale(zoom, zoom);
       ctx.translate(-cx, -cy);
@@ -944,6 +948,10 @@
       ctx.save();
       ctx.globalAlpha *= alpha;
       ctx.globalCompositeOperation = "screen";
+      // Clip to ellipse to avoid rectangular texture edges
+      ctx.beginPath();
+      ctx.ellipse(w * .5, h * .5, w * .48, h * .46, 0, 0, Math.PI * 2);
+      ctx.clip();
       ctx.drawImage(texture, 0, 0, w, h);
       ctx.restore();
     }
@@ -1036,27 +1044,16 @@
     }
 
     function drawCanvasEdgeFade(w, h) {
+      // Radial vignette — no rectangular edges
       ctx.save();
       ctx.globalCompositeOperation = "source-over";
-      const right = ctx.createLinearGradient(w * .84, 0, w, 0);
-      right.addColorStop(0, "rgba(2,2,2,0)");
-      right.addColorStop(.62, "rgba(2,2,2,.72)");
-      right.addColorStop(1, "rgba(2,2,2,1)");
-      ctx.fillStyle = right;
-      ctx.fillRect(w * .84, 0, w * .16, h);
-
-      const bottom = ctx.createLinearGradient(0, h * .80, 0, h);
-      bottom.addColorStop(0, "rgba(2,2,2,0)");
-      bottom.addColorStop(.58, "rgba(2,2,2,.76)");
-      bottom.addColorStop(1, "rgba(2,2,2,1)");
-      ctx.fillStyle = bottom;
-      ctx.fillRect(0, h * .80, w, h * .20);
-
-      const left = ctx.createLinearGradient(0, 0, w * .11, 0);
-      left.addColorStop(0, "rgba(2,2,2,.96)");
-      left.addColorStop(1, "rgba(2,2,2,0)");
-      ctx.fillStyle = left;
-      ctx.fillRect(0, 0, w * .11, h);
+      const vignette = ctx.createRadialGradient(w * .5, h * .5, Math.min(w, h) * .28, w * .5, h * .5, Math.max(w, h) * .56);
+      vignette.addColorStop(0, "rgba(2,2,2,0)");
+      vignette.addColorStop(.6, "rgba(2,2,2,0)");
+      vignette.addColorStop(.82, "rgba(2,2,2,.65)");
+      vignette.addColorStop(1, "rgba(2,2,2,.97)");
+      ctx.fillStyle = vignette;
+      ctx.fillRect(0, 0, w, h);
       ctx.restore();
     }
 
@@ -1157,7 +1154,9 @@
       membrane.addColorStop(.5, "rgba(238,233,220,.09)");
       membrane.addColorStop(1, "rgba(216,192,122,.05)");
       ctx.fillStyle = membrane;
-      ctx.fillRect(-430, -280, 860, 560);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 400, 260, 0, 0, Math.PI * 2);
+      ctx.fill();
       ctx.save();
       ctx.translate(-430, -280);
       drawProceduralTexture("micro", 860, 560, .62);
