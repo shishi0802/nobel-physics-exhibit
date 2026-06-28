@@ -737,6 +737,38 @@
       model: "./vendor/mediapipe/models/gesture_recognizer.task"
     };
 
+    // Preload photo assets for each scale layer
+    const scalePhotos = {};
+    const photoSrcs = {
+      nucleus: "./assets/scale/nucleus.png",
+      atom:    "./assets/scale/atom.png",
+      micro:   "./assets/scale/micro.jpg",
+      human:   "./assets/scale/human.jpg",
+      earth:   "./assets/scale/earth.jpg",
+      orbit:   "./assets/scale/orbit.jpg",
+      galaxy:  "./assets/scale/galaxy.jpg",
+      cosmos:  "./assets/scale/cosmos.jpg"
+    };
+    Object.entries(photoSrcs).forEach(([key, src]) => {
+      const img = new Image();
+      img.src = src;
+      scalePhotos[key] = img;
+    });
+
+    function drawPhoto(key, w, h, blendMode, alpha) {
+      const img = scalePhotos[key];
+      if (!img || !img.complete || !img.naturalWidth) return;
+      ctx.save();
+      ctx.globalAlpha *= alpha;
+      ctx.globalCompositeOperation = blendMode || "source-over";
+      // Fit image to canvas, cover mode centered
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+      const scale = Math.max(w / iw, h / ih);
+      const dw = iw * scale, dh = ih * scale;
+      ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+      ctx.restore();
+    }
+
     function resizeCanvas() {
       const rect = canvas.getBoundingClientRect();
       const dpr = 1; // Force DPR=1 for performance; visual quality maintained by large canvas
@@ -1060,38 +1092,40 @@
     function drawSubatomicField(w, h) {
       const cx = w * .5, cy = h * .5;
       ctx.save();
+      // Base: quark diagram tinted deep cyan
+      drawPhoto("nucleus", w, h, "screen", .55);
       ctx.globalCompositeOperation = "screen";
-      drawProceduralTexture("subatomic", w, h, .58);
+      drawProceduralTexture("subatomic", w, h, .38);
       const core = ctx.createRadialGradient(cx, cy, 1, cx, cy, w * .18);
-      core.addColorStop(0, "rgba(255,246,215,.95)");
-      core.addColorStop(.20, "rgba(216,192,122,.48)");
-      core.addColorStop(.52, "rgba(143,221,234,.18)");
+      core.addColorStop(0, "rgba(255,246,215,.85)");
+      core.addColorStop(.22, "rgba(216,192,122,.38)");
+      core.addColorStop(.52, "rgba(143,221,234,.12)");
       core.addColorStop(1, "rgba(143,221,234,0)");
       ctx.fillStyle = core;
       ctx.beginPath();
-      ctx.arc(cx, cy, w * .18, 0, Math.PI * 2);
+      ctx.arc(cx, cy, w * .20, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = "rgba(143,221,234,.34)";
+      ctx.strokeStyle = "rgba(143,221,234,.28)";
       ctx.lineWidth = 1;
-      for (let i = 0; i < 6; i++) {
-        const phase = pseudoT * .0012 + i * .8;
+      for (let i = 0; i < 5; i++) {
+        const phase = pseudoT * .0010 + i * .8;
         ctx.beginPath();
-        for (let x = -w * .45; x <= w * .45; x += 12) {
-          const env = Math.exp(-Math.abs(x) / (w * .32));
-          const y = Math.sin(x * .028 + phase) * 46 * env + Math.sin(x * .011 - phase) * 22;
-          if (x === -w * .45) ctx.moveTo(cx + x, cy + y + (i - 4) * 18);
-          else ctx.lineTo(cx + x, cy + y + (i - 4) * 18);
+        for (let x = -w * .44; x <= w * .44; x += 14) {
+          const env = Math.exp(-Math.abs(x) / (w * .30));
+          const y = Math.sin(x * .026 + phase) * 40 * env + Math.sin(x * .010 - phase) * 18;
+          if (x === -w * .44) ctx.moveTo(cx + x, cy + y + (i - 2) * 22);
+          else ctx.lineTo(cx + x, cy + y + (i - 2) * 22);
         }
         ctx.stroke();
       }
-      for (let i = 0; i < 72; i++) {
-        const a = i * 2.399 + pseudoT * .0006;
-        const r = Math.sqrt(i / 72) * w * .30;
-        const x = cx + Math.cos(a) * r;
-        const y = cy + Math.sin(a * 1.3) * r * .56;
-        ctx.fillStyle = i % 5 === 0 ? "rgba(216,192,122,.70)" : "rgba(143,221,234,.48)";
+      for (let i = 0; i < 50; i++) {
+        const a = i * 2.399 + pseudoT * .0005;
+        const r = Math.sqrt(i / 50) * w * .26;
+        const px = cx + Math.cos(a) * r;
+        const py = cy + Math.sin(a * 1.3) * r * .56;
+        ctx.fillStyle = i % 5 === 0 ? "rgba(216,192,122,.65)" : "rgba(143,221,234,.42)";
         ctx.beginPath();
-        ctx.arc(x, y, i % 5 === 0 ? 2.4 : 1.5, 0, Math.PI * 2);
+        ctx.arc(px, py, i % 5 === 0 ? 2.2 : 1.4, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.restore();
@@ -1100,37 +1134,41 @@
     function drawAtom(w, h, micro) {
       const cx = w * .5, cy = h * .5;
       ctx.save();
+      // Base: hydrogen electron density map
+      drawPhoto("atom", w, h, "screen", .50);
       ctx.globalCompositeOperation = "screen";
-      for (let i = 0; i < 6; i++) {
-        const radius = 54 + i * 38;
-        const alpha = .025 + (i % 3) * .014;
+      for (let i = 0; i < 5; i++) {
+        const radius = 60 + i * 44;
+        const alpha = .028 + (i % 3) * .014;
         ctx.strokeStyle = `rgba(143,221,234,${alpha})`;
-        ctx.lineWidth = 16 + (i % 3) * 8;
+        ctx.lineWidth = 14 + (i % 3) * 8;
         ctx.beginPath();
         ctx.ellipse(cx, cy, radius * 1.45, radius * .48, i * .68 + pseudoT * .00006, 0, Math.PI * 2);
         ctx.stroke();
       }
-      const cloud = ctx.createRadialGradient(cx, cy, 18, cx, cy, w * .32);
-      cloud.addColorStop(0, "rgba(238,233,220,.10)");
-      cloud.addColorStop(.34, "rgba(143,221,234,.14)");
-      cloud.addColorStop(.68, "rgba(216,192,122,.06)");
+      const cloud = ctx.createRadialGradient(cx, cy, 18, cx, cy, w * .30);
+      cloud.addColorStop(0, "rgba(238,233,220,.08)");
+      cloud.addColorStop(.34, "rgba(143,221,234,.10)");
+      cloud.addColorStop(.68, "rgba(216,192,122,.04)");
       cloud.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = cloud;
-      ctx.fillRect(0, 0, w, h);
+      ctx.beginPath();
+      ctx.arc(cx, cy, w * .30, 0, Math.PI * 2);
+      ctx.fill();
       for (let i = 0; i < 4; i++) {
-        ctx.strokeStyle = i % 2 ? "rgba(143,221,234,.40)" : "rgba(238,233,220,.26)";
+        ctx.strokeStyle = i % 2 ? "rgba(143,221,234,.36)" : "rgba(238,233,220,.22)";
         ctx.lineWidth = 1.2;
         ctx.beginPath();
         ctx.ellipse(cx, cy, 112 + i * 34, 34 + i * 14, i * Math.PI / 4 + pseudoT * .00008, 0, Math.PI * 2);
         ctx.stroke();
       }
-      const nucleus = ctx.createRadialGradient(cx, cy, 2, cx, cy, 72);
-      nucleus.addColorStop(0, "rgba(255,246,215,.95)");
-      nucleus.addColorStop(.28, "rgba(216,192,122,.38)");
+      const nucleus = ctx.createRadialGradient(cx, cy, 2, cx, cy, 68);
+      nucleus.addColorStop(0, "rgba(255,246,215,.90)");
+      nucleus.addColorStop(.28, "rgba(216,192,122,.32)");
       nucleus.addColorStop(1, "rgba(216,192,122,0)");
       ctx.fillStyle = nucleus;
       ctx.beginPath();
-      ctx.arc(cx, cy, 78 * micro + 22, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 72 * micro + 20, 0, Math.PI * 2);
       ctx.fill();
       for (let i = 0; i < 40; i++) {
         const a = i * 2.399 + pseudoT * .0004;
@@ -1147,6 +1185,8 @@
 
     function drawMicrostructure(w, h, micro) {
       ctx.save();
+      // Base: fluorescence microscopy cell
+      drawPhoto("micro", w, h, "screen", .62);
       ctx.translate(w * .5, h * .5);
       ctx.rotate(-.2);
       const membrane = ctx.createLinearGradient(-360, -240, 360, 260);
@@ -1185,6 +1225,8 @@
 
     function drawHumanRoom(w, h) {
       ctx.save();
+      // Base: Vitruvian Man (da Vinci, public domain)
+      drawPhoto("human", w, h, "source-over", .22);
       const cx = w * .5, cy = h * .54;
       const wash = ctx.createRadialGradient(cx, cy - 40, 8, cx, cy, w * .48);
       wash.addColorStop(0, "rgba(238,233,220,.10)");
@@ -1242,6 +1284,9 @@
     function drawPlanetary(w, h, cosmic, kind) {
       const cx = w * .5, cy = h * .54;
       ctx.save();
+      // Base photo: earth from Apollo 17 (earth), or solar system true color (orbit)
+      const photoKey = kind === "earth" ? "earth" : "orbit";
+      drawPhoto(photoKey, w, h, "screen", .60);
       const night = ctx.createRadialGradient(cx, cy, 10, cx, cy, w * .42);
       night.addColorStop(0, "rgba(72,132,145,.08)");
       night.addColorStop(.55, "rgba(143,221,234,.05)");
@@ -1299,8 +1344,10 @@
     function drawCosmos(w, h, cosmic) {
       const cx = w * .5, cy = h * .5;
       ctx.save();
+      // Base: NGC 4414 spiral galaxy (Hubble, public domain)
+      drawPhoto("galaxy", w, h, "screen", .70);
       ctx.globalCompositeOperation = "screen";
-      drawProceduralTexture("cosmos", w, h, .42);
+      drawProceduralTexture("cosmos", w, h, .28);
       const disk = ctx.createRadialGradient(cx, cy, 8, cx, cy, w * .36);
       disk.addColorStop(0, "rgba(238,233,220,.20)");
       disk.addColorStop(.22, "rgba(216,192,122,.13)");
@@ -1342,6 +1389,8 @@
       const cx = w * .5;
       const cy = h * .5;
       ctx.save();
+      // Base: JWST First Deep Field — thousands of galaxies at cosmic scale
+      drawPhoto("cosmos", w, h, "screen", .75);
       const voids = ctx.createRadialGradient(cx, cy, 10, cx, cy, w * .50);
       voids.addColorStop(0, "rgba(238,233,220,.055)");
       voids.addColorStop(.42, "rgba(143,221,234,.045)");
