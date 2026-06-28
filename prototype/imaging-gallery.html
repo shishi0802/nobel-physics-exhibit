@@ -22,332 +22,147 @@
         radial-gradient(circle at 40% 66%, rgba(216,192,122,.05), transparent 24%),
         linear-gradient(180deg, #080807 0%, #020202 66%, #000 100%);
     }
-    .room {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      perspective: 1200px;
-    }
+    .room { position: absolute; inset: 0; pointer-events: none; perspective: 1200px; }
     .wall {
-      position: absolute;
-      left: 11vw;
-      right: 11vw;
-      top: 8vh;
-      height: 66vh;
+      position: absolute; left: 11vw; right: 11vw; top: 8vh; height: 66vh;
       background: linear-gradient(180deg, rgba(17,17,16,.94), rgba(4,4,4,.96));
       border-top: 1px solid rgba(238,233,220,.07);
       box-shadow: inset 0 0 160px rgba(255,255,255,.018), 0 46px 160px rgba(0,0,0,.72);
       mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
     }
     .floor {
-      position: absolute;
-      left: -16vw;
-      right: -16vw;
-      bottom: -34vh;
-      height: 58vh;
-      transform: rotateX(65deg);
-      transform-origin: 50% 0;
+      position: absolute; left: -16vw; right: -16vw; bottom: -34vh; height: 58vh;
+      transform: rotateX(65deg); transform-origin: 50% 0;
       border-top: 1px solid rgba(238,233,220,.06);
       background: linear-gradient(180deg, rgba(22,22,20,.48), #020202 68%);
     }
     .light {
-      position: absolute;
-      left: 50%;
-      top: 3vh;
-      width: 60vw;
-      height: 72vh;
+      position: absolute; left: 50%; top: 3vh; width: 60vw; height: 72vh;
       transform: translateX(-50%);
       background: conic-gradient(from 180deg at 50% 0%, transparent 0 35%, rgba(143,221,234,.12) 44%, rgba(238,233,220,.10) 50%, rgba(143,221,234,.12) 56%, transparent 65% 100%);
-      filter: blur(20px);
-      opacity: .70;
-      mix-blend-mode: screen;
+      filter: blur(20px); opacity: .70; mix-blend-mode: screen;
     }
     .topline {
-      position: absolute;
-      left: clamp(40px, 5vw, 80px);
-      right: clamp(40px, 5vw, 80px);
-      top: 34px;
-      z-index: 10;
-      display: flex;
-      justify-content: space-between;
-      color: #8d887f;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: .15em;
+      position: absolute; left: clamp(40px, 5vw, 80px); right: clamp(40px, 5vw, 80px);
+      top: 34px; z-index: 10; display: flex; justify-content: space-between;
+      color: #8d887f; font-family: var(--mono); font-size: 11px; letter-spacing: .15em;
     }
     .topline a { color: #d9cfb2; }
 
-    /* --- Left panel: title + guide --- */
+    /* Left panel */
     .title-panel {
-      position: absolute;
-      left: clamp(48px, 6vw, 90px);
-      top: clamp(88px, 14vh, 136px);
-      z-index: 8;
-      width: min(380px, 28vw);
+      position: absolute; left: clamp(48px, 6vw, 90px); top: clamp(88px, 14vh, 136px);
+      z-index: 8; width: min(360px, 27vw);
     }
-    .kicker {
-      color: var(--gold);
-      font-family: var(--mono);
-      font-size: 12px;
-      letter-spacing: .18em;
-      margin-bottom: 20px;
-    }
-    h1 {
-      margin: 0;
-      font-family: var(--serif);
-      font-size: clamp(40px, 4.6vw, 68px);
-      line-height: 1.06;
-    }
-    .title-panel .subtitle {
-      margin: 18px 0 0;
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.85;
-      text-wrap: pretty;
-    }
-    .guide {
-      margin-top: 28px;
-      padding-top: 16px;
-      border-top: 1px solid rgba(238,233,220,.14);
-    }
-    .guide-title {
-      color: var(--gold);
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: .14em;
-      margin-bottom: 12px;
-    }
-    .guide ol {
-      margin: 0;
-      padding-left: 18px;
-      color: #928b80;
-      font-size: 13px;
-      line-height: 2.0;
-    }
+    .kicker { color: var(--gold); font-family: var(--mono); font-size: 12px; letter-spacing: .18em; margin-bottom: 20px; }
+    h1 { margin: 0; font-family: var(--serif); font-size: clamp(40px, 4.6vw, 68px); line-height: 1.06; }
+    .title-panel .subtitle { margin: 18px 0 0; color: var(--muted); font-size: 15px; line-height: 1.85; }
+    .guide { margin-top: 24px; padding-top: 14px; border-top: 1px solid rgba(238,233,220,.14); }
+    .guide-title { color: var(--gold); font-family: var(--mono); font-size: 10px; letter-spacing: .14em; margin-bottom: 10px; }
+    .guide ol { margin: 0; padding-left: 18px; color: #928b80; font-size: 13px; line-height: 2.0; }
     .guide ol li::marker { color: var(--cyan); }
 
-    /* --- Central viewer --- */
+    /* Central viewer — image-based */
     .viewer {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: min(52vw, 700px);
-      height: min(62vh, 580px);
-      transform: translate(-38%, -46%);
-      z-index: 4;
+      position: absolute; left: 50%; top: 50%;
+      width: min(48vw, 640px); height: min(60vh, 560px);
+      transform: translate(-36%, -46%); z-index: 4;
+      display: grid; place-items: center;
     }
-    #imageCanvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
+    .viewer-mask {
+      position: relative; width: 100%; height: 100%;
+      mask-image: radial-gradient(ellipse at 50% 50%, #000 0 56%, rgba(0,0,0,.6) 74%, transparent 100%);
+      overflow: hidden; border-radius: 8px;
     }
+    .img-layer {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: contain; opacity: 0;
+      transition: opacity .5s ease;
+      pointer-events: none;
+    }
+    .img-layer.visible { opacity: 1; }
+    .img-layer.xray-tint { filter: grayscale(1) brightness(var(--bright, 1)) contrast(var(--ctr, 1.1)); }
+    .img-layer.mri-tint { filter: grayscale(.6) brightness(var(--bright, .9)) contrast(var(--ctr, 1.2)) sepia(.3) hue-rotate(160deg); }
+    .img-layer.pet-tint { filter: brightness(var(--bright, 1)) contrast(var(--ctr, 1.1)) saturate(1.3); }
     .scanline {
-      position: absolute;
-      left: 14%;
-      right: 14%;
-      top: var(--scan, 45%);
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(143,221,234,.88), transparent);
-      box-shadow: 0 0 28px rgba(143,221,234,.30);
-      transition: top .25s cubic-bezier(.16,1,.3,1);
-      pointer-events: none;
-    }
-    .viewer-frame {
-      position: absolute;
-      inset: 0;
-      border: 1px solid rgba(238,233,220,.08);
-      border-radius: 4px;
-      pointer-events: none;
-      mask-image: radial-gradient(ellipse at 50% 50%, transparent 50%, #000 68%, #000 100%);
+      position: absolute; left: 10%; right: 10%; top: var(--scan, 45%); height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(143,221,234,.82), transparent);
+      box-shadow: 0 0 22px rgba(143,221,234,.28);
+      transition: top .2s cubic-bezier(.16,1,.3,1); pointer-events: none;
     }
     .viewer-label {
-      position: absolute;
-      left: 50%;
-      bottom: -28px;
-      transform: translateX(-50%);
-      color: #6d675f;
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: .12em;
-      white-space: nowrap;
+      position: absolute; left: 50%; bottom: -24px; transform: translateX(-50%);
+      color: #6d675f; font-family: var(--mono); font-size: 10px; letter-spacing: .12em; white-space: nowrap;
+    }
+    .credit {
+      position: absolute; right: 8px; bottom: 8px;
+      color: rgba(238,233,220,.18); font-family: var(--mono); font-size: 8px; letter-spacing: .08em;
     }
 
-    /* --- Right controls --- */
+    /* Right controls */
     .controls {
-      position: absolute;
-      right: clamp(46px, 5vw, 86px);
-      top: clamp(118px, 16vh, 170px);
-      width: min(360px, 28vw);
-      z-index: 11;
+      position: absolute; right: clamp(46px, 5vw, 86px); top: clamp(118px, 16vh, 170px);
+      width: min(340px, 27vw); z-index: 11;
     }
     .modes {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0;
-      background: transparent;
-      margin-bottom: 20px;
-      border-top: 1px solid rgba(238,233,220,.16);
-      border-bottom: 1px solid rgba(238,233,220,.09);
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+      background: transparent; margin-bottom: 20px;
+      border-top: 1px solid rgba(238,233,220,.16); border-bottom: 1px solid rgba(238,233,220,.09);
     }
     .mode {
-      border: 0;
-      background: rgba(238,233,220,.018);
-      color: rgba(238,233,220,.46);
-      min-height: 52px;
-      cursor: pointer;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: .12em;
-      position: relative;
-      transition: color .22s ease, background .22s ease;
+      border: 0; background: rgba(238,233,220,.018); color: rgba(238,233,220,.46);
+      min-height: 52px; cursor: pointer; font-family: var(--mono); font-size: 11px;
+      letter-spacing: .12em; position: relative; transition: color .22s ease, background .22s ease;
     }
     .mode + .mode { border-left: 1px solid rgba(238,233,220,.08); }
     .mode::after {
-      content: "";
-      position: absolute;
-      left: 18%;
-      right: 18%;
-      bottom: 0;
-      height: 1px;
-      background: rgba(216,192,122,.70);
-      transform: scaleX(0);
-      transform-origin: 50% 50%;
-      transition: transform .24s ease;
+      content: ""; position: absolute; left: 18%; right: 18%; bottom: 0; height: 1px;
+      background: rgba(216,192,122,.70); transform: scaleX(0); transition: transform .24s ease;
     }
-    .mode.active {
-      color: var(--ink);
-      background: linear-gradient(180deg, rgba(238,233,220,.055), rgba(238,233,220,.018));
-    }
+    .mode.active { color: var(--ink); background: linear-gradient(180deg, rgba(238,233,220,.055), rgba(238,233,220,.018)); }
     .mode.active::after { transform: scaleX(1); }
-    .control-row {
-      display: grid;
-      grid-template-columns: 100px 1fr;
-      gap: 16px;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-    .control-row label {
-      color: #777168;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: .10em;
-    }
-    input[type=range] {
-      appearance: none;
-      width: 100%;
-      height: 30px;
-      background: transparent;
-      cursor: pointer;
-    }
-    input[type=range]::-webkit-slider-runnable-track {
-      height: 2px;
-      background: linear-gradient(90deg, var(--cyan), rgba(238,233,220,.18), var(--gold));
-    }
+    .control-row { display: grid; grid-template-columns: 100px 1fr; gap: 16px; align-items: center; margin-bottom: 18px; }
+    .control-row label { color: #777168; font-family: var(--mono); font-size: 11px; letter-spacing: .10em; }
+    input[type=range] { appearance: none; width: 100%; height: 30px; background: transparent; cursor: pointer; }
+    input[type=range]::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(90deg, var(--cyan), rgba(238,233,220,.18), var(--gold)); }
     input[type=range]::-webkit-slider-thumb {
-      appearance: none;
-      width: 15px;
-      height: 15px;
-      margin-top: -6.5px;
-      border-radius: 50%;
-      border: 1px solid #050505;
-      background: var(--ink);
-      box-shadow: 0 0 20px rgba(238,233,220,.30);
+      appearance: none; width: 15px; height: 15px; margin-top: -6.5px; border-radius: 50%;
+      border: 1px solid #050505; background: var(--ink); box-shadow: 0 0 20px rgba(238,233,220,.30);
     }
-    .readout {
-      margin-top: 6px;
-      padding: 14px 0;
-      border-top: 1px solid rgba(238,233,220,.10);
-      color: #928b80;
-      font-size: 13px;
-      line-height: 1.85;
-    }
+    .readout { margin-top: 6px; padding: 14px 0; border-top: 1px solid rgba(238,233,220,.10); color: #928b80; font-size: 13px; line-height: 1.85; }
     .readout b { color: #eee4c7; font-weight: 500; }
-    .readout .physics {
-      display: block;
-      margin-top: 8px;
-      color: #6d675f;
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: .06em;
-      line-height: 1.6;
-    }
+    .readout .physics { display: block; margin-top: 8px; color: #6d675f; font-family: var(--mono); font-size: 10px; letter-spacing: .06em; line-height: 1.6; }
 
-    /* --- Inscription --- */
+    /* Inscription */
     .inscription {
-      position: absolute;
-      left: clamp(48px, 6vw, 90px);
-      bottom: clamp(56px, 8vh, 92px);
-      z-index: 10;
-      width: min(360px, 28vw);
-      border-top: 1px solid rgba(216,192,122,.30);
-      padding-top: 16px;
+      position: absolute; left: clamp(48px, 6vw, 90px); bottom: clamp(56px, 8vh, 92px);
+      z-index: 10; width: min(340px, 27vw);
+      border-top: 1px solid rgba(216,192,122,.30); padding-top: 16px;
     }
-    .inscription .label {
-      color: var(--gold);
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: .16em;
-      margin-bottom: 13px;
-    }
-    .quote {
-      font-family: var(--serif);
-      color: #d8d1bf;
-      font-size: 17px;
-      line-height: 1.65;
-      transition: opacity .35s ease;
-    }
-    .source {
-      margin-top: 10px;
-      color: #777168;
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: .09em;
-      transition: opacity .35s ease;
-    }
+    .inscription .label { color: var(--gold); font-family: var(--mono); font-size: 10px; letter-spacing: .16em; margin-bottom: 13px; }
+    .quote { font-family: var(--serif); color: #d8d1bf; font-size: 17px; line-height: 1.65; transition: opacity .35s ease; }
+    .source { margin-top: 10px; color: #777168; font-family: var(--mono); font-size: 10px; letter-spacing: .09em; transition: opacity .35s ease; }
     .fade { opacity: 0; }
 
-    /* --- Nav --- */
+    /* Nav */
     .navline {
-      position: absolute;
-      left: clamp(40px, 5vw, 80px);
-      right: clamp(40px, 5vw, 80px);
-      bottom: 28px;
-      z-index: 20;
-      display: flex;
-      justify-content: space-between;
-      color: #6d675f;
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: .13em;
+      position: absolute; left: clamp(40px, 5vw, 80px); right: clamp(40px, 5vw, 80px);
+      bottom: 28px; z-index: 20; display: flex; justify-content: space-between;
+      color: #6d675f; font-family: var(--mono); font-size: 10px; letter-spacing: .13em;
     }
     .navline a { color: #a79d86; }
 
-    /* --- Portal transition (page-local override) --- */
+    /* Transition overrides */
     .portal-transition.active { opacity: 1; animation: pageVeil .52s cubic-bezier(.22,1,.36,1) forwards; }
     .portal-transition.active::before { animation: none; opacity: 0; transform: none; }
     body.is-entering::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: 99;
-      pointer-events: none;
+      content: ""; position: fixed; inset: 0; z-index: 99; pointer-events: none;
       background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.045) 34%, rgba(3,3,2,.28) 100%);
       animation: pageReveal .72s cubic-bezier(.22,1,.36,1) forwards;
     }
-    body.is-leaving main > :not(.portal-transition) {
-      opacity: .72;
-      filter: none !important;
-      transition: opacity .52s cubic-bezier(.22,1,.36,1);
-    }
-    @keyframes pageVeil {
-      0% { background: rgba(0,0,0,0); }
-      100% { background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.050) 36%, rgba(3,3,2,.18) 100%); }
-    }
-    @keyframes pageReveal {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
+    body.is-leaving main > :not(.portal-transition) { opacity: .72; filter: none !important; transition: opacity .52s cubic-bezier(.22,1,.36,1); }
+    @keyframes pageVeil { 0% { background: rgba(0,0,0,0); } 100% { background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.050) 36%, rgba(3,3,2,.18) 100%); } }
+    @keyframes pageReveal { from { opacity: 1; } to { opacity: 0; } }
   </style>
   <link rel="stylesheet" href="./gallery-transition.css" />
   <link rel="stylesheet" href="./ambient-audio.css" />
@@ -364,23 +179,37 @@
     <section class="title-panel">
       <div class="kicker">IMAGING CHAMBER</div>
       <h1>被重构的身体</h1>
-      <p class="subtitle">同一个身体在不同物理技术下显出不同层次。医学成像不是简单拍照，是用物理过程重建身体的可见性。</p>
+      <p class="subtitle">同一个身体在不同物理技术下显出不同层次。医学成像不是拍照，是用物理过程重建身体的可见性。</p>
       <div class="guide">
         <div class="guide-title">OBSERVATION GUIDE</div>
         <ol>
           <li>选择右侧成像模式：X 光、MRI 或 PET</li>
-          <li>拖动切片位置滑杆改变观察层面</li>
-          <li>调节窗宽窗位控制显影对比度</li>
-          <li>观察不同模式下同一身体呈现出的不同结构</li>
+          <li>拖动切片滑杆浏览不同层面</li>
+          <li>调节窗宽窗位控制显影明暗</li>
+          <li>对比同一位置在不同物理原理下的呈现差异</li>
         </ol>
       </div>
     </section>
 
     <section class="viewer">
-      <canvas id="imageCanvas"></canvas>
-      <div class="scanline" id="scanline"></div>
-      <div class="viewer-frame"></div>
-      <div class="viewer-label" id="viewerLabel">AXIAL SLICE · LEVEL 45%</div>
+      <div class="viewer-mask" id="viewerMask">
+        <!-- X-RAY images -->
+        <img class="img-layer xray-tint visible" data-mode="xray" data-slice="0" src="./assets/imaging/ct-thorax.jpg" alt="CT 胸部轴向切片（骨窗）" />
+        <img class="img-layer xray-tint" data-mode="xray" data-slice="1" src="./assets/imaging/ct-lungs.jpg" alt="CT 胸部轴向切片（肺窗）" />
+        <!-- MRI images -->
+        <img class="img-layer mri-tint" data-mode="mri" data-slice="0" src="./assets/imaging/mri-t2-03.jpg" alt="MRI T2 脑轴向切片 Level 3" />
+        <img class="img-layer mri-tint" data-mode="mri" data-slice="1" src="./assets/imaging/mri-t2-05.jpg" alt="MRI T2 脑轴向切片 Level 5" />
+        <img class="img-layer mri-tint" data-mode="mri" data-slice="2" src="./assets/imaging/mri-t2-07.jpg" alt="MRI T2 脑轴向切片 Level 7" />
+        <img class="img-layer mri-tint" data-mode="mri" data-slice="3" src="./assets/imaging/mri-t2-15.jpg" alt="MRI T2 脑轴向切片 Level 15" />
+        <img class="img-layer mri-tint" data-mode="mri" data-slice="4" src="./assets/imaging/mri-t2-17.jpg" alt="MRI T2 脑轴向切片 Level 17" />
+        <img class="img-layer mri-tint" data-mode="mri" data-slice="5" src="./assets/imaging/mri-t2-18.jpg" alt="MRI T2 脑轴向切片 Level 18" />
+        <img class="img-layer mri-tint" data-mode="mri" data-slice="6" src="./assets/imaging/mri-t2-20.jpg" alt="MRI T2 脑轴向切片 Level 20" />
+        <!-- PET image -->
+        <img class="img-layer pet-tint" data-mode="pet" data-slice="0" src="./assets/imaging/pet-body.jpg" alt="PET/CT 全身代谢成像" />
+        <div class="scanline" id="scanline"></div>
+        <span class="credit">IMAGE · WIKIMEDIA COMMONS · EDUCATIONAL DISPLAY</span>
+      </div>
+      <div class="viewer-label" id="viewerLabel">X-RAY · BONE WINDOW</div>
     </section>
 
     <section class="controls">
@@ -390,19 +219,15 @@
         <button class="mode" data-mode="pet" type="button">PET</button>
       </div>
       <div class="control-row">
-        <label for="sliceSlider">SLICE LEVEL</label>
-        <input id="sliceSlider" type="range" min="0" max="1" value=".45" step=".001" />
+        <label for="sliceSlider">SLICE</label>
+        <input id="sliceSlider" type="range" min="0" max="1" value="0" step=".001" />
       </div>
       <div class="control-row">
-        <label for="contrastSlider">WINDOW / LEVEL</label>
-        <input id="contrastSlider" type="range" min="0" max="1" value=".62" step=".001" />
-      </div>
-      <div class="control-row">
-        <label for="densitySlider">DENSITY</label>
-        <input id="densitySlider" type="range" min="0" max="1" value=".5" step=".001" />
+        <label for="windowSlider">WINDOW</label>
+        <input id="windowSlider" type="range" min="0" max="1" value=".5" step=".001" />
       </div>
       <div class="readout" id="readout">
-        <b>X 光模式</b>：X 射线穿透软组织，被高密度结构（骨骼、钙化灶）吸收。密度差形成灰度图像，骨骼最亮。
+        <b>X 光模式</b>：X 射线穿透软组织被高密度结构吸收，密度差形成灰度图像。骨窗突出骨骼，肺窗显示气道。
         <span class="physics">物理原理：X 射线衰减 · 光电效应 · 康普顿散射 · 1895 伦琴发现</span>
       </div>
     </section>
@@ -423,347 +248,107 @@
   <script src="./philosophy-inscriptions.js"></script>
   <script src="./ambient-audio.js"></script>
   <script>
-    const canvas = document.getElementById("imageCanvas");
-    const ctx = canvas.getContext("2d");
     const sliceSlider = document.getElementById("sliceSlider");
-    const contrastSlider = document.getElementById("contrastSlider");
-    const densitySlider = document.getElementById("densitySlider");
+    const windowSlider = document.getElementById("windowSlider");
     const readout = document.getElementById("readout");
     const scanline = document.getElementById("scanline");
     const viewerLabel = document.getElementById("viewerLabel");
+    const viewerMask = document.getElementById("viewerMask");
+    const allLayers = Array.from(document.querySelectorAll(".img-layer"));
     let mode = "xray";
-    let slice = .45;
-    let contrast = .62;
-    let density = .5;
-    let t = 0;
 
-    function resize() {
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = Math.floor(rect.width);
-      canvas.height = Math.floor(rect.height);
-    }
+    const modeSlices = {
+      xray: allLayers.filter(el => el.dataset.mode === "xray"),
+      mri: allLayers.filter(el => el.dataset.mode === "mri"),
+      pet: allLayers.filter(el => el.dataset.mode === "pet")
+    };
 
-    function draw(now) {
-      t = now || 0;
-      if (document.hidden) { requestAnimationFrame(draw); return; }
-      const w = canvas.width;
-      const h = canvas.height;
-      ctx.clearRect(0, 0, w, h);
-      drawBackground(w, h);
-      drawBody(w, h);
-      drawOverlay(w, h);
-      requestAnimationFrame(draw);
-    }
-
-    function drawBackground(w, h) {
-      const cx = w * .50, cy = h * .50;
-      // Subtle ambient glow
-      const glow = ctx.createRadialGradient(cx, cy, 10, cx, cy, w * .52);
-      glow.addColorStop(0, "rgba(238,233,220,.06)");
-      glow.addColorStop(.3, mode === "pet" ? "rgba(255,107,95,.04)" : "rgba(143,221,234,.04)");
-      glow.addColorStop(.65, "rgba(0,0,0,.01)");
-      glow.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = glow;
-      ctx.fillRect(0, 0, w, h);
-
-      // Grid rings (like medical display)
-      ctx.save();
-      ctx.globalAlpha = .06;
-      ctx.strokeStyle = "#eee9dc";
-      ctx.lineWidth = .5;
-      for (let r = 60; r < w * .5; r += 60) {
-        ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-      // Cross hair
-      ctx.beginPath();
-      ctx.moveTo(cx - w * .42, cy);
-      ctx.lineTo(cx + w * .42, cy);
-      ctx.moveTo(cx, cy - h * .42);
-      ctx.lineTo(cx, cy + h * .42);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function drawBody(w, h) {
-      const cx = w * .50, cy = h * .50;
-      const bodyW = w * .30, bodyH = h * .40;
-      ctx.save();
-      ctx.translate(cx, cy);
-
-      if (mode === "xray") drawXray(bodyW, bodyH);
-      else if (mode === "mri") drawMRI(bodyW, bodyH);
-      else if (mode === "pet") drawPET(bodyW, bodyH);
-
-      ctx.restore();
-    }
-
-    function drawXray(bw, bh) {
-      const alpha = .14 + contrast * .50;
-      // Body outline (thorax cross-section)
-      ctx.strokeStyle = `rgba(238,233,220,${alpha * .4})`;
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, bw, bh * (.85 + slice * .15), 0, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Spine
-      ctx.strokeStyle = `rgba(238,233,220,${alpha})`;
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.moveTo(0, -bh * .90);
-      ctx.lineTo(0, bh * .90);
-      ctx.stroke();
-
-      // Vertebrae
-      ctx.lineWidth = 2.5;
-      const vertebrae = 12 + Math.floor(density * 6);
-      for (let i = 0; i < vertebrae; i++) {
-        const y = -bh * .80 + i * (bh * 1.6 / vertebrae);
-        const vw = 18 + Math.sin(i * .5 + slice * 3) * 6;
-        ctx.beginPath();
-        ctx.moveTo(-vw, y); ctx.lineTo(vw, y);
-        ctx.stroke();
-        // Transverse processes
-        ctx.strokeStyle = `rgba(238,233,220,${alpha * .6})`;
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(-vw, y); ctx.lineTo(-vw - 14, y - 4);
-        ctx.moveTo(vw, y); ctx.lineTo(vw + 14, y - 4);
-        ctx.stroke();
-        ctx.strokeStyle = `rgba(238,233,220,${alpha})`;
-        ctx.lineWidth = 2.5;
-      }
-
-      // Ribs
-      ctx.strokeStyle = `rgba(238,233,220,${alpha * .7})`;
-      ctx.lineWidth = 1.8;
-      const ribCount = 8 + Math.floor(density * 4);
-      for (let i = 0; i < ribCount; i++) {
-        const y = -bh * .55 + i * (bh * .9 / ribCount);
-        const ribSpan = bw * (.55 + Math.sin((i + slice * 5) * .4) * .15);
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.quadraticCurveTo(ribSpan * .5, y - 12, ribSpan, y + 8);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.quadraticCurveTo(-ribSpan * .5, y - 12, -ribSpan, y + 8);
-        ctx.stroke();
-      }
-
-      // Skull (at top slices)
-      if (slice < .25) {
-        ctx.strokeStyle = `rgba(238,233,220,${alpha * .8})`;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.ellipse(0, -bh * .72, bw * .38, bh * .22, 0, 0, Math.PI * 2);
-        ctx.stroke();
-        // Eye sockets
-        ctx.beginPath();
-        ctx.ellipse(-bw * .14, -bh * .74, 8, 6, 0, 0, Math.PI * 2);
-        ctx.ellipse(bw * .14, -bh * .74, 8, 6, 0, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-
-      // Pelvis (at lower slices)
-      if (slice > .70) {
-        ctx.strokeStyle = `rgba(238,233,220,${alpha * .7})`;
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.moveTo(-bw * .12, bh * .55);
-        ctx.quadraticCurveTo(-bw * .55, bh * .45, -bw * .45, bh * .75);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(bw * .12, bh * .55);
-        ctx.quadraticCurveTo(bw * .55, bh * .45, bw * .45, bh * .75);
-        ctx.stroke();
-      }
-
-      // Lung fields (translucent)
-      ctx.fillStyle = `rgba(143,221,234,${.03 + contrast * .04})`;
-      ctx.beginPath();
-      ctx.ellipse(-bw * .38, -bh * .12, bw * .22, bh * .30, -.08, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(bw * .38, -bh * .12, bw * .22, bh * .30, .08, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    function drawMRI(bw, bh) {
-      const alpha = .12 + contrast * .48;
-      // Tissue layers — concentric ellipses with varying brightness
-      const layers = 18 + Math.floor(density * 12);
-      for (let i = 0; i < layers; i++) {
-        const t_i = i / layers;
-        const rx = bw * (.15 + t_i * .85);
-        const ry = bh * (.15 + t_i * .85);
-        const signal = Math.sin(t_i * Math.PI * 2 + slice * 4) * .5 + .5;
-        ctx.strokeStyle = `rgba(143,221,234,${alpha * signal * (1 - t_i * .5)})`;
-        ctx.lineWidth = 2 + signal * 2;
-        ctx.beginPath();
-        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-
-      // Brain / organ structures
-      ctx.fillStyle = `rgba(238,233,220,${alpha * .3})`;
-      // Gray matter-like structure
-      const lobes = 6 + Math.floor(density * 4);
-      for (let i = 0; i < lobes; i++) {
-        const angle = (i / lobes) * Math.PI * 2 + slice * 2;
-        const dist = bw * (.25 + Math.sin(i * 2.3) * .12);
-        const x = Math.cos(angle) * dist;
-        const y = Math.sin(angle) * dist * (bh / bw);
-        const size = 16 + Math.sin(i * 1.7 + slice * 3) * 8;
-        ctx.beginPath();
-        ctx.ellipse(x, y, size, size * 1.3, angle, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // White matter tracts
-      ctx.strokeStyle = `rgba(238,233,220,${alpha * .5})`;
-      ctx.lineWidth = 1;
-      for (let i = 0; i < 8; i++) {
-        const startAngle = (i / 8) * Math.PI * 2;
-        const r1 = bw * .18;
-        const r2 = bw * (.45 + density * .2);
-        ctx.beginPath();
-        ctx.moveTo(Math.cos(startAngle) * r1, Math.sin(startAngle) * r1 * (bh / bw));
-        const ctrl = startAngle + .4;
-        ctx.quadraticCurveTo(
-          Math.cos(ctrl) * r2 * .6, Math.sin(ctrl) * r2 * .6 * (bh / bw),
-          Math.cos(startAngle + .8) * r2, Math.sin(startAngle + .8) * r2 * (bh / bw)
-        );
-        ctx.stroke();
-      }
-
-      // CSF spaces (dark voids)
-      ctx.fillStyle = `rgba(0,0,0,${.15 + contrast * .12})`;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, bw * .08, bh * .06, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(-bw * .06, -bh * .02, bw * .04, bh * .08, -.3, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(bw * .06, -bh * .02, bw * .04, bh * .08, .3, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    function drawPET(bw, bh) {
-      const alpha = .10 + contrast * .52;
-      // Metabolism map — hot spots and cold regions
-      const count = 120 + Math.floor(density * 80);
-      for (let i = 0; i < count; i++) {
-        const angle = i * 2.399 + slice * 2;
-        const dist = Math.sqrt(i / count) * bw * .92;
-        const x = Math.cos(angle) * dist;
-        const y = Math.sin(angle) * dist * (bh / bw);
-
-        // Check if inside body outline
-        if ((x * x) / (bw * bw) + (y * y) / (bh * bh) > .85) continue;
-
-        // Metabolic activity varies by region
-        const regional = Math.sin(x * .02 + slice * 3) * Math.cos(y * .015 + slice * 2);
-        const hot = regional > .2 - density * .3;
-        const intensity = hot ? (.3 + Math.abs(regional) * .7) : (.05 + Math.abs(regional) * .15);
-
-        if (hot) {
-          ctx.fillStyle = `rgba(255,107,95,${alpha * intensity})`;
-          ctx.beginPath();
-          ctx.arc(x, y, 2.5 + intensity * 3, 0, Math.PI * 2);
-          ctx.fill();
-          // Glow for hottest spots
-          if (intensity > .7) {
-            ctx.fillStyle = `rgba(255,200,80,${alpha * intensity * .3})`;
-            ctx.beginPath();
-            ctx.arc(x, y, 5 + intensity * 4, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        } else {
-          ctx.fillStyle = `rgba(216,192,122,${alpha * intensity * .4})`;
-          ctx.beginPath();
-          ctx.arc(x, y, 1.2 + intensity * 1.5, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-
-      // Organ outlines (faint)
-      ctx.strokeStyle = `rgba(238,233,220,${alpha * .15})`;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, bw * .85, bh * .85, 0, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-
-    function drawOverlay(w, h) {
-      // Corner markers (medical display HUD — subtle)
-      ctx.save();
-      ctx.strokeStyle = "rgba(238,233,220,.12)";
-      ctx.lineWidth = 1;
-      const m = 24;
-      const s = 18;
-      // Top-left
-      ctx.beginPath(); ctx.moveTo(m, m + s); ctx.lineTo(m, m); ctx.lineTo(m + s, m); ctx.stroke();
-      // Top-right
-      ctx.beginPath(); ctx.moveTo(w - m - s, m); ctx.lineTo(w - m, m); ctx.lineTo(w - m, m + s); ctx.stroke();
-      // Bottom-left
-      ctx.beginPath(); ctx.moveTo(m, h - m - s); ctx.lineTo(m, h - m); ctx.lineTo(m + s, h - m); ctx.stroke();
-      // Bottom-right
-      ctx.beginPath(); ctx.moveTo(w - m - s, h - m); ctx.lineTo(w - m, h - m); ctx.lineTo(w - m, h - m - s); ctx.stroke();
-
-      // Mode indicator text
-      ctx.font = "10px 'IBM Plex Mono', monospace";
-      ctx.fillStyle = "rgba(238,233,220,.22)";
-      ctx.textAlign = "left";
-      ctx.fillText(mode.toUpperCase() + " · W:" + Math.round(contrast * 100) + " L:" + Math.round(slice * 100), m + 4, h - m - 6);
-      ctx.textAlign = "right";
-      ctx.fillText("D:" + Math.round(density * 100) + " · " + new Date().toLocaleTimeString("en", {hour12: false}), w - m - 4, h - m - 6);
-      ctx.restore();
-    }
+    const modeLabels = {
+      xray: ["BONE WINDOW", "LUNG WINDOW"],
+      mri: ["LEVEL 03", "LEVEL 05", "LEVEL 07", "LEVEL 15", "LEVEL 17", "LEVEL 18", "LEVEL 20"],
+      pet: ["FDG METABOLISM"]
+    };
 
     const modeInfo = {
       xray: {
         title: "X 光模式",
-        desc: "X 射线穿透软组织，被高密度结构（骨骼、钙化灶）吸收。密度差形成灰度图像，骨骼最亮。",
+        desc: "X 射线穿透软组织被高密度结构吸收，密度差形成灰度图像。骨窗突出骨骼，肺窗显示气道。",
         physics: "物理原理：X 射线衰减 · 光电效应 · 康普顿散射 · 1895 伦琴发现"
       },
       mri: {
         title: "MRI 模式",
-        desc: "强磁场中氢原子核共振后释放射频信号。不同组织的弛豫时间差形成对比，软组织层次清晰。",
+        desc: "强磁场中氢原子核共振后释放射频信号，不同组织弛豫时间形成对比。T2 序列中水和脑脊液呈高信号（亮），灰白质层次分明。",
         physics: "物理原理：核磁共振 · 拉莫尔进动 · T1/T2 弛豫 · 1971 达马迪安提出"
       },
       pet: {
         title: "PET 模式",
-        desc: "注入正电子放射性示踪剂，正电子湮灭产生一对方向相反的 γ 光子。高代谢区域积累多，形成功能图像。",
-        physics: "物理原理：正电子湮灭 · γ 射线符合探测 · 放射性示踪 · FDG 代谢"
+        desc: "注入 FDG 示踪剂后，正电子湮灭产生方向相反的 γ 光子对。高代谢组织（如脑、肿瘤）积累更多示踪剂，呈现为亮色热区。",
+        physics: "物理原理：正电子湮灭 · γ 射线符合探测 · 放射性示踪 · FDG 葡萄糖代谢"
       }
     };
 
     function setMode(next) {
       mode = next;
       document.querySelectorAll(".mode").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === mode));
+      sliceSlider.value = 0;
+      updateView();
       const info = modeInfo[mode];
       readout.innerHTML = `<b>${info.title}</b>：${info.desc}<span class="physics">${info.physics}</span>`;
     }
 
-    function updateSlice() {
-      slice = parseFloat(sliceSlider.value);
-      scanline.style.setProperty("--scan", `${18 + slice * 64}%`);
-      viewerLabel.textContent = `AXIAL SLICE · LEVEL ${Math.round(slice * 100)}%`;
+    function updateView() {
+      const sliceVal = parseFloat(sliceSlider.value);
+      const windowVal = parseFloat(windowSlider.value);
+      const slices = modeSlices[mode];
+      const labels = modeLabels[mode];
+      const count = slices.length;
+
+      // Determine which slice(s) to show
+      const pos = sliceVal * (count - 1);
+      const lower = Math.floor(pos);
+      const upper = Math.min(lower + 1, count - 1);
+      const blend = pos - lower;
+
+      // Hide all layers
+      allLayers.forEach(el => { el.classList.remove("visible"); el.style.opacity = 0; });
+
+      // Show current mode's layers with crossfade
+      if (lower === upper) {
+        slices[lower].classList.add("visible");
+        slices[lower].style.opacity = 1;
+      } else {
+        slices[lower].classList.add("visible");
+        slices[lower].style.opacity = 1 - blend;
+        slices[upper].classList.add("visible");
+        slices[upper].style.opacity = blend;
+      }
+
+      // Window/level → brightness + contrast
+      const brightness = .6 + windowVal * .8;   // range 0.6 - 1.4
+      const contrast = .8 + windowVal * .5;     // range 0.8 - 1.3
+      viewerMask.style.setProperty("--bright", brightness.toFixed(2));
+      viewerMask.style.setProperty("--ctr", contrast.toFixed(2));
+      // Apply to visible layers
+      slices.forEach(el => {
+        el.style.setProperty("--bright", brightness.toFixed(2));
+        el.style.setProperty("--ctr", contrast.toFixed(2));
+      });
+
+      // Scanline position
+      scanline.style.setProperty("--scan", `${15 + sliceVal * 70}%`);
+
+      // Label
+      const labelIdx = Math.round(sliceVal * (labels.length - 1));
+      viewerLabel.textContent = `${mode.toUpperCase()} · ${labels[labelIdx]}`;
     }
 
+    // Event listeners
     document.querySelectorAll(".mode").forEach(btn => btn.addEventListener("click", () => setMode(btn.dataset.mode)));
-    sliceSlider.addEventListener("input", updateSlice);
-    contrastSlider.addEventListener("input", () => { contrast = parseFloat(contrastSlider.value); });
-    densitySlider.addEventListener("input", () => { density = parseFloat(densitySlider.value); });
+    sliceSlider.addEventListener("input", updateView);
+    windowSlider.addEventListener("input", updateView);
 
-    window.addEventListener("resize", resize);
-    resize();
+    // Init
     setMode("xray");
-    requestAnimationFrame(draw);
   </script>
   <script src="./transition-nav.js"></script>
 </body>
