@@ -77,8 +77,11 @@
     .img-layer {
       position: absolute; inset: 0; width: 100%; height: 100%;
       object-fit: contain; opacity: 0;
-      transition: opacity .5s ease;
+      transition: opacity .4s ease;
       pointer-events: none;
+    }
+    .img-layer.pet-tint {
+      object-fit: cover;
     }
     .img-layer.visible { opacity: 1; }
     .img-layer.xray-tint { filter: grayscale(1) brightness(var(--bright, 1)) contrast(var(--ctr, 1.1)); }
@@ -178,15 +181,15 @@
 
     <section class="title-panel">
       <div class="kicker">IMAGING CHAMBER</div>
-      <h1>被重构的身体</h1>
+      <h1>被重构的<br>身体</h1>
       <p class="subtitle">同一个身体在不同物理技术下显出不同层次。医学成像不是拍照，是用物理过程重建身体的可见性。</p>
       <div class="guide">
         <div class="guide-title">OBSERVATION GUIDE</div>
         <ol>
-          <li>选择右侧成像模式：X 光、MRI 或 PET</li>
-          <li>拖动切片滑杆浏览不同层面</li>
-          <li>调节窗宽窗位控制显影明暗</li>
-          <li>对比同一位置在不同物理原理下的呈现差异</li>
+          <li>选择成像模式：X 光 / MRI / PET</li>
+          <li>X光：滑杆切换骨窗与肺窗视角</li>
+          <li>MRI：滑杆浏览脑部不同层面</li>
+          <li>PET：滑杆移动观察区域，窗位调亮暗</li>
         </ol>
       </div>
     </section>
@@ -227,7 +230,7 @@
         <input id="windowSlider" type="range" min="0" max="1" value=".5" step=".001" />
       </div>
       <div class="readout" id="readout">
-        <b>X 光模式</b>：X 射线穿透软组织被高密度结构吸收，密度差形成灰度图像。骨窗突出骨骼，肺窗显示气道。
+        <b>X 光模式</b>：拖动切片滑杆切换骨窗和肺窗。骨窗下高密度骨骼最突出；肺窗下气道和肺纹理清晰。同一张 CT 数据，不同窗位呈现完全不同的身体。
         <span class="physics">物理原理：X 射线衰减 · 光电效应 · 康普顿散射 · 1895 伦琴发现</span>
       </div>
     </section>
@@ -266,23 +269,23 @@
     const modeLabels = {
       xray: ["BONE WINDOW", "LUNG WINDOW"],
       mri: ["LEVEL 03", "LEVEL 05", "LEVEL 07", "LEVEL 15", "LEVEL 17", "LEVEL 18", "LEVEL 20"],
-      pet: ["FDG METABOLISM"]
+      pet: ["WHOLE BODY · FDG"]
     };
 
     const modeInfo = {
       xray: {
         title: "X 光模式",
-        desc: "X 射线穿透软组织被高密度结构吸收，密度差形成灰度图像。骨窗突出骨骼，肺窗显示气道。",
+        desc: "拖动切片滑杆切换骨窗和肺窗。骨窗下高密度骨骼最突出；肺窗下气道和肺纹理清晰。同一张 CT 数据，不同窗位呈现完全不同的身体。",
         physics: "物理原理：X 射线衰减 · 光电效应 · 康普顿散射 · 1895 伦琴发现"
       },
       mri: {
         title: "MRI 模式",
-        desc: "强磁场中氢原子核共振后释放射频信号，不同组织弛豫时间形成对比。T2 序列中水和脑脊液呈高信号（亮），灰白质层次分明。",
+        desc: "拖动切片滑杆浏览从颅顶到颅底的连续脑切面。T2 序列中水和脑脊液呈高信号（亮），灰白质层次分明。",
         physics: "物理原理：核磁共振 · 拉莫尔进动 · T1/T2 弛豫 · 1971 达马迪安提出"
       },
       pet: {
         title: "PET 模式",
-        desc: "注入 FDG 示踪剂后，正电子湮灭产生方向相反的 γ 光子对。高代谢组织（如脑、肿瘤）积累更多示踪剂，呈现为亮色热区。",
+        desc: "全身 FDG 代谢成像。脑、心脏和膀胱等高代谢区域最亮。调节窗位控制显示哪些代谢水平的组织可见。",
         physics: "物理原理：正电子湮灭 · γ 射线符合探测 · 放射性示踪 · FDG 葡萄糖代谢"
       }
     };
@@ -303,32 +306,43 @@
       const labels = modeLabels[mode];
       const count = slices.length;
 
-      // Determine which slice(s) to show
-      const pos = sliceVal * (count - 1);
-      const lower = Math.floor(pos);
-      const upper = Math.min(lower + 1, count - 1);
-      const blend = pos - lower;
-
       // Hide all layers
       allLayers.forEach(el => { el.classList.remove("visible"); el.style.opacity = 0; });
 
-      // Show current mode's layers with crossfade
-      if (lower === upper) {
-        slices[lower].classList.add("visible");
-        slices[lower].style.opacity = 1;
+      if (mode === "xray") {
+        // X-RAY: discrete switch at 50% — bone window vs lung window
+        const idx = sliceVal < .5 ? 0 : 1;
+        slices[idx].classList.add("visible");
+        slices[idx].style.opacity = 1;
+        viewerLabel.textContent = `X-RAY · ${labels[idx]}`;
+      } else if (mode === "mri") {
+        // MRI: smooth crossfade between adjacent slices
+        const pos = sliceVal * (count - 1);
+        const lower = Math.floor(pos);
+        const upper = Math.min(lower + 1, count - 1);
+        const blend = pos - lower;
+        if (lower === upper) {
+          slices[lower].classList.add("visible");
+          slices[lower].style.opacity = 1;
+        } else {
+          slices[lower].classList.add("visible");
+          slices[lower].style.opacity = 1 - blend;
+          slices[upper].classList.add("visible");
+          slices[upper].style.opacity = blend;
+        }
+        const labelIdx = Math.round(sliceVal * (labels.length - 1));
+        viewerLabel.textContent = `MRI T2 · ${labels[labelIdx]}`;
       } else {
-        slices[lower].classList.add("visible");
-        slices[lower].style.opacity = 1 - blend;
-        slices[upper].classList.add("visible");
-        slices[upper].style.opacity = blend;
+        // PET: single image, slice controls vertical crop position
+        slices[0].classList.add("visible");
+        slices[0].style.opacity = 1;
+        slices[0].style.objectPosition = `50% ${20 + sliceVal * 60}%`;
+        viewerLabel.textContent = `PET/CT · ${labels[0]}`;
       }
 
       // Window/level → brightness + contrast
-      const brightness = .6 + windowVal * .8;   // range 0.6 - 1.4
-      const contrast = .8 + windowVal * .5;     // range 0.8 - 1.3
-      viewerMask.style.setProperty("--bright", brightness.toFixed(2));
-      viewerMask.style.setProperty("--ctr", contrast.toFixed(2));
-      // Apply to visible layers
+      const brightness = .6 + windowVal * .8;
+      const contrast = .8 + windowVal * .5;
       slices.forEach(el => {
         el.style.setProperty("--bright", brightness.toFixed(2));
         el.style.setProperty("--ctr", contrast.toFixed(2));
@@ -336,10 +350,6 @@
 
       // Scanline position
       scanline.style.setProperty("--scan", `${15 + sliceVal * 70}%`);
-
-      // Label
-      const labelIdx = Math.round(sliceVal * (labels.length - 1));
-      viewerLabel.textContent = `${mode.toUpperCase()} · ${labels[labelIdx]}`;
     }
 
     // Event listeners
