@@ -739,7 +739,7 @@
 
     function resizeCanvas() {
       const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = 1; // Force DPR=1 for performance; visual quality maintained by large canvas
       canvas.width = Math.max(1, Math.floor(rect.width * dpr));
       canvas.height = Math.max(1, Math.floor(rect.height * dpr));
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -935,10 +935,10 @@
     }
 
     function drawProceduralTexture(kind, w, h, alpha = 1) {
-      const key = `${kind}:${Math.round(w / 80)}:${Math.round(h / 80)}`;
+      const key = `${kind}`;
       let texture = textureCache.get(key);
       if (!texture) {
-        texture = buildTexture(kind, 760, 460);
+        texture = buildTexture(kind, 320, 200);
         textureCache.set(key, texture);
       }
       ctx.save();
@@ -997,7 +997,7 @@
       }
       g.putImageData(image, 0, 0);
       g.globalCompositeOperation = "screen";
-      for (let i = 0; i < 90; i++) {
+      for (let i = 0; i < 20; i++) {
         const x = grainNoise(i, 2, kind.length) * w;
         const y = grainNoise(i, 7, kind.length) * h;
         const radius = 18 + grainNoise(i, 11, kind.length) * 64;
@@ -1104,13 +1104,13 @@
       const cx = w * .5, cy = h * .5;
       ctx.save();
       ctx.globalCompositeOperation = "screen";
-      for (let i = 0; i < 12; i++) {
-        const radius = 54 + i * 22;
-        const alpha = .022 + (i % 4) * .012;
+      for (let i = 0; i < 6; i++) {
+        const radius = 54 + i * 38;
+        const alpha = .025 + (i % 3) * .014;
         ctx.strokeStyle = `rgba(143,221,234,${alpha})`;
-        ctx.lineWidth = 18 + (i % 3) * 10;
+        ctx.lineWidth = 16 + (i % 3) * 8;
         ctx.beginPath();
-        ctx.ellipse(cx, cy, radius * 1.45, radius * .48, i * .41 + pseudoT * .00006, 0, Math.PI * 2);
+        ctx.ellipse(cx, cy, radius * 1.45, radius * .48, i * .68 + pseudoT * .00006, 0, Math.PI * 2);
         ctx.stroke();
       }
       const cloud = ctx.createRadialGradient(cx, cy, 18, cx, cy, w * .32);
@@ -1162,24 +1162,20 @@
       ctx.translate(-430, -280);
       drawProceduralTexture("micro", 860, 560, .62);
       ctx.restore();
-      for (let y = -240; y < 260; y += 38) {
-        for (let x = -380; x < 400; x += 52) {
-          const r = 14 + Math.sin((x + y) * .02 + pseudoT * .001) * 4;
-          ctx.strokeStyle = "rgba(143,221,234,.20)";
-          const cell = ctx.createRadialGradient(x, y, 2, x, y, r + 18);
-          cell.addColorStop(0, "rgba(238,233,220,.11)");
-          cell.addColorStop(.58, "rgba(143,221,234,.055)");
-          cell.addColorStop(1, "rgba(0,0,0,0)");
-          ctx.fillStyle = cell;
+      // Reduced cell grid: larger spacing, simpler rendering
+      ctx.strokeStyle = "rgba(143,221,234,.18)";
+      ctx.lineWidth = 1;
+      for (let y = -200; y < 220; y += 72) {
+        for (let x = -320; x < 340; x += 88) {
+          const r = 18 + Math.sin((x + y) * .02) * 5;
           ctx.beginPath();
-          ctx.arc(x + ((y / 38) % 2) * 26, y, r + micro * 8, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.arc(x + ((Math.round(y / 72)) % 2) * 44, y, r + micro * 8, 0, Math.PI * 2);
           ctx.stroke();
         }
       }
-      ctx.strokeStyle = "rgba(216,192,122,.13)";
-      for (let i = 0; i < 18; i++) {
-        const x = -430 + i * 52;
+      ctx.strokeStyle = "rgba(216,192,122,.11)";
+      for (let i = 0; i < 9; i++) {
+        const x = -380 + i * 95;
         ctx.beginPath();
         ctx.moveTo(x, -280);
         ctx.bezierCurveTo(x + 54, -120, x - 46, 80, x + 30, 280);
