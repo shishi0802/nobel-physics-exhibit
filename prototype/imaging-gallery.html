@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./base.css" />
   <style>
-.chamber {
+    .chamber {
       position: relative;
       width: 100vw;
       height: 100vh;
@@ -18,18 +18,9 @@
       min-height: 720px;
       overflow: hidden;
       background:
-        radial-gradient(circle at 54% 43%, rgba(143,221,234,.10), transparent 19%),
-        radial-gradient(circle at 40% 66%, rgba(216,192,122,.07), transparent 24%),
+        radial-gradient(circle at 54% 43%, rgba(143,221,234,.08), transparent 19%),
+        radial-gradient(circle at 40% 66%, rgba(216,192,122,.05), transparent 24%),
         linear-gradient(180deg, #080807 0%, #020202 66%, #000 100%);
-    }
-    .grain {
-      position: absolute;
-      inset: 0;
-      z-index: 50;
-      opacity: .13;
-      pointer-events: none;
-      mix-blend-mode: screen;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E");
     }
     .room {
       position: absolute;
@@ -85,43 +76,65 @@
       letter-spacing: .15em;
     }
     .topline a { color: #d9cfb2; }
-    .title {
+
+    /* --- Left panel: title + guide --- */
+    .title-panel {
       position: absolute;
       left: clamp(48px, 6vw, 90px);
-      top: clamp(88px, 14vh, 142px);
+      top: clamp(88px, 14vh, 136px);
       z-index: 8;
-      width: min(460px, 34vw);
+      width: min(380px, 28vw);
     }
     .kicker {
       color: var(--gold);
       font-family: var(--mono);
       font-size: 12px;
       letter-spacing: .18em;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
     h1 {
       margin: 0;
       font-family: var(--serif);
-      font-size: clamp(48px, 5.5vw, 78px);
-      line-height: 1.04;
-      letter-spacing: 0;
+      font-size: clamp(40px, 4.6vw, 68px);
+      line-height: 1.06;
     }
-    .title p {
-      margin: 22px 0 0;
+    .title-panel .subtitle {
+      margin: 18px 0 0;
       color: var(--muted);
-      font-size: 16px;
+      font-size: 15px;
       line-height: 1.85;
       text-wrap: pretty;
     }
+    .guide {
+      margin-top: 28px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(238,233,220,.14);
+    }
+    .guide-title {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      margin-bottom: 12px;
+    }
+    .guide ol {
+      margin: 0;
+      padding-left: 18px;
+      color: #928b80;
+      font-size: 13px;
+      line-height: 2.0;
+    }
+    .guide ol li::marker { color: var(--cyan); }
+
+    /* --- Central viewer --- */
     .viewer {
       position: absolute;
       left: 50%;
       top: 50%;
-      width: min(60vw, 820px);
-      height: min(58vh, 580px);
-      transform: translate(-41%, -45%);
+      width: min(52vw, 700px);
+      height: min(62vh, 580px);
+      transform: translate(-38%, -46%);
       z-index: 4;
-      mask-image: radial-gradient(ellipse at 50% 50%, #000 0 64%, rgba(0,0,0,.70) 82%, transparent 100%);
     }
     #imageCanvas {
       position: absolute;
@@ -138,49 +151,87 @@
       background: linear-gradient(90deg, transparent, rgba(143,221,234,.88), transparent);
       box-shadow: 0 0 28px rgba(143,221,234,.30);
       transition: top .25s cubic-bezier(.16,1,.3,1);
+      pointer-events: none;
     }
+    .viewer-frame {
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(238,233,220,.08);
+      border-radius: 4px;
+      pointer-events: none;
+      mask-image: radial-gradient(ellipse at 50% 50%, transparent 50%, #000 68%, #000 100%);
+    }
+    .viewer-label {
+      position: absolute;
+      left: 50%;
+      bottom: -28px;
+      transform: translateX(-50%);
+      color: #6d675f;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .12em;
+      white-space: nowrap;
+    }
+
+    /* --- Right controls --- */
     .controls {
       position: absolute;
       right: clamp(46px, 5vw, 86px);
-      bottom: clamp(44px, 7vh, 82px);
-      width: min(430px, 34vw);
+      top: clamp(118px, 16vh, 170px);
+      width: min(360px, 28vw);
       z-index: 11;
-      border-top: 1px solid rgba(238,233,220,.18);
-      padding-top: 18px;
     }
     .modes {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: rgba(238,233,220,.12);
-      margin-bottom: 22px;
+      gap: 0;
+      background: transparent;
+      margin-bottom: 20px;
+      border-top: 1px solid rgba(238,233,220,.16);
+      border-bottom: 1px solid rgba(238,233,220,.09);
     }
     .mode {
       border: 0;
-      background: rgba(4,4,3,.86);
-      color: #8f887d;
-      min-height: 58px;
+      background: rgba(238,233,220,.018);
+      color: rgba(238,233,220,.46);
+      min-height: 52px;
       cursor: pointer;
       font-family: var(--mono);
       font-size: 11px;
       letter-spacing: .12em;
+      position: relative;
+      transition: color .22s ease, background .22s ease;
+    }
+    .mode + .mode { border-left: 1px solid rgba(238,233,220,.08); }
+    .mode::after {
+      content: "";
+      position: absolute;
+      left: 18%;
+      right: 18%;
+      bottom: 0;
+      height: 1px;
+      background: rgba(216,192,122,.70);
+      transform: scaleX(0);
+      transform-origin: 50% 50%;
+      transition: transform .24s ease;
     }
     .mode.active {
       color: var(--ink);
-      background: rgba(22,22,20,.95);
+      background: linear-gradient(180deg, rgba(238,233,220,.055), rgba(238,233,220,.018));
     }
+    .mode.active::after { transform: scaleX(1); }
     .control-row {
       display: grid;
-      grid-template-columns: 118px 1fr;
-      gap: 20px;
+      grid-template-columns: 100px 1fr;
+      gap: 16px;
       align-items: center;
-      margin-bottom: 22px;
+      margin-bottom: 18px;
     }
     .control-row label {
       color: #777168;
       font-family: var(--mono);
       font-size: 11px;
-      letter-spacing: .13em;
+      letter-spacing: .10em;
     }
     input[type=range] {
       appearance: none;
@@ -195,29 +246,42 @@
     }
     input[type=range]::-webkit-slider-thumb {
       appearance: none;
-      width: 17px;
-      height: 17px;
-      margin-top: -7.5px;
+      width: 15px;
+      height: 15px;
+      margin-top: -6.5px;
       border-radius: 50%;
       border: 1px solid #050505;
       background: var(--ink);
-      box-shadow: 0 0 26px rgba(238,233,220,.34);
+      box-shadow: 0 0 20px rgba(238,233,220,.30);
     }
     .readout {
+      margin-top: 6px;
+      padding: 14px 0;
+      border-top: 1px solid rgba(238,233,220,.10);
       color: #928b80;
       font-size: 13px;
-      line-height: 1.75;
+      line-height: 1.85;
     }
     .readout b { color: #eee4c7; font-weight: 500; }
+    .readout .physics {
+      display: block;
+      margin-top: 8px;
+      color: #6d675f;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .06em;
+      line-height: 1.6;
+    }
+
+    /* --- Inscription --- */
     .inscription {
       position: absolute;
       left: clamp(48px, 6vw, 90px);
-      bottom: clamp(44px, 7vh, 82px);
+      bottom: clamp(56px, 8vh, 92px);
       z-index: 10;
-      width: min(430px, 34vw);
+      width: min(360px, 28vw);
       border-top: 1px solid rgba(216,192,122,.30);
       padding-top: 16px;
-      min-height: 122px;
     }
     .inscription .label {
       color: var(--gold);
@@ -229,12 +293,12 @@
     .quote {
       font-family: var(--serif);
       color: #d8d1bf;
-      font-size: 18px;
+      font-size: 17px;
       line-height: 1.65;
       transition: opacity .35s ease;
     }
     .source {
-      margin-top: 12px;
+      margin-top: 10px;
       color: #777168;
       font-family: var(--mono);
       font-size: 10px;
@@ -242,6 +306,8 @@
       transition: opacity .35s ease;
     }
     .fade { opacity: 0; }
+
+    /* --- Nav --- */
     .navline {
       position: absolute;
       left: clamp(40px, 5vw, 80px);
@@ -256,40 +322,11 @@
       letter-spacing: .13em;
     }
     .navline a { color: #a79d86; }
-    .portal-transition {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      pointer-events: none;
-      opacity: 0;
-      background: #000;
-    }
-    .portal-transition.active { opacity: 1; animation: walkBlackout .96s cubic-bezier(.76,0,.24,1) forwards; }
-    .portal-transition::before {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 10vmin;
-      aspect-ratio: 1;
-      transform: translate(-50%, -50%) scale(.08);
-      border-radius: 50%;
-      border: 1px solid rgba(238,233,220,.72);
-      box-shadow: 0 0 90px rgba(238,233,220,.30), inset 0 0 38px rgba(143,221,234,.20);
-      opacity: 0;
-    }
-    .portal-transition.active::before { animation: portalOpen .82s cubic-bezier(.16,1,.3,1) forwards; }
-    @keyframes portalOpen {
-      0% { opacity: 0; transform: translate(-50%, -50%) scale(.08); }
-      18% { opacity: 1; }
-      100% { opacity: .18; transform: translate(-50%, -50%) scale(24); }
-    }
-    @keyframes portalBlackout {
-      0% { background: rgba(0,0,0,0); }
-      62% { background: rgba(0,0,0,.26); }
-      100% { background: rgba(0,0,0,1); }
-    }
-      body.is-entering::before {
+
+    /* --- Portal transition (page-local override) --- */
+    .portal-transition.active { opacity: 1; animation: pageVeil .52s cubic-bezier(.22,1,.36,1) forwards; }
+    .portal-transition.active::before { animation: none; opacity: 0; transform: none; }
+    body.is-entering::before {
       content: "";
       position: fixed;
       inset: 0;
@@ -303,17 +340,14 @@
       filter: none !important;
       transition: opacity .52s cubic-bezier(.22,1,.36,1);
     }
-    .portal-transition.active { opacity: 1; animation: pageVeil .52s cubic-bezier(.22,1,.36,1) forwards !important; }
-    .portal-transition.active::before { animation: none !important; opacity: 0 !important; transform: none !important; }
     @keyframes pageVeil {
       0% { background: rgba(0,0,0,0); }
       100% { background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.050) 36%, rgba(3,3,2,.18) 100%); }
     }
-     @keyframes pageReveal {
+    @keyframes pageReveal {
       from { opacity: 1; }
       to { opacity: 0; }
     }
-
   </style>
   <link rel="stylesheet" href="./gallery-transition.css" />
   <link rel="stylesheet" href="./ambient-audio.css" />
@@ -324,17 +358,31 @@
     <div class="grain"></div>
     <header class="topline">
       <a href="./hall.html" data-transition>← HALL</a>
-      <span>EXHIBIT 03 · MEDICAL IMAGING</span>
+      <span>EXHIBIT 05 · MEDICAL IMAGING</span>
     </header>
-    <section class="title">
-      <div class="kicker">IMAGING GALLERY</div>
+
+    <section class="title-panel">
+      <div class="kicker">IMAGING CHAMBER</div>
       <h1>被重构的身体</h1>
-      <p>同一个身体，在不同物理技术下显出不同层次：骨骼、软组织、代谢活动或磁共振信号。医学成像不是简单拍照，而是用物理过程重建可见性。</p>
+      <p class="subtitle">同一个身体在不同物理技术下显出不同层次。医学成像不是简单拍照，是用物理过程重建身体的可见性。</p>
+      <div class="guide">
+        <div class="guide-title">OBSERVATION GUIDE</div>
+        <ol>
+          <li>选择右侧成像模式：X 光、MRI 或 PET</li>
+          <li>拖动切片位置滑杆改变观察层面</li>
+          <li>调节窗宽窗位控制显影对比度</li>
+          <li>观察不同模式下同一身体呈现出的不同结构</li>
+        </ol>
+      </div>
     </section>
+
     <section class="viewer">
       <canvas id="imageCanvas"></canvas>
       <div class="scanline" id="scanline"></div>
+      <div class="viewer-frame"></div>
+      <div class="viewer-label" id="viewerLabel">AXIAL SLICE · LEVEL 45%</div>
     </section>
+
     <section class="controls">
       <div class="modes">
         <button class="mode active" data-mode="xray" type="button">X-RAY</button>
@@ -342,23 +390,32 @@
         <button class="mode" data-mode="pet" type="button">PET</button>
       </div>
       <div class="control-row">
-        <label for="sliceSlider">SLICE</label>
+        <label for="sliceSlider">SLICE LEVEL</label>
         <input id="sliceSlider" type="range" min="0" max="1" value=".45" step=".001" />
       </div>
       <div class="control-row">
-        <label for="contrastSlider">CONTRAST</label>
+        <label for="contrastSlider">WINDOW / LEVEL</label>
         <input id="contrastSlider" type="range" min="0" max="1" value=".62" step=".001" />
       </div>
-      <div class="readout" id="readout"><b>X 光模式</b>：高密度结构更清晰，骨骼成为身体内部最先显影的层次。</div>
+      <div class="control-row">
+        <label for="densitySlider">DENSITY</label>
+        <input id="densitySlider" type="range" min="0" max="1" value=".5" step=".001" />
+      </div>
+      <div class="readout" id="readout">
+        <b>X 光模式</b>：X 射线穿透软组织，被高密度结构（骨骼、钙化灶）吸收。密度差形成灰度图像，骨骼最亮。
+        <span class="physics">物理原理：X 射线衰减 · 光电效应 · 康普顿散射 · 1895 伦琴发现</span>
+      </div>
     </section>
+
     <aside class="inscription" data-inscription-topic="imaging">
       <div class="label">PHILOSOPHICAL INSCRIPTION</div>
       <div class="quote" id="quoteText"></div>
       <div class="source" id="quoteSource"></div>
     </aside>
+
     <nav class="navline">
       <a href="./quantum-gallery.html" data-transition>← MEASUREMENT CHAMBER</a>
-      <a href="./hall.html" data-transition>BACK TO HALL</a>
+      <a href="./light-micro-gallery.html" data-transition>LIGHT EXHIBIT →</a>
     </nav>
     <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
   </main>
@@ -370,136 +427,340 @@
     const ctx = canvas.getContext("2d");
     const sliceSlider = document.getElementById("sliceSlider");
     const contrastSlider = document.getElementById("contrastSlider");
+    const densitySlider = document.getElementById("densitySlider");
     const readout = document.getElementById("readout");
     const scanline = document.getElementById("scanline");
+    const viewerLabel = document.getElementById("viewerLabel");
     let mode = "xray";
     let slice = .45;
     let contrast = .62;
+    let density = .5;
     let t = 0;
 
     function resize() {
       const rect = canvas.getBoundingClientRect();
-      const dpr = 1;
-      canvas.width = Math.floor(rect.width * dpr);
-      canvas.height = Math.floor(rect.height * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      canvas.width = Math.floor(rect.width);
+      canvas.height = Math.floor(rect.height);
     }
 
     function draw(now) {
       t = now || 0;
-      const rect = canvas.getBoundingClientRect();
-      const w = rect.width;
-      const h = rect.height;
+      if (document.hidden) { requestAnimationFrame(draw); return; }
+      const w = canvas.width;
+      const h = canvas.height;
       ctx.clearRect(0, 0, w, h);
-      const cx = w * .50;
-      const cy = h * .50;
-      const glow = ctx.createRadialGradient(cx, cy, 20, cx, cy, w * .48);
-      glow.addColorStop(0, "rgba(238,233,220,.13)");
-      glow.addColorStop(.34, mode === "pet" ? "rgba(255,107,95,.08)" : "rgba(143,221,234,.08)");
-      glow.addColorStop(.70, "rgba(216,192,122,.04)");
-      glow.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = glow;
-      ctx.fillRect(0, 0, w, h);
+      drawBackground(w, h);
       drawBody(w, h);
+      drawOverlay(w, h);
       requestAnimationFrame(draw);
     }
 
-    function drawBody(w, h) {
-      const cx = w * .50;
-      const cy = h * .52;
+    function drawBackground(w, h) {
+      const cx = w * .50, cy = h * .50;
+      // Subtle ambient glow
+      const glow = ctx.createRadialGradient(cx, cy, 10, cx, cy, w * .52);
+      glow.addColorStop(0, "rgba(238,233,220,.06)");
+      glow.addColorStop(.3, mode === "pet" ? "rgba(255,107,95,.04)" : "rgba(143,221,234,.04)");
+      glow.addColorStop(.65, "rgba(0,0,0,.01)");
+      glow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, w, h);
+
+      // Grid rings (like medical display)
       ctx.save();
-      ctx.translate(cx, cy);
-      const bodyGrad = ctx.createRadialGradient(0, -40, 20, 0, 0, 230);
-      bodyGrad.addColorStop(0, mode === "pet" ? "rgba(255,107,95,.28)" : "rgba(238,233,220,.18)");
-      bodyGrad.addColorStop(.45, mode === "mri" ? "rgba(143,221,234,.20)" : "rgba(238,233,220,.08)");
-      bodyGrad.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = bodyGrad;
+      ctx.globalAlpha = .06;
+      ctx.strokeStyle = "#eee9dc";
+      ctx.lineWidth = .5;
+      for (let r = 60; r < w * .5; r += 60) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      // Cross hair
       ctx.beginPath();
-      ctx.ellipse(0, 0, 135 + slice * 18, 225 - slice * 26, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = "rgba(238,233,220,.18)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 135, 225, 0, 0, Math.PI * 2);
+      ctx.moveTo(cx - w * .42, cy);
+      ctx.lineTo(cx + w * .42, cy);
+      ctx.moveTo(cx, cy - h * .42);
+      ctx.lineTo(cx, cy + h * .42);
       ctx.stroke();
-      if (mode === "xray") drawXray();
-      if (mode === "mri") drawMRI();
-      if (mode === "pet") drawPET();
       ctx.restore();
     }
 
-    function drawXray() {
-      ctx.strokeStyle = `rgba(238,233,220,${.28 + contrast * .42})`;
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(0, -162);
-      ctx.lineTo(0, 158);
-      ctx.stroke();
-      for (let i = 0; i < 9; i++) {
-        const y = -116 + i * 24;
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.quadraticCurveTo(58, y - 18, 92, y - 6);
-        ctx.moveTo(0, y);
-        ctx.quadraticCurveTo(-58, y - 18, -92, y - 6);
-        ctx.stroke();
-      }
-      ctx.strokeStyle = `rgba(143,221,234,${.10 + contrast * .16})`;
-      ctx.beginPath();
-      ctx.ellipse(0, -178, 52, 42, 0, 0, Math.PI * 2);
-      ctx.stroke();
+    function drawBody(w, h) {
+      const cx = w * .50, cy = h * .50;
+      const bodyW = w * .30, bodyH = h * .40;
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      if (mode === "xray") drawXray(bodyW, bodyH);
+      else if (mode === "mri") drawMRI(bodyW, bodyH);
+      else if (mode === "pet") drawPET(bodyW, bodyH);
+
+      ctx.restore();
     }
 
-    function drawMRI() {
-      for (let i = 0; i < 16; i++) {
-        const y = -176 + i * 23;
-        const width = 112 * Math.sqrt(Math.max(0, 1 - Math.pow(y / 230, 2)));
-        ctx.strokeStyle = `rgba(143,221,234,${.08 + contrast * .18 + (i % 3) * .018})`;
+    function drawXray(bw, bh) {
+      const alpha = .14 + contrast * .50;
+      // Body outline (thorax cross-section)
+      ctx.strokeStyle = `rgba(238,233,220,${alpha * .4})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, bw, bh * (.85 + slice * .15), 0, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Spine
+      ctx.strokeStyle = `rgba(238,233,220,${alpha})`;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(0, -bh * .90);
+      ctx.lineTo(0, bh * .90);
+      ctx.stroke();
+
+      // Vertebrae
+      ctx.lineWidth = 2.5;
+      const vertebrae = 12 + Math.floor(density * 6);
+      for (let i = 0; i < vertebrae; i++) {
+        const y = -bh * .80 + i * (bh * 1.6 / vertebrae);
+        const vw = 18 + Math.sin(i * .5 + slice * 3) * 6;
         ctx.beginPath();
-        ctx.ellipse(0, y, width, 6 + slice * 8, 0, 0, Math.PI * 2);
+        ctx.moveTo(-vw, y); ctx.lineTo(vw, y);
+        ctx.stroke();
+        // Transverse processes
+        ctx.strokeStyle = `rgba(238,233,220,${alpha * .6})`;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(-vw, y); ctx.lineTo(-vw - 14, y - 4);
+        ctx.moveTo(vw, y); ctx.lineTo(vw + 14, y - 4);
+        ctx.stroke();
+        ctx.strokeStyle = `rgba(238,233,220,${alpha})`;
+        ctx.lineWidth = 2.5;
+      }
+
+      // Ribs
+      ctx.strokeStyle = `rgba(238,233,220,${alpha * .7})`;
+      ctx.lineWidth = 1.8;
+      const ribCount = 8 + Math.floor(density * 4);
+      for (let i = 0; i < ribCount; i++) {
+        const y = -bh * .55 + i * (bh * .9 / ribCount);
+        const ribSpan = bw * (.55 + Math.sin((i + slice * 5) * .4) * .15);
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.quadraticCurveTo(ribSpan * .5, y - 12, ribSpan, y + 8);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.quadraticCurveTo(-ribSpan * .5, y - 12, -ribSpan, y + 8);
         ctx.stroke();
       }
-      ctx.fillStyle = "rgba(238,233,220,.10)";
+
+      // Skull (at top slices)
+      if (slice < .25) {
+        ctx.strokeStyle = `rgba(238,233,220,${alpha * .8})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(0, -bh * .72, bw * .38, bh * .22, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        // Eye sockets
+        ctx.beginPath();
+        ctx.ellipse(-bw * .14, -bh * .74, 8, 6, 0, 0, Math.PI * 2);
+        ctx.ellipse(bw * .14, -bh * .74, 8, 6, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Pelvis (at lower slices)
+      if (slice > .70) {
+        ctx.strokeStyle = `rgba(238,233,220,${alpha * .7})`;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(-bw * .12, bh * .55);
+        ctx.quadraticCurveTo(-bw * .55, bh * .45, -bw * .45, bh * .75);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(bw * .12, bh * .55);
+        ctx.quadraticCurveTo(bw * .55, bh * .45, bw * .45, bh * .75);
+        ctx.stroke();
+      }
+
+      // Lung fields (translucent)
+      ctx.fillStyle = `rgba(143,221,234,${.03 + contrast * .04})`;
       ctx.beginPath();
-      ctx.ellipse(-38, -20 + slice * 32, 28, 78, -.18, 0, Math.PI * 2);
+      ctx.ellipse(-bw * .38, -bh * .12, bw * .22, bh * .30, -.08, 0, Math.PI * 2);
       ctx.fill();
       ctx.beginPath();
-      ctx.ellipse(44, -8 - slice * 20, 30, 88, .16, 0, Math.PI * 2);
+      ctx.ellipse(bw * .38, -bh * .12, bw * .22, bh * .30, .08, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    function drawPET() {
-      for (let i = 0; i < 90; i++) {
-        const a = i * 2.399 + t * .0002;
-        const r = Math.sqrt(i / 90) * 160;
-        const x = Math.cos(a) * r * .72;
-        const y = Math.sin(a) * r * 1.14;
-        const hot = Math.sin(i * 1.7 + slice * 5) > .42;
-        ctx.fillStyle = hot ? `rgba(255,107,95,${.20 + contrast * .42})` : `rgba(216,192,122,${.08 + contrast * .16})`;
+    function drawMRI(bw, bh) {
+      const alpha = .12 + contrast * .48;
+      // Tissue layers — concentric ellipses with varying brightness
+      const layers = 18 + Math.floor(density * 12);
+      for (let i = 0; i < layers; i++) {
+        const t_i = i / layers;
+        const rx = bw * (.15 + t_i * .85);
+        const ry = bh * (.15 + t_i * .85);
+        const signal = Math.sin(t_i * Math.PI * 2 + slice * 4) * .5 + .5;
+        ctx.strokeStyle = `rgba(143,221,234,${alpha * signal * (1 - t_i * .5)})`;
+        ctx.lineWidth = 2 + signal * 2;
         ctx.beginPath();
-        ctx.arc(x, y, hot ? 3.8 : 1.8, 0, Math.PI * 2);
+        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Brain / organ structures
+      ctx.fillStyle = `rgba(238,233,220,${alpha * .3})`;
+      // Gray matter-like structure
+      const lobes = 6 + Math.floor(density * 4);
+      for (let i = 0; i < lobes; i++) {
+        const angle = (i / lobes) * Math.PI * 2 + slice * 2;
+        const dist = bw * (.25 + Math.sin(i * 2.3) * .12);
+        const x = Math.cos(angle) * dist;
+        const y = Math.sin(angle) * dist * (bh / bw);
+        const size = 16 + Math.sin(i * 1.7 + slice * 3) * 8;
+        ctx.beginPath();
+        ctx.ellipse(x, y, size, size * 1.3, angle, 0, Math.PI * 2);
         ctx.fill();
       }
+
+      // White matter tracts
+      ctx.strokeStyle = `rgba(238,233,220,${alpha * .5})`;
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 8; i++) {
+        const startAngle = (i / 8) * Math.PI * 2;
+        const r1 = bw * .18;
+        const r2 = bw * (.45 + density * .2);
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(startAngle) * r1, Math.sin(startAngle) * r1 * (bh / bw));
+        const ctrl = startAngle + .4;
+        ctx.quadraticCurveTo(
+          Math.cos(ctrl) * r2 * .6, Math.sin(ctrl) * r2 * .6 * (bh / bw),
+          Math.cos(startAngle + .8) * r2, Math.sin(startAngle + .8) * r2 * (bh / bw)
+        );
+        ctx.stroke();
+      }
+
+      // CSF spaces (dark voids)
+      ctx.fillStyle = `rgba(0,0,0,${.15 + contrast * .12})`;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, bw * .08, bh * .06, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(-bw * .06, -bh * .02, bw * .04, bh * .08, -.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(bw * .06, -bh * .02, bw * .04, bh * .08, .3, 0, Math.PI * 2);
+      ctx.fill();
     }
+
+    function drawPET(bw, bh) {
+      const alpha = .10 + contrast * .52;
+      // Metabolism map — hot spots and cold regions
+      const count = 120 + Math.floor(density * 80);
+      for (let i = 0; i < count; i++) {
+        const angle = i * 2.399 + slice * 2;
+        const dist = Math.sqrt(i / count) * bw * .92;
+        const x = Math.cos(angle) * dist;
+        const y = Math.sin(angle) * dist * (bh / bw);
+
+        // Check if inside body outline
+        if ((x * x) / (bw * bw) + (y * y) / (bh * bh) > .85) continue;
+
+        // Metabolic activity varies by region
+        const regional = Math.sin(x * .02 + slice * 3) * Math.cos(y * .015 + slice * 2);
+        const hot = regional > .2 - density * .3;
+        const intensity = hot ? (.3 + Math.abs(regional) * .7) : (.05 + Math.abs(regional) * .15);
+
+        if (hot) {
+          ctx.fillStyle = `rgba(255,107,95,${alpha * intensity})`;
+          ctx.beginPath();
+          ctx.arc(x, y, 2.5 + intensity * 3, 0, Math.PI * 2);
+          ctx.fill();
+          // Glow for hottest spots
+          if (intensity > .7) {
+            ctx.fillStyle = `rgba(255,200,80,${alpha * intensity * .3})`;
+            ctx.beginPath();
+            ctx.arc(x, y, 5 + intensity * 4, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else {
+          ctx.fillStyle = `rgba(216,192,122,${alpha * intensity * .4})`;
+          ctx.beginPath();
+          ctx.arc(x, y, 1.2 + intensity * 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Organ outlines (faint)
+      ctx.strokeStyle = `rgba(238,233,220,${alpha * .15})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, bw * .85, bh * .85, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    function drawOverlay(w, h) {
+      // Corner markers (medical display HUD — subtle)
+      ctx.save();
+      ctx.strokeStyle = "rgba(238,233,220,.12)";
+      ctx.lineWidth = 1;
+      const m = 24;
+      const s = 18;
+      // Top-left
+      ctx.beginPath(); ctx.moveTo(m, m + s); ctx.lineTo(m, m); ctx.lineTo(m + s, m); ctx.stroke();
+      // Top-right
+      ctx.beginPath(); ctx.moveTo(w - m - s, m); ctx.lineTo(w - m, m); ctx.lineTo(w - m, m + s); ctx.stroke();
+      // Bottom-left
+      ctx.beginPath(); ctx.moveTo(m, h - m - s); ctx.lineTo(m, h - m); ctx.lineTo(m + s, h - m); ctx.stroke();
+      // Bottom-right
+      ctx.beginPath(); ctx.moveTo(w - m - s, h - m); ctx.lineTo(w - m, h - m); ctx.lineTo(w - m, h - m - s); ctx.stroke();
+
+      // Mode indicator text
+      ctx.font = "10px 'IBM Plex Mono', monospace";
+      ctx.fillStyle = "rgba(238,233,220,.22)";
+      ctx.textAlign = "left";
+      ctx.fillText(mode.toUpperCase() + " · W:" + Math.round(contrast * 100) + " L:" + Math.round(slice * 100), m + 4, h - m - 6);
+      ctx.textAlign = "right";
+      ctx.fillText("D:" + Math.round(density * 100) + " · " + new Date().toLocaleTimeString("en", {hour12: false}), w - m - 4, h - m - 6);
+      ctx.restore();
+    }
+
+    const modeInfo = {
+      xray: {
+        title: "X 光模式",
+        desc: "X 射线穿透软组织，被高密度结构（骨骼、钙化灶）吸收。密度差形成灰度图像，骨骼最亮。",
+        physics: "物理原理：X 射线衰减 · 光电效应 · 康普顿散射 · 1895 伦琴发现"
+      },
+      mri: {
+        title: "MRI 模式",
+        desc: "强磁场中氢原子核共振后释放射频信号。不同组织的弛豫时间差形成对比，软组织层次清晰。",
+        physics: "物理原理：核磁共振 · 拉莫尔进动 · T1/T2 弛豫 · 1971 达马迪安提出"
+      },
+      pet: {
+        title: "PET 模式",
+        desc: "注入正电子放射性示踪剂，正电子湮灭产生一对方向相反的 γ 光子。高代谢区域积累多，形成功能图像。",
+        physics: "物理原理：正电子湮灭 · γ 射线符合探测 · 放射性示踪 · FDG 代谢"
+      }
+    };
 
     function setMode(next) {
       mode = next;
       document.querySelectorAll(".mode").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === mode));
-      const copy = {
-        xray: "<b>X 光模式</b>：高密度结构更清晰，骨骼成为身体内部最先显影的层次。",
-        mri: "<b>MRI 模式</b>：核磁共振把组织差异转化为层层切片的信号。",
-        pet: "<b>PET 模式</b>：代谢活动被转化为热点分布，身体变成一张过程地图。"
-      };
-      readout.innerHTML = copy[mode];
+      const info = modeInfo[mode];
+      readout.innerHTML = `<b>${info.title}</b>：${info.desc}<span class="physics">${info.physics}</span>`;
+    }
+
+    function updateSlice() {
+      slice = parseFloat(sliceSlider.value);
+      scanline.style.setProperty("--scan", `${18 + slice * 64}%`);
+      viewerLabel.textContent = `AXIAL SLICE · LEVEL ${Math.round(slice * 100)}%`;
     }
 
     document.querySelectorAll(".mode").forEach(btn => btn.addEventListener("click", () => setMode(btn.dataset.mode)));
-    sliceSlider.addEventListener("input", () => {
-      slice = parseFloat(sliceSlider.value);
-      scanline.style.setProperty("--scan", `${18 + slice * 64}%`);
-    });
+    sliceSlider.addEventListener("input", updateSlice);
     contrastSlider.addEventListener("input", () => { contrast = parseFloat(contrastSlider.value); });
-window.addEventListener("resize", resize);
+    densitySlider.addEventListener("input", () => { density = parseFloat(densitySlider.value); });
+
+    window.addEventListener("resize", resize);
     resize();
     setMode("xray");
     requestAnimationFrame(draw);
