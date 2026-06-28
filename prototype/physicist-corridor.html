@@ -542,6 +542,7 @@
     <nav class="controls">
       <button id="prevBtn" type="button">PREV</button>
       <button id="nextBtn" type="button">NEXT</button>
+      <button id="downloadBtn" type="button">DOWNLOAD</button>
       <a href="./physicist-test.html" data-transition>TAKE TEST</a>
     </nav>
     <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
@@ -723,10 +724,147 @@
 
     document.getElementById("prevBtn").addEventListener("click", () => setActive(active - 1));
     document.getElementById("nextBtn").addEventListener("click", () => setActive(active + 1));
+    document.getElementById("downloadBtn").addEventListener("click", downloadCard);
     window.addEventListener("keydown", (event) => {
       if (event.key === "ArrowLeft") setActive(active - 1);
       if (event.key === "ArrowRight") setActive(active + 1);
     });
+
+    function downloadCard() {
+      const p = people[active];
+      const bio = corridorBios[p.id] || { field: "物理学", period: "", intro: "", work: p.title };
+      const photo = portraitPhotos[p.id];
+      const W = 1200, H = 1600;
+      const cvs = document.createElement("canvas");
+      cvs.width = W; cvs.height = H;
+      const ctx = cvs.getContext("2d");
+
+      function renderCard(imgEl) {
+        // Background
+        const bg = ctx.createLinearGradient(0, 0, 0, H);
+        bg.addColorStop(0, "#0a0a09");
+        bg.addColorStop(0.6, "#020202");
+        bg.addColorStop(1, "#000");
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        // Subtle top light
+        const topLight = ctx.createRadialGradient(W * 0.5, H * 0.18, 20, W * 0.5, H * 0.18, W * 0.5);
+        topLight.addColorStop(0, "rgba(238,233,220,.12)");
+        topLight.addColorStop(0.4, "rgba(216,192,122,.06)");
+        topLight.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = topLight;
+        ctx.fillRect(0, 0, W, H);
+
+        // Border frame
+        ctx.strokeStyle = "rgba(216,192,122,.30)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(48, 48, W - 96, H - 96);
+        ctx.strokeStyle = "rgba(238,233,220,.08)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(64, 64, W - 128, H - 128);
+
+        // Portrait
+        const imgSize = 560;
+        const imgX = (W - imgSize) / 2;
+        const imgY = 180;
+        ctx.fillStyle = "#080808";
+        ctx.fillRect(imgX - 4, imgY - 4, imgSize + 8, imgSize + 8);
+        ctx.strokeStyle = "rgba(216,192,122,.34)";
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(imgX - 4, imgY - 4, imgSize + 8, imgSize + 8);
+        if (imgEl) {
+          ctx.save();
+          ctx.filter = "grayscale(1) contrast(0.88) brightness(0.76)";
+          ctx.drawImage(imgEl, imgX, imgY, imgSize, imgSize);
+          ctx.restore();
+          const overlay = ctx.createLinearGradient(imgX, imgY, imgX, imgY + imgSize);
+          overlay.addColorStop(0, "rgba(238,233,220,.08)");
+          overlay.addColorStop(0.7, "rgba(0,0,0,0)");
+          overlay.addColorStop(1, "rgba(0,0,0,.28)");
+          ctx.fillStyle = overlay;
+          ctx.fillRect(imgX, imgY, imgSize, imgSize);
+        } else {
+          ctx.font = "bold 180px 'Noto Serif SC', serif";
+          ctx.fillStyle = "rgba(238,233,220,.18)";
+          ctx.textAlign = "center";
+          ctx.fillText(p.initials, W / 2, imgY + imgSize / 2 + 60);
+        }
+
+        // Header
+        ctx.font = "500 22px 'IBM Plex Mono', monospace";
+        ctx.fillStyle = "rgba(216,192,122,.80)";
+        ctx.textAlign = "center";
+        ctx.fillText("NOBEL PHYSICS ATLAS · 诺奖物理人格图鉴", W / 2, 120);
+
+        // Name
+        ctx.font = "bold 72px 'Noto Serif SC', serif";
+        ctx.fillStyle = "#eee9dc";
+        ctx.fillText(p.name, W / 2, 870);
+
+        // Title
+        ctx.font = "500 28px 'Noto Sans SC', sans-serif";
+        ctx.fillStyle = "rgba(238,233,220,.60)";
+        ctx.fillText(p.title, W / 2, 920);
+
+        // Field + Period
+        ctx.font = "500 24px 'IBM Plex Mono', monospace";
+        ctx.fillStyle = "rgba(216,192,122,.72)";
+        ctx.fillText(bio.field + " · " + bio.period, W / 2, 980);
+
+        // Key work
+        ctx.font = "400 22px 'Noto Sans SC', sans-serif";
+        ctx.fillStyle = "rgba(238,233,220,.50)";
+        const workText = bio.work || "";
+        if (workText.length > 36) {
+          ctx.fillText(workText.slice(0, 36), W / 2, 1040);
+          ctx.fillText(workText.slice(36), W / 2, 1072);
+        } else {
+          ctx.fillText(workText, W / 2, 1040);
+        }
+
+        // Intro (wrapped)
+        ctx.textAlign = "left";
+        ctx.font = "400 22px 'Noto Sans SC', sans-serif";
+        ctx.fillStyle = "rgba(238,233,220,.46)";
+        const introText = bio.intro || "";
+        const maxW = W - 200;
+        const lines = [];
+        let line = "";
+        for (const ch of introText) {
+          if (ctx.measureText(line + ch).width > maxW) { lines.push(line); line = ch; }
+          else { line += ch; }
+        }
+        if (line) lines.push(line);
+        lines.slice(0, 8).forEach((l, i) => { ctx.fillText(l, 100, 1120 + i * 36); });
+
+        // Footer
+        ctx.textAlign = "center";
+        ctx.font = "500 18px 'IBM Plex Mono', monospace";
+        ctx.fillStyle = "rgba(143,221,234,.50)";
+        ctx.fillText("始于有趣，终于有理 · Nobel Physics Interactive Exhibition", W / 2, H - 80);
+
+        // Download
+        cvs.toBlob(function (blob) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "physicist-" + p.id + ".png";
+          a.click();
+          URL.revokeObjectURL(url);
+        }, "image/png");
+      }
+
+      if (photo && photo.src) {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = function () { renderCard(img); };
+        img.onerror = function () { renderCard(null); };
+        img.src = photo.src;
+      } else {
+        renderCard(null);
+      }
+    }
 
     renderProgress();
     renderRail();
