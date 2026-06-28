@@ -487,6 +487,11 @@
       font-family: var(--serif);
       font-size: 13px;
       line-height: 1.85;
+      transition: opacity .4s ease;
+    }
+    .inscription.hidden-by-stage {
+      opacity: 0;
+      pointer-events: none;
     }
     .inscription .label {
       color: var(--gold);
@@ -694,6 +699,7 @@
       stage.hidden = false;
       panel.hidden = false;
       stage.classList.remove("question-mode");
+      document.querySelector(".inscription").classList.remove("hidden-by-stage");
       stage.innerHTML = `<div class="kicker">MEASUREMENT TEST</div><h1>你是哪位物理学家</h1><p class="lead">这是一台展厅里的风格测量仪。20 个选择会把你投影到理论、实验、直觉、概率、协作与生活做派的坐标中。</p><button class="start" id="startBtn" type="button">BEGIN TEST</button>`;
       document.getElementById("startBtn").addEventListener("click", () => { step = 0; renderQuestion(); });
       renderPanel();
@@ -703,6 +709,7 @@
       const q = atlas.questions[step];
       stage.classList.remove("switching");
       stage.classList.add("question-mode");
+      document.querySelector(".inscription").classList.add("hidden-by-stage");
       stage.innerHTML = `<div class="kicker">QUESTION ${String(step + 1).padStart(2, "0")} / ${String(atlas.questions.length).padStart(2, "0")}</div><h2 class="question-title">${q.title}</h2><div class="answers">${q.answers.map((a, i) => `<button class="answer" type="button" data-index="${i}"><small>OPTION ${a.key}</small><span>${a.text}</span></button>`).join("")}</div>`;
       stage.querySelectorAll(".answer").forEach(btn => {
         btn.addEventListener("click", () => chooseAnswer(Number(btn.dataset.index)));
