@@ -30,37 +30,27 @@
   let playing = false;
   let hintDismissed = false;
   let fadeInterval = null;
+  let hintTimer = null;
 
-  // ── Hint pulse: show 3s, hide 10s, repeat until user clicks ──
-  function startHintPulse() {
+  function showHint(text, durationMs = 3600) {
     if (!hintEl || hintDismissed) return;
-    // Start visible
-    hintEl.style.opacity = '1';
+    if (hintTimer) clearTimeout(hintTimer);
+    if (text) hintEl.textContent = text;
+    hintEl.classList.add('is-visible');
+    hintTimer = setTimeout(() => {
+      if (!hintDismissed && hintEl) hintEl.classList.remove('is-visible');
+    }, durationMs);
+  }
 
-    function cycle() {
-      if (hintDismissed) return;
-      // Show for 3s, then fade out
-      hintEl.style.transition = 'opacity 0.8s ease';
-      hintEl.style.opacity = '1';
-      setTimeout(() => {
-        if (hintDismissed) return;
-        hintEl.style.opacity = '0';
-        // Stay hidden for 10s, then reappear
-        setTimeout(() => {
-          if (!hintDismissed) cycle();
-        }, 10000);
-      }, 3000);
-    }
-
-    // First appearance: wait until page entry animation finishes (~900ms)
-    setTimeout(cycle, 950);
+  function startHintPulse(label) {
+    setTimeout(() => showHint(`♩ ${label}`, 5600), 760);
   }
 
   function dismissHint() {
     if (!hintEl || hintDismissed) return;
     hintDismissed = true;
-    hintEl.style.transition = 'opacity 0.6s ease';
-    hintEl.style.opacity = '0';
+    if (hintTimer) clearTimeout(hintTimer);
+    hintEl.classList.remove('is-visible');
     setTimeout(() => {
       if (hintEl && hintEl.parentNode) hintEl.parentNode.removeChild(hintEl);
     }, 700);
@@ -90,9 +80,9 @@
     button.classList.toggle('is-playing', playing);
     button.classList.toggle('is-muted', !playing);
     button.setAttribute('aria-label', playing ? '暂停背景音乐' : '播放背景音乐');
-    dismissHint();
 
     if (playing) {
+      showHint('正在播放', 1800);
       // Ensure loaded, then play with fade-in
       if (audioEl.readyState < 2) {
         audioEl.load();
@@ -107,9 +97,11 @@
             playing = false;
             button.classList.remove('is-playing');
             button.classList.add('is-muted');
+            showHint('浏览器阻止播放，请再点一次', 3000);
           });
       }
     } else {
+      showHint('已暂停', 1600);
       // Fade out then pause
       audioFadeTo(0, 600, () => {
         audioEl.pause();
@@ -144,18 +136,23 @@
     // Hint element
     hintEl = document.createElement('div');
     hintEl.className  = 'ambient-hint';
-    hintEl.textContent = '♩ 背景音乐';
-    hintEl.style.opacity = '0';  // start hidden, pulse takes over
+    hintEl.textContent = `♩ ${sceneLabels[key] || '背景音乐'}`;
     document.body.appendChild(hintEl);
 
     button.addEventListener('click', () => setPlaying(!playing));
+    button.addEventListener('mouseenter', () => showHint(sceneLabels[key] || '背景音乐', 2200));
+    button.addEventListener('focus', () => showHint(sceneLabels[key] || '背景音乐', 2200));
 
     // Pause when tab goes to background
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && playing) setPlaying(false);
     });
 
-    startHintPulse();
+    setTimeout(() => {
+      document.body.classList.add('ambient-ready');
+    }, 720);
+
+    startHintPulse(sceneLabels[key] || '背景音乐');
   }
 
   document.addEventListener('DOMContentLoaded', boot);
