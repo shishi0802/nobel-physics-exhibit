@@ -28,6 +28,7 @@
   let button  = null;
   let hintEl  = null;
   let playing = false;
+  let loading = false;
   let hintDismissed = false;
   let fadeInterval = null;
   let hintTimer = null;
@@ -40,10 +41,6 @@
     hintTimer = setTimeout(() => {
       if (!hintDismissed && hintEl) hintEl.classList.remove('is-visible');
     }, durationMs);
-  }
-
-  function startHintPulse(label) {
-    setTimeout(() => showHint(`♩ ${label}`, 5600), 760);
   }
 
   function dismissHint() {
@@ -76,13 +73,28 @@
   }
 
   function setPlaying(next) {
-    playing = next;
-    button.classList.toggle('is-playing', playing);
-    button.classList.toggle('is-muted', !playing);
-    button.setAttribute('aria-label', playing ? '暂停背景音乐' : '播放背景音乐');
+    if (loading) return;
 
     if (playing) {
-      showHint('正在播放', 1800);
+      playing = false;
+      loading = false;
+      button.classList.remove('is-playing', 'is-loading');
+      button.classList.add('is-muted');
+      button.setAttribute('aria-label', '播放背景音乐');
+      showHint('已暂停', 2200);
+      audioFadeTo(0, 600, () => {
+        audioEl.pause();
+        audioEl.volume = 0.68;
+      });
+      return;
+    }
+
+    if (next) {
+      loading = true;
+      button.classList.remove('is-muted', 'is-playing');
+      button.classList.add('is-loading');
+      button.setAttribute('aria-label', '正在加载背景音乐');
+      showHint('正在加载音乐', 2600);
       // Ensure loaded, then play with fade-in
       if (audioEl.readyState < 2) {
         audioEl.load();
@@ -91,22 +103,25 @@
       const playPromise = audioEl.play();
       if (playPromise !== undefined) {
         playPromise
-          .then(() => audioFadeTo(0.68, 1200))
+          .then(() => {
+            playing = true;
+            loading = false;
+            button.classList.remove('is-loading', 'is-muted');
+            button.classList.add('is-playing');
+            button.setAttribute('aria-label', '暂停背景音乐');
+            showHint('正在播放', 2600);
+            audioFadeTo(0.68, 1200);
+          })
           .catch((err) => {
             console.warn('[ambient-audio] play() blocked:', err.message);
             playing = false;
-            button.classList.remove('is-playing');
+            loading = false;
+            button.classList.remove('is-playing', 'is-loading');
             button.classList.add('is-muted');
-            showHint('浏览器阻止播放，请再点一次', 3000);
+            button.setAttribute('aria-label', '播放背景音乐');
+            showHint('播放被浏览器拦截，请再点一次', 4200);
           });
       }
-    } else {
-      showHint('已暂停', 1600);
-      // Fade out then pause
-      audioFadeTo(0, 600, () => {
-        audioEl.pause();
-        audioEl.volume = 0.68;
-      });
     }
   }
 
@@ -135,7 +150,7 @@
 
     // Hint element
     hintEl = document.createElement('div');
-    hintEl.className  = 'ambient-hint';
+    hintEl.className  = 'ambient-hint is-visible';
     hintEl.textContent = `♩ ${sceneLabels[key] || '背景音乐'}`;
     document.body.appendChild(hintEl);
 
@@ -150,9 +165,11 @@
 
     setTimeout(() => {
       document.body.classList.add('ambient-ready');
+      if (hintTimer) clearTimeout(hintTimer);
+      hintTimer = setTimeout(() => {
+        if (!hintDismissed && hintEl) hintEl.classList.remove('is-visible');
+      }, 30000);
     }, 720);
-
-    startHintPulse(sceneLabels[key] || '背景音乐');
   }
 
   document.addEventListener('DOMContentLoaded', boot);

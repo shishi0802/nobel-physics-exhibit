@@ -31,7 +31,8 @@ while true; do
   port=$((port + 1))
 done
 
-url="http://localhost:$port/$START_PAGE"
+version="$(date +%s)"
+url="http://localhost:$port/$START_PAGE?v=$version"
 echo ""
 echo "已打开满血版网站：$url"
 echo "请保持这个窗口开着；关闭窗口后，本地网站服务也会停止。"

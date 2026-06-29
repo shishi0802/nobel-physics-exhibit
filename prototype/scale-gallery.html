@@ -618,7 +618,7 @@
 
   </style>
   <link rel="stylesheet" href="./gallery-transition.css" />
-  <link rel="stylesheet" href="./ambient-audio.css" />
+  <link rel="stylesheet" href="./ambient-audio.css?v=20260630-audio5" />
 </head>
 <body class="is-entering" data-ambient-scene="scale">
   <main class="gallery" id="gallery">
@@ -688,7 +688,7 @@
     <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
   </main>
 
-  <script src="./ambient-audio.js"></script>
+  <script src="./ambient-audio.js?v=20260630-audio5"></script>
   <script type="module">
     const points = [
       { exp: -15, label: "原子核尺度", desc: "质子、中子等原子核结构所在的极端微观尺度。日常物体的坚实感在这里变成相互作用的结果。", kind: "nucleus" },
@@ -1684,9 +1684,12 @@
     });
     document.querySelectorAll("[data-transition]").forEach((link) => {
       link.addEventListener("click", (event) => {
-        const href = link.getAttribute("href");
+        let href = link.getAttribute("href");
         if (!href || href === "#") return;
         event.preventDefault();
+        if (window.location.search && !href.includes("?") && !href.startsWith("#")) {
+          href += window.location.search;
+        }
         document.body.classList.add("is-leaving");
         document.getElementById("portalTransition").classList.add("active");
         sessionStorage.setItem("museumTransition", "soft");

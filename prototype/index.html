@@ -336,7 +336,7 @@
       entrance.classList.add("is-leaving");
       document.getElementById("veil").classList.add("active");
       sessionStorage.setItem("museumTransition", "soft");
-      window.setTimeout(() => { window.location.href = "./hall.html"; }, 720);
+      window.setTimeout(() => { window.location.href = `./hall.html${window.location.search || ""}`; }, 720);
     });
     window.addEventListener("resize", resize);
     resize();

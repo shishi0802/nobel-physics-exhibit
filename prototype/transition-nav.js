@@ -17,6 +17,9 @@
         var href = link.getAttribute("href");
         if (!href || href === "#") return;
         event.preventDefault();
+        if (window.location.search && href.indexOf("?") === -1 && href.indexOf("#") !== 0) {
+          href += window.location.search;
+        }
         document.body.classList.add("is-leaving");
         var portal = document.getElementById("portalTransition");
         if (portal) portal.classList.add("active");
