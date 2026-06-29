@@ -1,4 +1,0 @@
-{
-  "rewrites": [{ "source": "/(.*)", "destination": "/prototype/$1" }],
-  "redirects": [{ "source": "/", "destination": "/prototype/", "permanent": false }]
-}
