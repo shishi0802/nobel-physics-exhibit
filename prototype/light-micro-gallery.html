@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>光学防伪展厅 · Optical Security</title>
+  <title>光与微缩展厅 · Anti-Counterfeit Microscope</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23020202'/%3E%3Cpath d='M10 40h44M18 24h28M24 12h16' stroke='%23d8c07a' stroke-width='3'/%3E%3Ccircle cx='32' cy='40' r='5' fill='%238fddea'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -128,9 +128,6 @@
       overflow: hidden;
       opacity: .88;
       filter: saturate(.72) contrast(1.05) brightness(.86);
-      /* soften the bill edges with a mask so no hard rectangle shows */
-      mask-image: radial-gradient(ellipse 96% 94% at 50% 50%, #000 72%, transparent 100%);
-      transition: filter .3s ease, opacity .3s ease;
     }
     .bill::before {
       content: "SPECIMEN · EDUCATIONAL DISPLAY";
@@ -156,7 +153,7 @@
         radial-gradient(circle at 79% 67%, rgba(121,216,166,.38), transparent 12%);
       mix-blend-mode: screen;
       transform: translateX(var(--tilt-shift, 0));
-      transition: opacity .30s ease, transform .30s ease;
+      transition: opacity .25s;
     }
     .bill-mark {
       position: absolute;
@@ -219,61 +216,28 @@
       transform: translateX(calc(var(--tilt-shift, 0) * .12));
     }
     .uv .bill {
-      filter: saturate(.18) contrast(1.35) brightness(.38) hue-rotate(200deg);
-      mask-image: radial-gradient(ellipse 96% 94% at 50% 50%, #000 72%, transparent 100%);
+      filter: saturate(.35) contrast(1.25) brightness(.46);
     }
     .uv .bill::after {
-      opacity: .90;
+      opacity: .82;
       background:
-        /* strong cyan stripe for security ribbon under UV */
-        linear-gradient(90deg, transparent 0 44%, rgba(143,221,234,.92) 47%, rgba(143,221,234,.40) 50%, transparent 53%),
-        /* bright magenta/violet for security thread */
-        linear-gradient(90deg, transparent 0 52%, rgba(184,156,255,.78) 54%, transparent 56%),
-        /* green glow around OVI ink zone */
-        radial-gradient(circle at 80% 66%, rgba(121,216,166,.72), transparent 14%),
-        /* ambient UV tint */
-        linear-gradient(180deg, rgba(90,60,160,.22), rgba(0,0,0,.0));
+        linear-gradient(90deg, transparent 0 47%, rgba(184,156,255,.78) 49%, transparent 51%),
+        radial-gradient(circle at 80% 66%, rgba(121,216,166,.62), transparent 14%);
       mix-blend-mode: screen;
     }
     .transmit .bill {
-      filter: saturate(.28) contrast(.88) brightness(1.38) sepia(.18);
-      opacity: .60;
-      mask-image: radial-gradient(ellipse 96% 94% at 50% 50%, #000 72%, transparent 100%);
+      filter: saturate(.45) contrast(.92) brightness(1.12);
+      opacity: .66;
     }
     .transmit .bill::after {
-      opacity: .78;
+      opacity: .72;
       background:
-        /* warm backlight wash */
-        radial-gradient(ellipse at 50% 50%, rgba(255,245,220,.38), transparent 62%),
-        /* watermark zone highlight */
-        radial-gradient(ellipse at 24% 47%, rgba(238,233,220,.55), transparent 18%),
-        /* security thread reveal */
-        linear-gradient(90deg, transparent 0 52%, rgba(238,233,220,.40) 53%, transparent 56%);
+        radial-gradient(ellipse at 24% 47%, rgba(238,233,220,.50), transparent 18%),
+        linear-gradient(90deg, transparent 0 50%, rgba(238,233,220,.34) 51%, transparent 54%);
       mix-blend-mode: screen;
-    }
-    /* tilt mode: pronounced specular highlights to simulate oblique illumination */
-    .tilt .bill {
-      filter: saturate(.88) contrast(1.18) brightness(.78);
-      mask-image: radial-gradient(ellipse 96% 94% at 50% 50%, #000 72%, transparent 100%);
-    }
-    .tilt .bill::after {
-      opacity: var(--overlay-opacity, .68);
-      background:
-        linear-gradient(100deg, transparent 0 40%,
-          rgba(255,255,255,.12) 43%,
-          rgba(143,221,234,.52) 47%,
-          rgba(216,192,122,.28) 50%,
-          rgba(143,221,234,.42) 53%,
-          rgba(255,255,255,.08) 57%,
-          transparent 62%),
-        radial-gradient(circle at 79% 67%, rgba(121,216,166,.44), transparent 12%),
-        /* edge specular sheen */
-        linear-gradient(80deg, rgba(255,255,255,.04), rgba(255,255,255,.10) 48%, rgba(255,255,255,.02) 100%);
-      mix-blend-mode: screen;
-      transform: translateX(var(--tilt-shift, 0));
-      transition: transform .3s ease, opacity .3s ease;
     }
     .hotspot {
+      position: absolute;
       width: 22px;
       height: 22px;
       border: 1px solid rgba(238,233,220,.55);
@@ -292,26 +256,20 @@
       position: absolute;
       left: var(--mx, 52%);
       top: var(--my, 48%);
-      width: 154px;
-      height: 154px;
+      width: 142px;
+      height: 142px;
       border-radius: 50%;
       transform: translate(-50%, -50%);
       z-index: 12;
       pointer-events: none;
       border: 0;
-      /* elegant soft glow ring instead of hard border */
-      box-shadow:
-        0 0 0 1px rgba(143,221,234,.18),
-        0 0 0 3px rgba(0,0,0,.90),
-        0 0 24px rgba(143,221,234,.28),
-        0 18px 70px rgba(0,0,0,.62),
-        inset 0 0 32px rgba(0,0,0,.36);
+      box-shadow: 0 18px 70px rgba(0,0,0,.42), inset 0 0 26px rgba(0,0,0,.20);
       overflow: hidden;
       opacity: 0;
-      clip-path: circle(50% at 50% 50%);
-      transition: opacity .28s ease;
+      clip-path: circle(48% at 50% 50%);
+      transition: opacity .22s ease;
     }
-    .scope.active { opacity: 1; }
+    .scope.active { opacity: .88; }
     .scope-view {
       position: absolute;
       inset: 0;
@@ -333,10 +291,8 @@
       content: "";
       position: absolute;
       inset: 0;
-      /* refined vignette: soft fade toward edges, sharp center view */
-      background: radial-gradient(circle, transparent 0 48%, rgba(0,0,0,.28) 62%, rgba(0,0,0,.78) 100%);
+      background: radial-gradient(circle, transparent 0 58%, rgba(0,0,0,.42) 100%);
       pointer-events: none;
-      z-index: 2;
     }
     .scope-view::after {
       content: "";
@@ -347,79 +303,6 @@
         radial-gradient(circle at 45% 42%, rgba(143,221,234,.24), transparent 36%);
       mix-blend-mode: screen;
       opacity: .55;
-    }
-    /* ── OBSERVATION GUIDE ── */
-    .obs-guide {
-      position: absolute;
-      left: clamp(48px, 6vw, 90px);
-      top: clamp(88px, 14vh, 142px);
-      margin-top: min(220px, 23vh);
-      width: min(360px, 27vw);
-      z-index: 8;
-      border-top: 1px solid rgba(238,233,220,.12);
-      padding-top: 18px;
-      transition: opacity .46s ease, filter .46s ease, transform .46s cubic-bezier(.22,1,.36,1);
-    }
-    .obs-guide-label {
-      color: var(--cyan);
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: .20em;
-      margin-bottom: 14px;
-      opacity: .72;
-    }
-    .obs-steps {
-      list-style: none;
-      margin: 0 0 18px;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .obs-steps li {
-      display: flex;
-      gap: 10px;
-      align-items: baseline;
-    }
-    .step-num {
-      color: var(--gold);
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: .10em;
-      opacity: .70;
-      min-width: 18px;
-    }
-    .step-text {
-      color: #807970;
-      font-size: 12px;
-      line-height: 1.55;
-    }
-    .step-text strong {
-      color: #a8a090;
-      font-weight: 500;
-    }
-    .obs-physics-intro {
-      border-top: 1px solid rgba(238,233,220,.08);
-      padding-top: 14px;
-    }
-    .obs-physics-title {
-      color: #7a7368;
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: .14em;
-      margin-bottom: 8px;
-    }
-    .obs-physics-body {
-      margin: 0;
-      color: #65605a;
-      font-size: 11.5px;
-      line-height: 1.80;
-    }
-    .chamber.observing .obs-guide {
-      opacity: 0;
-      filter: blur(8px);
-      pointer-events: none;
-      transform: translateY(-16px);
     }
     .controls {
       position: absolute;
@@ -694,35 +577,21 @@
     }
   </style>
   <link rel="stylesheet" href="./gallery-transition.css" />
-  <link rel="stylesheet" href="./ambient-audio.css" />
 </head>
-<body class="is-entering" data-ambient-scene="light">
+<body class="is-entering">
   <main class="chamber" id="chamber">
     <div class="wall"></div>
     <div class="light"></div>
     <div class="grain"></div>
     <header class="topline">
       <a href="./hall.html" data-transition>← HALL</a>
-      <span>EXHIBIT 06 · OPTICAL SECURITY</span>
+      <span>EXHIBIT 06 · LIGHT & MICRO</span>
     </header>
     <section class="title">
-      <div class="kicker">EXHIBIT 06 · OPTICAL SECURITY</div>
+      <div class="kicker">EXHIBIT 06 · 光与微缩</div>
       <h1>防伪显微台</h1>
-      <p>纸币表面集合了微透镜阵列、结构色薄膜与荧光材料。这三类光学物理现象协同工作，使得任何单一复制手段都无法同时还原全部特征。</p>
+      <p>纸币表面集合了微透镜、结构色、透光水印与材料荧光。移动镜头、改变倾斜角、切换紫外与透光条件，观察复制机难以同时复现的光谱和微结构。</p>
     </section>
-    <aside class="obs-guide">
-      <div class="obs-guide-label">OBSERVATION GUIDE</div>
-      <ol class="obs-steps">
-        <li><span class="step-num">01</span><span class="step-text">点击纸币上的<strong>热点</strong>选取防伪区域</span></li>
-        <li><span class="step-num">02</span><span class="step-text">切换<strong>观察模式</strong>：可见光→倾斜→紫外→透光</span></li>
-        <li><span class="step-num">03</span><span class="step-text">拖动<strong>倾斜角度</strong>滑杆，观察结构色随角度漂移</span></li>
-        <li><span class="step-num">04</span><span class="step-text">开启<strong>显微镜</strong>，移动鼠标检查微缩线条细节</span></li>
-      </ol>
-      <div class="obs-physics-intro">
-        <div class="obs-physics-title">背后的光学物理</div>
-        <p class="obs-physics-body">微光学阵列（MOA）通过微透镜聚焦，产生随角度变化的运动视差。结构色源于薄膜干涉与衍射光栅：光在纳米薄膜界面多次反射，特定波长因相位差相长叠加而增强——即所谓薄膜干涉。安全线中的荧光染料在紫外激发下跃迁至高能级，弛豫时辐射可见光。三种效应协同，在复杂三维材料体系中编码信息。</p>
-      </div>
-    </aside>
     <section class="stage" id="stage">
       <div class="bill-rig" id="billRig">
         <div class="bill" id="bill">
@@ -749,7 +618,7 @@
         <button class="mode" data-mode="transmit" type="button">透光</button>
       </div>
       <button class="tool-toggle" id="microscopeToggle" type="button">开启显微镜</button>
-      <p class="panel-hint">悬停热点预览区域说明，点击锁定选区。倾斜角度滑杆在"倾斜"模式下效果最明显——结构色随角度实时漂移。</p>
+      <p class="panel-hint">点击纸币上的防伪区域，再切换观察条件。显微镜是独立工具，开启后移动鼠标查看局部线条、纤维和微结构。</p>
       <div class="control-row">
         <label for="zoomSlider">放大倍率</label>
         <input id="zoomSlider" type="range" min="2" max="9" value="4.6" step=".01" />
@@ -797,57 +666,31 @@
     let microscopeOn = false;
     let pointer = { x: .52, y: .48 };
 
-    // Per-feature data with mode-specific physics readouts
     const features = {
       ribbon: {
         title: "3-D 安全条带",
-        copy: {
-          visible: "蓝色安全条带利用微透镜阵列（MOA）制造运动视差。条带下方是微小透镜矩阵，与更深层的图像层协同，产生随角度变化的放大和移动效果。",
-          tilt: "倾斜观察时，条带内的钟形图案与"100"字样会沿相反方向移动——这是微光学阵列的角度选择性。不同入射角映射不同子图像。",
-          uv: "在紫外光下，条带基底材料呈现蓝色荧光背景。安全条带的聚酯基材中掺入了荧光增白剂，UV 激发（约 365 nm）触发荧光辐射。",
-          transmit: "透光观察时，条带因材质不同而呈现不透明轮廓——聚酯薄膜与纸张的透射率差异在背光下变得清晰可见。"
-        },
-        physics: "微光学阵列 / 运动视差 / 衍射光学元件"
+        copy: "蓝色安全条带利用微透镜阵列制造运动视差。倾斜时，条带里的钟形图案和 100 字样会呈现相对移动。",
+        physics: "微光学阵列 / 运动视差 / 角度选择"
       },
       ink: {
-        title: "变色墨水（OVI）",
-        copy: {
-          visible: "右下角数字印有光学可变墨水（OVI）。颜色随观察角在绿色与铜金色之间切换——正是结构色的特征：颜色来自纳米结构干涉，而非色素吸收。",
-          tilt: "倾斜时，颜色偏移最为明显。薄膜干涉原理：光在折射率边界多次反射，特定波长因光程差满足相长干涉条件而增强；改变角度改变光程差，因此改变颜色。",
-          uv: "紫外模式下，OVI 区域呈现特有的荧光响应。墨水中含有荧光敏化剂，UV 激发后发出与日光下不同的光谱特征，是隐形防伪层。",
-          transmit: "透光下，变色墨水因覆盖厚度较大而呈现深色不透明区域，与周围纸张的透射率对比明显。"
-        },
-        physics: "结构色 / 薄膜干涉 / 波长选择反射"
+        title: "变色墨水",
+        copy: "右下角的墨水区域在不同观察角下改变颜色。微结构和薄膜会选择性反射不同波长，让颜色随视角漂移。",
+        physics: "结构色 / 薄膜干涉 / 波长选择"
       },
       watermark: {
-        title: "水印与透光区",
-        copy: {
-          visible: "可见光下，水印在正常亮度下隐约可见——Franklin 肖像的轮廓藏在纸张纤维密度差异之中，正面观察几乎察觉不到。",
-          tilt: "斜光观察时，纸张表面纤维方向会形成细微光泽差异，与水印区域边界产生反射率对比。",
-          uv: "紫外光下，水印纸张区域呈现暗区——水印通过控制纸浆厚度制成，厚纸区荧光减弱，薄纸区荧光较强，形成明暗对比图案。",
-          transmit: "透光是观察水印的标准方法。光透过纸张，厚纸区吸收更多，显现出 Benjamin Franklin 肖像的透射成像——这是吸收与散射强度的空间分布编码。"
-        },
-        physics: "透射成像 / 差分吸收 / 纸张密度调制"
+        title: "水印与透光",
+        copy: "把纸币放到透光环境下，纸张厚度和纤维密度差异会显出隐约图像。它利用的是吸收、散射和透射强度的空间分布。",
+        physics: "透射成像 / 散射 / 材料密度"
       },
       microprint: {
         title: "微缩文字",
-        copy: {
-          visible: "微缩文字（约 0.1 mm 字高）在正常光线下仅呈现为细线条——需要放大镜或显微镜才能辨认文字内容，复印机或扫描仪无法精确复现。",
-          tilt: "斜光下，微缩文字的凸起油墨边缘产生细微阴影，增强了文字轮廓可见性，这也是雕刻凹印工艺的微观体现。",
-          uv: "紫外模式下，微缩文字区域可见与背景不同的荧光响应——油墨配方中含有紫外响应成分，形成隐形微缩信息层。",
-          transmit: "透光观察时，微缩文字区域因油墨厚度不透光，形成精细的暗纹图案，进一步确认其真实性。"
-        },
-        physics: "调制传递函数 / 分辨率极限 / 凹版印刷"
+        copy: "微缩文字依赖高精度制版和印刷。扫描复制会损失边缘锐度，显微镜下能看到普通打印难以保留的线条和断裂特征。",
+        physics: "显微成像 / 分辨率 / 调制传递"
       },
       thread: {
         title: "安全线",
-        copy: {
-          visible: "安全线（security thread）嵌入纸张内部，可见光下仅显示为细窄深色竖条。线上印有"USA 100"微缩字样，透光可确认。",
-          tilt: "斜光下，安全线与纸张折射率边界产生微弱反射差异，在高对比度下可见线迹轮廓变化。",
-          uv: "紫外模式下，安全线发出粉紫色强荧光——线材中掺入荧光染料，UV 激发（365 nm）使染料分子跃迁至激发态，弛豫时释放可见光光子（约 400–450 nm）。",
-          transmit: "透光是最直观的安全线验证方式：线材不透光，呈现为清晰细带，同时可见微缩字样——将材料位置、纸张结构与光谱响应三重绑定。"
-        },
-        physics: "荧光激发与辐射 / 透射检测 / 嵌入式材料防伪"
+        copy: "安全线埋入纸张内部，在透光或紫外环境下显现。它把光谱响应、材料位置和纸张结构绑定在一起。",
+        physics: "荧光响应 / 透光检测 / 材料防伪"
       }
     };
 
@@ -855,7 +698,6 @@
       mode = next;
       chamber.classList.toggle("uv", mode === "uv");
       chamber.classList.toggle("transmit", mode === "transmit");
-      chamber.classList.toggle("tilt", mode === "tilt");
       document.querySelectorAll(".mode").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === mode));
       updateView();
     }
@@ -895,48 +737,30 @@
       const x = pointer.x * 100;
       const y = pointer.y * 100;
       const absAngle = Math.abs(angle);
-
       scope.style.setProperty("--mx", `${x}%`);
       scope.style.setProperty("--my", `${y}%`);
       scopeView.style.setProperty("--zoom", zoom.toFixed(2));
       scopeView.style.setProperty("--bx", `${x}%`);
       scopeView.style.setProperty("--by", `${y}%`);
-
-      // Perspective-based tilt: larger perspective value = subtle, small = dramatic
-      const perspDist = Math.max(360, 900 - absAngle * 300);
-      const rotXBase = 48 - angle * 16;
-      const rotY = angle * 18;
-      const rotZ = -8 + angle * 9;
-      stage.style.perspective = `${perspDist}px`;
-      billRig.style.transform = `translate(-50%, -50%) rotateX(${rotXBase}deg) rotateY(${rotY}deg) rotateZ(${rotZ}deg)`;
-
-      bill.style.setProperty("--tilt-shift", `${angle * 52}px`);
+      bill.style.setProperty("--tilt-shift", `${angle * 46}px`);
       bill.style.setProperty("--angle-skew", `${angle * 7}deg`);
       bill.style.setProperty("--angle-hue", `${angle * 54}deg`);
       bill.style.setProperty("--angle-abs", absAngle.toFixed(3));
-      bill.style.setProperty("--overlay-opacity", mode === "tilt" ? (.42 + absAngle * .28) : mode === "visible" ? .10 : .30);
+      bill.style.setProperty("--overlay-opacity", mode === "tilt" ? .68 : mode === "visible" ? .10 : .30);
       bill.style.setProperty("--mark-opacity", mode === "visible" ? .12 : .34 + absAngle * .10);
-      bill.style.setProperty("--watermark-opacity", mode === "transmit" ? .68 : mode === "visible" ? .06 : .18);
-      bill.style.setProperty("--thread-opacity", mode === "uv" ? .92 : mode === "transmit" ? .82 : .12);
+      bill.style.setProperty("--watermark-opacity", mode === "transmit" ? .62 : mode === "visible" ? .06 : .18);
+      bill.style.setProperty("--thread-opacity", mode === "uv" || mode === "transmit" ? .82 : .12);
       bill.style.setProperty("--microprint-opacity", microscopeOn ? Math.min(.72, .22 + zoom * .065) : .12);
-
-      // Tilt mode: also drive drop-shadow intensity for specular pop
-      if (mode === "tilt") {
-        billRig.style.filter = `drop-shadow(0 56px 80px rgba(0,0,0,.64)) drop-shadow(${angle * 28}px ${absAngle * 12}px 40px rgba(216,192,122,${(absAngle * .22).toFixed(3)}))`;
-      } else {
-        billRig.style.filter = "drop-shadow(0 56px 80px rgba(0,0,0,.64))";
-      }
-
+      billRig.style.transform = `translate(-50%, -50%) rotateX(${48 - angle * 14}deg) rotateY(${angle * 14}deg) rotateZ(${-8 + angle * 8}deg)`;
       const f = features[feature];
-      const modeCopy = f.copy[mode];
-      const modeLabel = {
-        visible: "可见光",
-        tilt: "斜光·结构色",
-        uv: "紫外·荧光",
-        transmit: "透射成像"
-      }[mode];
-      const toolCopy = microscopeOn ? "<br>显微镜已开启——移动鼠标检查局部线条与纤维。" : "";
-      readout.innerHTML = `<b>${f.title}</b><br>${modeCopy}${toolCopy}<span class="source">当前模式：${modeLabel} · 物理机制：${f.physics} · 图像：WIKIMEDIA COMMONS / 教育展示样张</span>`;
+      const modeCopy = {
+        visible: "可见光下先定位防伪区域。",
+        tilt: "倾斜模式改变观察角，突出角度依赖的光学效果。",
+        uv: "紫外模式模拟安全线与材料荧光。",
+        transmit: "透光模式模拟水印和埋入式安全线。"
+      };
+      const toolCopy = microscopeOn ? "显微镜已开启，移动鼠标检查局部细节。" : "可开启显微镜作为附加观察工具。";
+      readout.innerHTML = `<b>${f.title}</b>：${f.copy}<br>${modeCopy[mode]}${toolCopy}<span class="source">物理机制：${f.physics} · 图像来源：WIKIMEDIA COMMONS / 教育展示样张</span>`;
     }
 
     stage.addEventListener("pointermove", (event) => {
@@ -948,27 +772,7 @@
       };
       updateView();
     });
-
-    // Hotspot: click to select, hover to preview readout
-    document.querySelectorAll(".hotspot").forEach(btn => {
-      btn.addEventListener("click", () => setFeature(btn.dataset.feature));
-      btn.addEventListener("pointerenter", () => {
-        // Preview on hover — show feature info without changing active hotspot
-        const hoverFeature = btn.dataset.feature;
-        if (hoverFeature === feature) return;
-        const f = features[hoverFeature];
-        const modeCopy = f.copy[mode];
-        const modeLabel = {
-          visible: "可见光", tilt: "斜光·结构色",
-          uv: "紫外·荧光", transmit: "透射成像"
-        }[mode];
-        readout.innerHTML = `<b>${f.title}</b> <span style="color:#66605a;font-size:11px">（悬停预览）</span><br>${modeCopy}<span class="source">当前模式：${modeLabel} · 物理机制：${f.physics}</span>`;
-      });
-      btn.addEventListener("pointerleave", () => {
-        updateView(); // restore active feature readout
-      });
-    });
-
+    document.querySelectorAll(".hotspot").forEach(btn => btn.addEventListener("click", () => setFeature(btn.dataset.feature)));
     document.querySelectorAll(".mode").forEach(btn => btn.addEventListener("click", () => setMode(btn.dataset.mode)));
     microscopeToggle.addEventListener("click", () => setMicroscope(!microscopeOn));
     observeMicroscope.addEventListener("click", () => setMicroscope(!microscopeOn));
@@ -976,12 +780,10 @@
     observeExit.addEventListener("click", () => setObserving(false));
     zoomSlider.addEventListener("input", updateView);
     angleSlider.addEventListener("input", updateView);
-    setFeature("ribbon");
+setFeature("ribbon");
     setMode("visible");
     setMicroscope(false);
   </script>
   <script src="./transition-nav.js"></script>
-  <script src="./philosophy-inscriptions.js"></script>
-  <script src="./ambient-audio.js"></script>
 </body>
 </html>
