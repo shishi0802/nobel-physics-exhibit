@@ -80,13 +80,11 @@
       transition: opacity .4s ease;
       pointer-events: none;
     }
-    .img-layer.pet-tint {
-      object-fit: cover;
-    }
+    .img-layer.pet-tint { object-fit: cover; }
     .img-layer.visible { opacity: 1; }
     .img-layer.xray-tint { filter: grayscale(1) brightness(var(--bright, 1)) contrast(var(--ctr, 1.1)); }
-    .img-layer.mri-tint { filter: grayscale(.6) brightness(var(--bright, .9)) contrast(var(--ctr, 1.2)) sepia(.3) hue-rotate(160deg); }
-    .img-layer.pet-tint { filter: brightness(var(--bright, 1)) contrast(var(--ctr, 1.1)) saturate(1.3); }
+    .img-layer.mri-tint { filter: grayscale(.5) brightness(var(--bright, .9)) contrast(var(--ctr, 1.2)) sepia(.25) hue-rotate(165deg); }
+    .img-layer.pet-tint { filter: brightness(var(--bright, 1)) contrast(var(--ctr, 1.1)) saturate(var(--sat, 1.4)); }
     .scanline {
       position: absolute; left: 10%; right: 10%; top: var(--scan, 45%); height: 1px;
       background: linear-gradient(90deg, transparent, rgba(143,221,234,.82), transparent);
@@ -305,7 +303,7 @@
     const modeInfo = {
       xray: {
         title: "X 光模式",
-        desc: "拖动 WINDOW 滑杆调节窗宽（window width）。窗宽窄时骨皮质与骨松质的细节对比最高；窗宽宽时整体灰阶均匀，能看到软组织轮廓。这就是放射科医生每天做的"调窗位"——同一组 CT 数据，呈现完全不同的身体。",
+        desc: "拖动 WINDOW 滑杆调节窗宽（window width）。窗宽窄时骨骼细节对比最高；窗宽宽时软组织可见。放射科医生每天做的调窗位——同一组 CT 数据，呈现完全不同的身体。",
         physics: "物理原理：X 射线衰减系数 · 光电效应（骨）· 康普顿散射（软组织）· 1895 伦琴发现"
       },
       mri: {
@@ -385,67 +383,67 @@
       const slices    = modeSlices[mode];
       const count     = slices.length;
 
-      // Hide all layers
-      allLayers.forEach(el => { el.classList.remove("visible"); el.style.opacity = 0; });
+      // Hide all layers via class (keeps CSS transition working)
+      allLayers.forEach(el => el.classList.remove("visible"));
 
       if (mode === "xray") {
-        // X-RAY: single bone-window image; WINDOW slider is the only active control
         slices[0].classList.add("visible");
-        slices[0].style.opacity = 1;
         viewerLabel.textContent = "X-RAY · BONE WINDOW";
-        // Scanline stays at a fixed mid-point for X-RAY
         scanline.style.setProperty("--scan", "45%");
 
       } else if (mode === "mri") {
-        // MRI: smooth crossfade between adjacent slices
+        // Smooth crossfade between adjacent slices via opacity custom prop
         const pos   = sliceVal * (count - 1);
         const lower = Math.floor(pos);
         const upper = Math.min(lower + 1, count - 1);
         const blend = pos - lower;
+        // Show both with per-element opacity override via CSS var
         if (lower === upper) {
           slices[lower].classList.add("visible");
-          slices[lower].style.opacity = 1;
         } else {
+          // Use inline opacity on visible elements (class makes them visible, inline fine-tunes blend)
           slices[lower].classList.add("visible");
-          slices[lower].style.opacity = 1 - blend;
+          slices[lower].style.opacity = (1 - blend).toFixed(3);
           slices[upper].classList.add("visible");
-          slices[upper].style.opacity = blend;
+          slices[upper].style.opacity = blend.toFixed(3);
         }
+        // Reset any previously set inline opacity on non-visible
+        slices.forEach((el, i) => {
+          if (i !== lower && i !== upper) el.style.opacity = "";
+        });
         const labelIdx = Math.round(sliceVal * (mriLabels.length - 1));
         viewerLabel.textContent = `MRI T2 · ${mriLabels[labelIdx]}`;
         scanline.style.setProperty("--scan", `${15 + sliceVal * 70}%`);
 
       } else {
-        // PET: single image; objectPosition jumps to focused hotspot
+        // PET: jump to focused hotspot
         const h = petHotspots[petFocusIdx];
         slices[0].classList.add("visible");
-        slices[0].style.opacity = 1;
         slices[0].style.objectPosition = `50% ${h.pos}%`;
         slices[0].style.transition = "object-position .55s cubic-bezier(.22,1,.36,1), opacity .4s ease";
         viewerLabel.textContent = `PET/CT · ${h.label}`;
-        // Scanline follows hotspot position
         scanline.style.setProperty("--scan", `${h.pos}%`);
       }
 
-      // WINDOW slider → brightness + contrast for all modes
-      // X-RAY: narrower window = higher contrast (radiologist window-leveling feel)
-      let brightness, contrast;
+      // WINDOW slider → brightness + contrast
+      let brightness, contrast, sat;
       if (mode === "xray") {
-        // windowVal low = narrow window (high contrast bone detail)
-        // windowVal high = wide window (flatter, softer)
         brightness = 0.55 + windowVal * 0.70;
-        contrast   = 1.8  - windowVal * 0.90;  // high → low contrast as window opens
+        contrast   = 1.8  - windowVal * 0.90;
+        sat = 1;
       } else if (mode === "pet") {
-        // PET: higher window = more contrast, reveals subtle hot spots
         brightness = 0.50 + windowVal * 0.70;
         contrast   = 1.0  + windowVal * 1.20;
+        sat = 1.2 + windowVal * 0.4;
       } else {
         brightness = .6  + windowVal * .8;
         contrast   = .8  + windowVal * .5;
+        sat = 1;
       }
       slices.forEach(el => {
         el.style.setProperty("--bright", brightness.toFixed(2));
         el.style.setProperty("--ctr",    contrast.toFixed(2));
+        el.style.setProperty("--sat",    sat.toFixed(2));
       });
     }
 
