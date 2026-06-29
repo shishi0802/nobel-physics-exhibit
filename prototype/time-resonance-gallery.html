@@ -64,7 +64,7 @@
     /* Central experiment */
     .experiment {
       position: absolute; left: 50%; top: 50%;
-      width: min(50vw, 680px); height: min(62vh, 580px);
+      width: min(50vw, 680px); height: min(72vh, 640px);
       transform: translate(-50%, -47%); z-index: 4;
       mask-image: radial-gradient(ellipse at 50% 50%, #000 0 58%, rgba(0,0,0,.6) 78%, transparent 100%);
     }
@@ -278,13 +278,13 @@
     }
 
     function drawAtomicClock(w, h, amp, t) {
-      const zoneH = h * 0.38;
+      const zoneH = h * 0.32;
       const cx = w * 0.5;
       const waveW = w * 0.55;
       const waveX0 = cx - waveW / 2;
       const waveX1 = cx + waveW / 2;
-      const yUpper = h * 0.14;
-      const yLower = h * 0.30;
+      const yUpper = h * 0.12;
+      const yLower = h * 0.28;
       const yMid   = (yUpper + yLower) / 2;
 
       const grd = ctx.createRadialGradient(cx, yMid, 0, cx, yMid, waveW * 0.58);
@@ -355,8 +355,8 @@
     }
 
     function drawGauge(w, h, amp, t) {
-      const cx = w * 0.50; const cy = h * 0.62;
-      const R = Math.max(60, Math.min(w, h) * 0.16);
+      const cx = w * 0.50; const cy = h * 0.56;
+      const R = Math.max(68, Math.min(w, h) * 0.18);
       const startDeg = 210; const endDeg = 330; const totalAngle = endDeg - startDeg;
       const startRad = startDeg * Math.PI / 180; const endRad = endDeg * Math.PI / 180;
 
@@ -418,7 +418,7 @@
     }
 
     function drawResonanceCurve(w, h, amp) {
-      const zoneTop = h * 0.78; const baseline = h * 0.95; const zoneH = baseline - zoneTop;
+      const zoneTop = h * 0.76; const baseline = h * 0.93; const zoneH = baseline - zoneTop;
       const Q = 1 / (damp * 0.8 + 0.08); const numPts = 300;
       const pts = [];
       for (let i = 0; i <= numPts; i++) {
