@@ -3,902 +3,532 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>时间与共振 — 诺贝尔物理展</title>
+  <title>时间与共振 · Time and Resonance</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23020202'/%3E%3Ccircle cx='32' cy='32' r='12' fill='none' stroke='%23d8c07a' stroke-width='3'/%3E%3Cpath d='M32 20v12l8 4' stroke='%238fddea' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+SC:wght@300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./base.css" />
-  <link rel="stylesheet" href="./gallery-transition.css" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #020202;
-      --ink: #eee9dc;
-      --gold: #d8c07a;
-      --cyan: #8fddea;
-      --muted: #7c7670;
-      --mono: 'IBM Plex Mono', monospace;
-      --serif: 'Noto Serif SC', serif;
-      --sans: 'Noto Sans SC', sans-serif;
-    }
-
-    html, body {
-      width: 100%; height: 100%;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: var(--sans);
-      overflow: hidden;
-    }
-
-    /* ── Page veil animation ───────────────────────────────── */
-    @keyframes pageVeil {
-      0%   { background: rgba(0,0,0,0); }
-      100% { background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.050) 36%, rgba(3,3,2,.18) 100%); }
-    }
-    @keyframes pageReveal {
-      from { opacity: 1; }
-      to   { opacity: 0; }
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ── Layout shell ──────────────────────────────────────── */
     .chamber {
       position: relative; width: 100vw; height: 100vh;
-      min-width: 1100px; min-height: 700px;
-      overflow: hidden; isolation: isolate;
+      min-width: 1080px; min-height: 720px; overflow: hidden;
       background:
         radial-gradient(circle at 50% 42%, rgba(216,192,122,.08), transparent 24%),
         radial-gradient(circle at 68% 60%, rgba(143,221,234,.06), transparent 20%),
         linear-gradient(180deg, #080807 0%, #020202 60%, #000 100%);
+      isolation: isolate;
     }
-
-    .grain {
-      position: absolute; inset: 0; z-index: 50;
-      opacity: .11; pointer-events: none; mix-blend-mode: screen;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.88' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+    .room { position: absolute; inset: 0; z-index: 1; perspective: 1200px; pointer-events: none; }
+    .wall {
+      position: absolute; left: 11vw; right: 11vw; top: 8vh; height: 66vh;
+      background: linear-gradient(180deg, rgba(17,17,16,.94), rgba(4,4,4,.96));
+      border-top: 1px solid rgba(238,233,220,.07);
+      box-shadow: inset 0 0 160px rgba(255,255,255,.018), 0 46px 160px rgba(0,0,0,.72);
+      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
     }
-
-    .ambient-glow {
-      position: absolute; left: 50%; top: 10%; width: 70vw; height: 68vh;
-      transform: translateX(-50%);
-      background: conic-gradient(from 180deg at 50% 0%,
-        transparent 0 34%,
-        rgba(216,192,122,.09) 42%, rgba(238,233,220,.07) 50%,
-        rgba(143,221,234,.09) 58%,
-        transparent 66% 100%);
-      filter: blur(28px); opacity: .65; mix-blend-mode: screen;
-      pointer-events: none; z-index: 1;
-    }
-
-    /* ── Topline ───────────────────────────────────────────── */
-    .topline {
-      position: absolute; left: clamp(36px,4.5vw,72px); right: clamp(36px,4.5vw,72px);
-      top: 28px; z-index: 9;
-      display: flex; justify-content: space-between; align-items: center;
-      color: #6e6860; font-family: var(--mono); font-size: 11px; letter-spacing: .16em;
-    }
-    .topline a { color: #bdb49a; text-decoration: none; }
-    .topline a:hover { color: var(--gold); }
-
-    /* ── 3-column exhibit layout ───────────────────────────── */
-    .exhibit-layout {
-      position: absolute; inset: 0; z-index: 3;
-      display: grid;
-      grid-template-columns: 260px 1fr 220px;
-      grid-template-rows: 1fr;
-      gap: 0;
-      height: 100vh;
-      padding: 70px 0 60px;
-      pointer-events: none;
-    }
-
-    /* ── Left: title panel ─────────────────────────────────── */
-    .title-panel {
-      padding: clamp(16px,2.5vh,32px) 0 0 clamp(40px,4.5vw,70px);
-      display: flex; flex-direction: column; justify-content: flex-start;
-      pointer-events: auto;
-      animation: fadeUp .9s ease both;
-    }
-
-    .kicker {
-      color: var(--gold); font-family: var(--mono);
-      font-size: 10px; letter-spacing: .20em; margin-bottom: 18px;
-      opacity: .85;
-    }
-
-    h1 {
-      font-family: var(--serif); font-size: clamp(36px,4.2vw,60px);
-      line-height: 1.08; font-weight: 600;
-      color: var(--ink);
-    }
-
-    .subtitle {
-      margin: 16px 0 0; color: #857f74;
-      font-size: 13px; line-height: 1.9;
-      font-family: var(--sans); font-weight: 300;
-    }
-
-    .guide {
-      margin-top: 22px; padding-top: 14px;
-      border-top: 1px solid rgba(238,233,220,.12);
-    }
-    .guide-title {
-      color: var(--gold); font-family: var(--mono);
-      font-size: 9.5px; letter-spacing: .16em; margin-bottom: 10px;
-      opacity: .75;
-    }
-    .guide ol {
-      margin: 0; padding-left: 16px;
-      color: #7a7468; font-size: 12.5px; line-height: 2.1;
-      font-family: var(--sans);
-    }
-    .guide ol li::marker { color: var(--cyan); font-family: var(--mono); }
-
-    /* ── Center: canvas experiment ─────────────────────────── */
-    .experiment-col {
-      display: flex; align-items: center; justify-content: center;
-      position: relative;
-    }
-
-    .experiment {
-      position: relative;
-      width: min(580px, 90%); height: min(520px, 92%);
-      mask-image: radial-gradient(ellipse at 50% 50%, #000 0 55%, rgba(0,0,0,.55) 76%, transparent 100%);
-    }
-
-    #timeCanvas {
-      position: absolute; inset: 0; width: 100%; height: 100%;
-      display: block;
-    }
-
-    /* ── Right: controls panel ─────────────────────────────── */
-    .controls {
-      padding: clamp(14px,2vh,28px) clamp(16px,2vw,28px) 0 10px;
-      display: flex; flex-direction: column; gap: 22px;
-      pointer-events: auto;
-      animation: fadeUp .9s .15s ease both;
-    }
-
-    .controls-title {
-      color: var(--gold); font-family: var(--mono);
-      font-size: 9.5px; letter-spacing: .18em; opacity: .75;
-      margin-bottom: -8px;
-    }
-
-    .ctrl-group { display: flex; flex-direction: column; gap: 7px; }
-
-    .ctrl-label {
-      display: flex; justify-content: space-between; align-items: baseline;
-      font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
-      color: #928b7f;
-    }
-    .ctrl-label .val { color: var(--cyan); }
-    .ctrl-note {
-      font-family: var(--sans); font-size: 11px; color: #5c5650;
-      margin-top: 1px;
-    }
-
-    input[type=range] {
-      -webkit-appearance: none; appearance: none;
-      width: 100%; height: 2px;
-      background: rgba(238,233,220,.12);
-      outline: none; cursor: pointer;
-    }
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 12px; height: 12px; border-radius: 50%;
-      background: var(--gold);
-      box-shadow: 0 0 8px rgba(216,192,122,.5);
-      cursor: pointer;
-    }
-    input[type=range]:hover { background: rgba(238,233,220,.20); }
-
-    .btn-toggle {
-      width: 100%; padding: 8px 12px;
-      background: rgba(143,221,234,.06);
-      border: 1px solid rgba(143,221,234,.18);
-      color: var(--cyan); font-family: var(--mono); font-size: 10px;
-      letter-spacing: .12em; cursor: pointer;
-      transition: background .25s, border-color .25s;
-    }
-    .btn-toggle:hover { background: rgba(143,221,234,.12); border-color: rgba(143,221,234,.35); }
-    .btn-toggle.active {
-      background: rgba(143,221,234,.18);
-      border-color: rgba(143,221,234,.5);
-      color: #b8f0f8;
-      box-shadow: 0 0 12px rgba(143,221,234,.15);
-    }
-
-    .readout {
-      padding: 12px; margin-top: 4px;
-      background: rgba(238,233,220,.03);
-      border-left: 2px solid rgba(216,192,122,.25);
-      font-family: var(--sans); font-size: 12px; line-height: 1.75;
-      color: #7a7468;
-      min-height: 80px;
-    }
-    .readout .highlight { color: var(--gold); }
-
-    /* ── Inscription ───────────────────────────────────────── */
-    .inscription {
-      position: absolute; left: clamp(36px,4vw,66px); bottom: 68px;
-      z-index: 8; width: min(280px,22vw);
-      transform-origin: left bottom;
-      pointer-events: none;
-      animation: fadeUp 1s .3s ease both;
-    }
-    .inscription-label {
-      color: #4a4640; font-family: var(--mono); font-size: 9px; letter-spacing: .18em;
-      margin-bottom: 8px; display: block;
-    }
-    .inscription-quote {
-      color: #5c5852; font-family: var(--serif); font-size: 13px; line-height: 1.85;
-      font-style: italic;
-    }
-    .inscription-source {
-      margin-top: 8px; color: #3e3a36; font-family: var(--mono); font-size: 10px;
-      letter-spacing: .10em;
-    }
-
-    /* ── Bottom navline ────────────────────────────────────── */
-    .navline {
-      position: absolute; left: 0; right: 0; bottom: 0; height: 52px;
-      z-index: 9; display: flex; align-items: center;
-      padding: 0 clamp(36px,4.5vw,72px);
-      justify-content: space-between;
+    .floor {
+      position: absolute; left: -16vw; right: -16vw; bottom: -34vh; height: 58vh;
+      transform: rotateX(65deg); transform-origin: 50% 0;
       border-top: 1px solid rgba(238,233,220,.06);
-      background: linear-gradient(0deg, rgba(2,2,2,.85), transparent);
+      background: linear-gradient(180deg, rgba(22,22,20,.48), #020202 68%);
     }
-    .navline a {
-      font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em;
-      color: #6e6860; text-decoration: none;
-      transition: color .25s;
+    .light {
+      position: absolute; left: 50%; top: 3vh; width: 60vw; height: 72vh;
+      transform: translateX(-50%);
+      background: conic-gradient(from 180deg at 50% 0%, transparent 0 35%, rgba(216,192,122,.10) 44%, rgba(238,233,220,.08) 50%, rgba(216,192,122,.10) 56%, transparent 65% 100%);
+      filter: blur(22px); opacity: .65; mix-blend-mode: screen;
     }
-    .navline a:hover { color: var(--gold); }
-    .navline .hall-link { color: #8d887f; }
-    .navline .nav-disabled { color: #3a3632; cursor: default; pointer-events: none; }
+
+    /* Topline */
+    .topline {
+      position: absolute; left: clamp(40px,5vw,80px); right: clamp(40px,5vw,80px);
+      top: 34px; z-index: 9; display: flex; justify-content: space-between;
+      color: #8d887f; font-family: var(--mono); font-size: 11px; letter-spacing: .15em;
+    }
+    .topline a { color: #d9cfb2; }
+
+    /* Left title panel */
+    .title-panel {
+      position: absolute; left: clamp(48px,6vw,90px); top: clamp(88px,14vh,136px);
+      z-index: 8; width: min(310px,24vw);
+    }
+    .kicker { color: var(--gold); font-family: var(--mono); font-size: 12px; letter-spacing: .18em; margin-bottom: 20px; }
+    h1 { margin: 0; font-family: var(--serif); font-size: clamp(38px,4.4vw,64px); line-height: 1.06; }
+    .title-panel .subtitle { margin: 16px 0 0; color: var(--muted); font-size: 14px; line-height: 1.85; }
+    .guide { margin-top: 22px; padding-top: 14px; border-top: 1px solid rgba(238,233,220,.14); }
+    .guide-title { color: var(--gold); font-family: var(--mono); font-size: 10px; letter-spacing: .14em; margin-bottom: 10px; }
+    .guide ol { margin: 0; padding-left: 18px; color: #928b80; font-size: 13px; line-height: 2.0; }
+    .guide ol li::marker { color: var(--cyan); }
+
+    /* Central experiment */
+    .experiment {
+      position: absolute; left: 50%; top: 50%;
+      width: min(50vw, 680px); height: min(62vh, 580px);
+      transform: translate(-50%, -47%); z-index: 4;
+      mask-image: radial-gradient(ellipse at 50% 50%, #000 0 58%, rgba(0,0,0,.6) 78%, transparent 100%);
+    }
+    #timeCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+    /* Right controls */
+    .controls {
+      position: absolute; right: clamp(46px,5vw,86px); top: clamp(100px,14vh,148px);
+      width: min(300px,24vw); z-index: 11;
+    }
+    .controls-label {
+      color: var(--gold); font-family: var(--mono); font-size: 10px;
+      letter-spacing: .16em; margin-bottom: 16px; opacity: .85;
+    }
+    .control-row { display: grid; grid-template-columns: 90px 1fr; gap: 14px; align-items: center; margin-bottom: 16px; }
+    .control-row label { color: #777168; font-family: var(--mono); font-size: 10px; letter-spacing: .10em; }
+    .ctrl-note { color: #555048; font-size: 11px; margin-top: -8px; margin-bottom: 16px; }
+    input[type=range] { appearance: none; width: 100%; height: 30px; background: transparent; cursor: pointer; }
+    input[type=range]::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(90deg, var(--cyan), rgba(238,233,220,.18), var(--gold)); }
+    input[type=range]::-webkit-slider-thumb {
+      appearance: none; width: 15px; height: 15px; margin-top: -6.5px; border-radius: 50%;
+      border: 1px solid #050505; background: var(--ink); box-shadow: 0 0 20px rgba(238,233,220,.30);
+    }
+    /* Toggle buttons — same style as quantum gallery's toggle-btn */
+    .toggle-row { display: flex; gap: 10px; margin-bottom: 16px; }
+    .toggle-btn {
+      flex: 1; border: 0; border-top: 1px solid rgba(238,233,220,.16); padding: 11px 0 0;
+      background: transparent; color: rgba(238,233,220,.45); cursor: pointer;
+      font-family: var(--mono); font-size: 10px; letter-spacing: .10em; text-align: left;
+      transition: color .28s;
+    }
+    .toggle-btn.active { color: var(--ink); border-top-color: rgba(216,192,122,.5); }
+    .readout {
+      margin-top: 8px; padding: 13px 0; border-top: 1px solid rgba(238,233,220,.10);
+      color: #928b80; font-size: 13px; line-height: 1.85;
+    }
+    .readout b { color: #eee4c7; font-weight: 500; }
+    .readout .physics { display: block; margin-top: 8px; color: #6d675f; font-family: var(--mono); font-size: 10px; letter-spacing: .06em; line-height: 1.6; }
+
+    /* Inscription */
+    .inscription {
+      position: absolute; left: clamp(48px,6vw,90px); bottom: clamp(62px,9vh,100px);
+      z-index: 10; width: min(310px,24vw);
+      border-top: 1px solid rgba(216,192,122,.30); padding-top: 16px;
+    }
+    .inscription .label { color: var(--gold); font-family: var(--mono); font-size: 10px; letter-spacing: .16em; margin-bottom: 13px; }
+    .quote { font-family: var(--serif); color: #d8d1bf; font-size: 17px; line-height: 1.65; transition: opacity .35s ease; }
+    .source { margin-top: 10px; color: #777168; font-family: var(--mono); font-size: 10px; letter-spacing: .09em; transition: opacity .35s ease; }
+    .fade { opacity: 0; }
+
+    /* Navline */
+    .navline {
+      position: absolute; left: clamp(40px,5vw,80px); right: clamp(40px,5vw,80px);
+      bottom: 28px; z-index: 20; display: flex; justify-content: space-between;
+      color: #6d675f; font-family: var(--mono); font-size: 10px; letter-spacing: .13em;
+    }
+    .navline a { color: #a79d86; }
+
+    /* Page transitions */
+    .portal-transition.active { opacity: 1; animation: pageVeil .52s cubic-bezier(.22,1,.36,1) forwards; }
+    .portal-transition.active::before { animation: none; opacity: 0; transform: none; }
+    body.is-entering::before {
+      content: ""; position: fixed; inset: 0; z-index: 99; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.045) 34%, rgba(3,3,2,.28) 100%);
+      animation: pageReveal .72s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    body.is-leaving main > :not(.portal-transition) { opacity: .72; filter: none !important; transition: opacity .52s cubic-bezier(.22,1,.36,1); }
+    @keyframes pageVeil { 0% { background: rgba(0,0,0,0); } 100% { background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.050) 36%, rgba(3,3,2,.18) 100%); } }
+    @keyframes pageReveal { from { opacity: 1; } to { opacity: 0; } }
   </style>
+  <link rel="stylesheet" href="./gallery-transition.css" />
+  <link rel="stylesheet" href="./ambient-audio.css" />
 </head>
-<body data-ambient-scene="time">
+<body class="is-entering" data-ambient-scene="time">
+  <main class="chamber">
+    <div class="room" aria-hidden="true"><div class="wall"></div><div class="floor"></div><div class="light"></div></div>
+    <div class="grain"></div>
 
-  <!-- Ambient layers -->
-  <div class="grain" aria-hidden="true"></div>
-  <div class="ambient-glow" aria-hidden="true"></div>
+    <header class="topline">
+      <a href="./hall.html" data-transition>← HALL</a>
+      <span>EXHIBIT 07 · TIME &amp; RESONANCE</span>
+    </header>
 
-  <!-- Topline -->
-  <div class="topline" aria-label="展厅导航">
-    <span>EXHIBIT 07 &middot; TIME and RESONANCE</span>
-    <a href="hall.html" data-transition>RETURN TO HALL</a>
-  </div>
-
-  <!-- 3-column exhibit layout -->
-  <div class="exhibit-layout">
-
-    <!-- Left: title panel -->
-    <aside class="title-panel">
-      <p class="kicker">CLOCK / FREQUENCY / RESONANCE</p>
-      <h1>时间与共振</h1>
-      <p class="subtitle">
-        铯原子在两个超精细能级之间的跃迁频率恰好是 9,192,631,770&thinsp;Hz。1967 年，人类以此重新定义「秒」。原子钟的精度让 GPS 导航、深空通信和引力波探测成为可能。
-      </p>
+    <section class="title-panel">
+      <div class="kicker">TIME GALLERY</div>
+      <h1>时间的节拍</h1>
+      <p class="subtitle">铯原子在两个超精细能级间跃迁的频率恰好是 9,192,631,770 Hz。1967 年，人类以此重新定义「秒」。原子钟让 GPS 导航、相对论验证和引力波探测成为可能。</p>
       <div class="guide">
-        <p class="guide-title">OBSERVATION GUIDE</p>
+        <div class="guide-title">OBSERVATION GUIDE</div>
         <ol>
-          <li>拖动频率滑杆接近固有频率</li>
-          <li>观察共振仪表指针振动</li>
-          <li>观察铯原子跃迁波形的变化</li>
-          <li>调节阻尼感受 Q 值变化</li>
-          <li>海拔滑杆模拟相对论红移</li>
+          <li>拖动频率滑杆接近固有频率 f₀</li>
+          <li>观察仪表指针抖动和共振峰形变</li>
+          <li>调节阻尼感受 Q 值对峰宽的影响</li>
+          <li>切换相对论校准观察海拔引起的钟频漂移</li>
         </ol>
       </div>
+    </section>
+
+    <section class="experiment" aria-label="共振与原子钟可视化">
+      <canvas id="timeCanvas"></canvas>
+    </section>
+
+    <section class="controls">
+      <div class="controls-label">PARAMETERS</div>
+      <div class="control-row">
+        <label for="freqSlider">FREQUENCY</label>
+        <input type="range" id="freqSlider" min="0" max="1" step=".001" value=".44" />
+      </div>
+      <p class="ctrl-note" id="freqNote">f = 552 Hz &nbsp;·&nbsp; 远离 f₀</p>
+      <div class="control-row">
+        <label for="dampSlider">DAMPING</label>
+        <input type="range" id="dampSlider" min="0" max="1" step=".001" value=".28" />
+      </div>
+      <p class="ctrl-note">低阻尼 → 尖锐共振峰 · 高 Q 值</p>
+      <div class="control-row">
+        <label for="altSlider">ALTITUDE</label>
+        <input type="range" id="altSlider" min="0" max="1" step=".001" value=".36" />
+      </div>
+      <p class="ctrl-note" id="altNote">0 m &nbsp;·&nbsp; 引力势差 δf/f ≈ gh/c²</p>
+      <div class="toggle-row">
+        <button class="toggle-btn" id="relBtn" type="button">RELATIVITY OFF</button>
+        <button class="toggle-btn" id="resetBtn" type="button">RESET</button>
+      </div>
+      <div class="readout" id="readout">
+        <b>远离固有频率</b>：系统几乎不响应，振幅接近零。将频率滑杆向右拖动至约 58% 处，观察共振峰。
+        <span class="physics">物理原理：受迫振动 · 洛伦兹线型 · Q 因子 · 铯原子钟 · 1967 SI 秒定义</span>
+      </div>
+    </section>
+
+    <aside class="inscription" data-inscription-topic="time">
+      <div class="label">PHILOSOPHICAL INSCRIPTION</div>
+      <div class="quote"></div>
+      <div class="source"></div>
     </aside>
 
-    <!-- Center: canvas -->
-    <div class="experiment-col">
-      <div class="experiment">
-        <canvas id="timeCanvas"></canvas>
-      </div>
-    </div>
+    <nav class="navline">
+      <a href="./light-micro-gallery.html" data-transition>← LIGHT EXHIBIT</a>
+      <a href="./hall.html" data-transition>BACK TO HALL</a>
+    </nav>
+    <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
+  </main>
 
-    <!-- Right: controls -->
-    <div class="controls">
-      <p class="controls-title">PARAMETERS</p>
-
-      <div class="ctrl-group">
-        <div class="ctrl-label">
-          <span>FREQUENCY</span>
-          <span class="val" id="freqVal">f = 432 Hz</span>
-        </div>
-        <input type="range" id="freqSlider" min="0" max="1" step="0.001" value="0.44">
-      </div>
-
-      <div class="ctrl-group">
-        <div class="ctrl-label">
-          <span>DAMPING</span>
-          <span class="val" id="dampVal">0.28</span>
-        </div>
-        <input type="range" id="dampSlider" min="0" max="1" step="0.001" value="0.28">
-        <p class="ctrl-note">低阻尼 &rarr; 尖锐峰值</p>
-      </div>
-
-      <div class="ctrl-group">
-        <div class="ctrl-label">
-          <span>ALTITUDE</span>
-          <span class="val" id="altVal">0 m</span>
-        </div>
-        <input type="range" id="altSlider" min="0" max="1" step="0.001" value="0.36">
-        <p class="ctrl-note">引力势差 &rarr; 钟频漂移</p>
-      </div>
-
-      <button class="btn-toggle" id="relBtn">RELATIVISTIC CALIBRATION</button>
-
-      <div class="readout" id="readout">
-        远离固有频率：系统几乎不响应，振幅接近零。
-      </div>
-    </div>
-  </div>
-
-  <!-- Philosophical inscription (bottom-left) -->
-  <aside class="inscription" data-inscription-topic="time" aria-label="哲学铭文">
-    <span class="inscription-label">PHILOSOPHICAL INSCRIPTION</span>
-    <div class="inscription-quote" id="inscriptionQuote">时间是运动的数，按前与后而计量。</div>
-    <div class="inscription-source" id="inscriptionSource">— Aristotle, Physics IV.11</div>
-  </aside>
-
-  <!-- Bottom navline -->
-  <nav class="navline" aria-label="展厅导航">
-    <a href="light-micro-gallery.html" data-transition>&larr; EXHIBIT 06 &middot; LIGHT &amp; MICROSCOPY</a>
-    <a href="hall.html" class="hall-link" data-transition>HALL &middot; ATRIUM</a>
-    <span class="nav-disabled">EXHIBIT 08 &middot; — &rarr;</span>
-  </nav>
-
-  <!-- External scripts -->
   <script src="./philosophy-inscriptions.js"></script>
   <script src="./ambient-audio.js"></script>
 
-  <!-- ── Main canvas animation script ─────────────────────── -->
+  <!-- Main canvas script -->
   <script>
   (function () {
     'use strict';
 
-    /* ── DOM refs ─────────────────────────────────────────── */
-    const canvas   = document.getElementById('timeCanvas');
-    const ctx      = canvas.getContext('2d');
-    const freqSl   = document.getElementById('freqSlider');
-    const dampSl   = document.getElementById('dampSlider');
-    const altSl    = document.getElementById('altSlider');
-    const relBtn   = document.getElementById('relBtn');
-    const freqVal  = document.getElementById('freqVal');
-    const dampVal  = document.getElementById('dampVal');
-    const altVal   = document.getElementById('altVal');
-    const readout  = document.getElementById('readout');
+    const canvas  = document.getElementById('timeCanvas');
+    const ctx     = canvas.getContext('2d');
+    const freqSl  = document.getElementById('freqSlider');
+    const dampSl  = document.getElementById('dampSlider');
+    const altSl   = document.getElementById('altSlider');
+    const relBtn  = document.getElementById('relBtn');
+    const resetBtn= document.getElementById('resetBtn');
+    const freqNote= document.getElementById('freqNote');
+    const altNote = document.getElementById('altNote');
+    const readout = document.getElementById('readout');
 
-    /* ── State ────────────────────────────────────────────── */
     let freq    = 0.44;
     let damp    = 0.28;
     let alt     = 0.36;
     let relMode = false;
     let W = 0, H = 0;
-    let lastTime = 0;
 
-    /* ── Natural resonance frequency ──────────────────────── */
     const F0 = 0.58;
 
-    /* ── Resize handler ───────────────────────────────────── */
     function resize() {
       const rect = canvas.parentElement.getBoundingClientRect();
       W = canvas.width  = Math.floor(rect.width);
       H = canvas.height = Math.floor(rect.height);
     }
 
-    /* ── Resonance amplitude (0..1) ───────────────────────── */
     function resonanceAmp() {
       const detune = Math.abs(freq - F0);
       const Q = 1 / (damp * 0.8 + 0.08);
-      const denom = 1 + Math.pow(detune * Q * 10, 2);
-      return 1 / denom;
+      return 1 / (1 + Math.pow(detune * Q * 10, 2));
     }
 
-    /* ── Slider label update ──────────────────────────────── */
     function updateLabels() {
       const hz = Math.round(200 + freq * 800);
-      freqVal.textContent = 'f = ' + hz + ' Hz';
-      dampVal.textContent = damp.toFixed(2);
+      const detune = Math.abs(freq - F0);
+      const status = detune < 0.035 ? '共振峰' : detune < 0.12 ? '接近 f₀' : '远离 f₀';
+      freqNote.textContent = 'f = ' + hz + ' Hz  ·  ' + status;
       const meters = Math.round(alt * 8848);
-      altVal.textContent = meters + ' m';
+      const drift = relMode ? '  ·  δf/f ≈ ' + (9.8 * meters / (9e16)).toExponential(1) : '';
+      altNote.textContent = meters + ' m' + drift;
     }
 
-    /* ── Readout logic ────────────────────────────────────── */
     function updateReadout() {
+      const amp = resonanceAmp();
       const detune = Math.abs(freq - F0);
-      let msg = '';
-
+      const hz = Math.round(200 + freq * 800);
+      let msg;
       if (detune < 0.035) {
-        msg = '<span class="highlight">共振峰：</span>系统以最大振幅响应。Q&thinsp;值越高，峰越尖锐，原子跃迁越纯净。';
+        msg = '<b>共振峰</b>：系统以最大振幅响应。阻尼越低，共振峰越尖锐，铯原子跃迁频率越纯净，时间精度越高。';
       } else if (detune < 0.12) {
-        msg = '靠近共振频率：振幅上升，能量传递效率提升。';
+        msg = '<b>接近 f₀</b>：振幅上升，能量传递效率提升。继续向右拖动至共振峰。';
       } else {
-        msg = '远离固有频率：系统几乎不响应，振幅接近零。';
+        msg = '<b>远离固有频率</b>：系统几乎不响应，振幅接近零。将频率拖动至约 58% 处观察共振。';
       }
-
       if (relMode) {
         const meters = Math.round(alt * 8848);
-        msg += '<br><span class="highlight">相对论校准模式：</span>时钟在 ' + meters +
-               ' m 高处运行，引力势差使铯原子跃迁频率升高 δf/f&thinsp;≈&thinsp;gh/c²。';
+        const dff = (9.8 * meters / (9e16)).toExponential(2);
+        msg += '<br><b>相对论模式</b>：在 ' + meters + ' m 高处，引力势差 gh/c² ≈ ' + dff + '，原子钟比海平面快了这个比例。GPS 卫星每天须校正约 38 μs。';
       }
-
+      msg += '<span class="physics">受迫振动 · 洛伦兹线型 · Q 因子 · 铯-133 超精细跃迁 · 1967 SI 秒定义</span>';
       readout.innerHTML = msg;
     }
 
-    /* ── Draw: Atomic clock zone (top 38%) ───────────────── */
     function drawAtomicClock(w, h, amp, t) {
       const zoneH = h * 0.38;
       const cx = w * 0.5;
       const waveW = w * 0.55;
       const waveX0 = cx - waveW / 2;
       const waveX1 = cx + waveW / 2;
-
       const yUpper = h * 0.14;
       const yLower = h * 0.30;
       const yMid   = (yUpper + yLower) / 2;
 
-      /* Warm ambient glow behind zone */
       const grd = ctx.createRadialGradient(cx, yMid, 0, cx, yMid, waveW * 0.58);
       grd.addColorStop(0, 'rgba(216,192,122,0.07)');
       grd.addColorStop(1, 'rgba(216,192,122,0)');
       ctx.fillStyle = grd;
-      ctx.fillRect(0, 0, w, zoneH);
+      ctx.beginPath(); ctx.ellipse(cx, yMid, waveW * 0.58, zoneH * 0.5, 0, 0, Math.PI * 2); ctx.fill();
 
-      /* Cs-133 label */
       ctx.save();
       ctx.font = '400 11px IBM Plex Mono, monospace';
-      ctx.fillStyle = 'rgba(216,192,122,0.55)';
-      ctx.textAlign = 'left';
+      ctx.fillStyle = 'rgba(216,192,122,0.45)'; ctx.textAlign = 'left';
       ctx.fillText('Cs-133', waveX0, yMid - 4);
       ctx.restore();
 
-      /* Upper energy level line: F=4 */
       ctx.save();
-      ctx.strokeStyle = 'rgba(216,192,122,0.50)';
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.moveTo(waveX0, yUpper);
-      ctx.lineTo(waveX1, yUpper);
-      ctx.stroke();
-
-      /* F=4 label */
+      ctx.strokeStyle = 'rgba(216,192,122,0.50)'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(waveX0, yUpper); ctx.lineTo(waveX1, yUpper); ctx.stroke();
       ctx.font = '400 10px IBM Plex Mono, monospace';
-      ctx.fillStyle = 'rgba(216,192,122,0.60)';
-      ctx.textAlign = 'right';
+      ctx.fillStyle = 'rgba(216,192,122,0.55)'; ctx.textAlign = 'right';
       ctx.fillText('F = 4', waveX0 - 6, yUpper + 4);
-      ctx.restore();
-
-      /* Lower energy level line: F=3 */
-      ctx.save();
       ctx.strokeStyle = 'rgba(143,221,234,0.50)';
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.moveTo(waveX0, yLower);
-      ctx.lineTo(waveX1, yLower);
-      ctx.stroke();
-
-      /* F=3 label */
-      ctx.font = '400 10px IBM Plex Mono, monospace';
-      ctx.fillStyle = 'rgba(143,221,234,0.60)';
-      ctx.textAlign = 'right';
+      ctx.beginPath(); ctx.moveTo(waveX0, yLower); ctx.lineTo(waveX1, yLower); ctx.stroke();
+      ctx.fillStyle = 'rgba(143,221,234,0.55)';
       ctx.fillText('F = 3', waveX0 - 6, yLower + 4);
       ctx.restore();
 
-      /* 9,192,631,770 Hz label */
       ctx.save();
       ctx.font = '400 9px IBM Plex Mono, monospace';
-      ctx.fillStyle = 'rgba(238,233,220,0.22)';
-      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(238,233,220,0.18)'; ctx.textAlign = 'center';
       ctx.fillText('9,192,631,770 Hz', cx, yMid + (yLower - yUpper) * 0.5 + 18);
       ctx.restore();
 
-      /* Animated EM wave between the two levels */
       const waveAmp  = (yLower - yUpper) * 0.38 * (0.25 + amp * 0.75);
       const waveFreq = 8;
       const speed    = t * 0.003;
       const alpha    = 0.30 + amp * 0.50;
-
       ctx.save();
-      ctx.strokeStyle = `rgba(143,221,234,${alpha})`;
+      ctx.strokeStyle = 'rgba(143,221,234,' + alpha + ')';
       ctx.lineWidth = 1.5;
       ctx.shadowColor = 'rgba(143,221,234,0.4)';
       ctx.shadowBlur  = amp > 0.5 ? 8 : 3;
       ctx.beginPath();
-      const steps = 120;
-      for (let i = 0; i <= steps; i++) {
-        const px = waveX0 + (waveW * i / steps);
-        const phase = (i / steps) * Math.PI * 2 * waveFreq - speed;
+      for (let i = 0; i <= 120; i++) {
+        const px = waveX0 + (waveW * i / 120);
+        const phase = (i / 120) * Math.PI * 2 * waveFreq - speed;
         const py = yMid + Math.sin(phase) * waveAmp;
         i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
       }
-      ctx.stroke();
-      ctx.restore();
+      ctx.stroke(); ctx.restore();
 
-      /* Cesium atom dot oscillating between levels */
       const atomCycle = (t * 0.0014) % (Math.PI * 2);
       let atomY;
-      if (amp > 0.7) {
-        /* Near resonance: snaps between levels sharply */
-        atomY = Math.sin(atomCycle * 3) > 0 ? yUpper : yLower;
-      } else {
-        /* Smooth drift */
-        atomY = yMid + Math.sin(atomCycle) * (yLower - yUpper) * 0.48;
-      }
+      if (amp > 0.7) { atomY = Math.sin(atomCycle * 3) > 0 ? yUpper : yLower; }
+      else { atomY = yMid + Math.sin(atomCycle) * (yLower - yUpper) * 0.48; }
       const atomX = cx + Math.cos(atomCycle * 1.3) * waveW * 0.08;
 
-      /* Glow */
       const aGrd = ctx.createRadialGradient(atomX, atomY, 0, atomX, atomY, 14);
       aGrd.addColorStop(0, 'rgba(255,255,255,0.90)');
       aGrd.addColorStop(0.3, 'rgba(216,192,122,0.60)');
       aGrd.addColorStop(1, 'rgba(216,192,122,0)');
       ctx.fillStyle = aGrd;
-      ctx.beginPath();
-      ctx.arc(atomX, atomY, 14, 0, Math.PI * 2);
-      ctx.fill();
-
+      ctx.beginPath(); ctx.arc(atomX, atomY, 14, 0, Math.PI * 2); ctx.fill();
       ctx.save();
       ctx.fillStyle = amp > 0.7 ? 'rgba(255,255,220,0.95)' : 'rgba(216,192,122,0.90)';
-      ctx.shadowColor = 'rgba(216,192,122,0.8)';
-      ctx.shadowBlur  = 6 + amp * 8;
-      ctx.beginPath();
-      ctx.arc(atomX, atomY, 4.5, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.shadowColor = 'rgba(216,192,122,0.8)'; ctx.shadowBlur = 6 + amp * 8;
+      ctx.beginPath(); ctx.arc(atomX, atomY, 4.5, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
     }
 
-    /* ── Draw: Semicircular gauge (center zone) ───────────── */
     function drawGauge(w, h, amp, t) {
-      const cx = w * 0.50;
-      const cy = h * 0.62;
-      const radius = Math.min(w, h) * 0.16;
-      radius < 60 && (radius = 60);  /* floor */
+      const cx = w * 0.50; const cy = h * 0.62;
       const R = Math.max(60, Math.min(w, h) * 0.16);
+      const startDeg = 210; const endDeg = 330; const totalAngle = endDeg - startDeg;
+      const startRad = startDeg * Math.PI / 180; const endRad = endDeg * Math.PI / 180;
 
-      /* Arc spans from 210° to 330° (150° arc) */
-      const startDeg = 210;
-      const endDeg   = 330;
-      const startRad = (startDeg * Math.PI) / 180;
-      const endRad   = (endDeg   * Math.PI) / 180;
-
-      /* Background arc track */
       ctx.save();
-      ctx.beginPath();
-      ctx.arc(cx, cy, R, startRad, endRad);
-      ctx.strokeStyle = 'rgba(238,233,220,0.08)';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      ctx.restore();
+      ctx.beginPath(); ctx.arc(cx, cy, R, startRad, endRad);
+      ctx.strokeStyle = 'rgba(238,233,220,0.08)'; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
 
-      /* Outer glow arc */
       ctx.save();
-      ctx.beginPath();
-      ctx.arc(cx, cy, R + 4, startRad, endRad);
-      ctx.strokeStyle = `rgba(143,221,234,${0.04 + amp * 0.10})`;
-      ctx.lineWidth = 8;
-      ctx.filter = 'blur(4px)';
-      ctx.stroke();
-      ctx.restore();
+      ctx.beginPath(); ctx.arc(cx, cy, R + 4, startRad, endRad);
+      ctx.strokeStyle = 'rgba(143,221,234,' + (0.04 + amp * 0.10) + ')';
+      ctx.lineWidth = 8; ctx.filter = 'blur(4px)'; ctx.stroke(); ctx.restore();
 
-      /* Tick marks */
-      const totalAngle = endDeg - startDeg; /* 120 degrees */
-      const majorStep = 15;
-      const minorStep = 5;
-      const labels    = ['0', '200', '400', '600', '800', '1000'];
-      let labelIdx    = 0;
-
-      for (let deg = startDeg; deg <= endDeg; deg += minorStep) {
-        const rad = (deg * Math.PI) / 180;
-        const isMajor = (deg - startDeg) % majorStep === 0;
+      const labels = ['0', '200', '400', '600', '800', '1k'];
+      let li = 0;
+      for (let deg = startDeg; deg <= endDeg; deg += 5) {
+        const rad = deg * Math.PI / 180;
+        const isMajor = (deg - startDeg) % 15 === 0;
         const tickLen = isMajor ? 10 : 5;
-        const x1 = cx + Math.cos(rad) * R;
-        const y1 = cy + Math.sin(rad) * R;
-        const x2 = cx + Math.cos(rad) * (R - tickLen);
-        const y2 = cy + Math.sin(rad) * (R - tickLen);
-
+        const x1 = cx + Math.cos(rad) * R; const y1 = cy + Math.sin(rad) * R;
+        const x2 = cx + Math.cos(rad) * (R - tickLen); const y2 = cy + Math.sin(rad) * (R - tickLen);
         ctx.save();
-        ctx.strokeStyle = isMajor
-          ? 'rgba(143,221,234,0.55)'
-          : 'rgba(143,221,234,0.22)';
+        ctx.strokeStyle = isMajor ? 'rgba(143,221,234,0.55)' : 'rgba(143,221,234,0.22)';
         ctx.lineWidth = isMajor ? 1.5 : 0.8;
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.stroke();
-        ctx.restore();
-
-        if (isMajor && labelIdx < labels.length) {
-          const lx = cx + Math.cos(rad) * (R - 20);
-          const ly = cy + Math.sin(rad) * (R - 20);
-          ctx.save();
-          ctx.font = '400 9px IBM Plex Mono, monospace';
-          ctx.fillStyle = 'rgba(143,221,234,0.50)';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(labels[labelIdx], lx, ly);
-          ctx.restore();
-          labelIdx++;
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.restore();
+        if (isMajor && li < labels.length) {
+          const lx = cx + Math.cos(rad) * (R - 20); const ly = cy + Math.sin(rad) * (R - 20);
+          ctx.save(); ctx.font = '400 9px IBM Plex Mono, monospace';
+          ctx.fillStyle = 'rgba(143,221,234,0.50)'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText(labels[li], lx, ly); ctx.restore(); li++;
         }
       }
 
-      /* Needle */
-      /* Map freq (0..1) → angle (startDeg..endDeg) in radians */
       let needleAngle = startDeg + freq * totalAngle;
-
-      /* Near-resonance jitter on needle */
       const detune = Math.abs(freq - F0);
-      if (detune < 0.12) {
-        const jitter = Math.sin(t * 0.08) * amp * 4;
-        needleAngle += jitter;
-      }
-
-      const nRad = (needleAngle * Math.PI) / 180;
+      if (detune < 0.12) { needleAngle += Math.sin(t * 0.08) * amp * 4; }
+      const nRad = needleAngle * Math.PI / 180;
       const needleLen = R * 0.85;
-      const nx = cx + Math.cos(nRad) * needleLen;
-      const ny = cy + Math.sin(nRad) * needleLen;
+      const nx = cx + Math.cos(nRad) * needleLen; const ny = cy + Math.sin(nRad) * needleLen;
 
-      /* Needle glow */
       ctx.save();
-      ctx.strokeStyle = `rgba(216,192,122,${0.15 + amp * 0.25})`;
-      ctx.lineWidth = 6;
-      ctx.filter = 'blur(5px)';
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(nx, ny);
-      ctx.stroke();
-      ctx.restore();
-
-      /* Needle solid line */
+      ctx.strokeStyle = 'rgba(216,192,122,' + (0.15 + amp * 0.25) + ')'; ctx.lineWidth = 6; ctx.filter = 'blur(5px)';
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(nx, ny); ctx.stroke(); ctx.restore();
       ctx.save();
-      ctx.strokeStyle = `rgba(216,192,122,${0.75 + amp * 0.25})`;
-      ctx.lineWidth = 1.8;
-      ctx.shadowColor = 'rgba(216,192,122,0.7)';
-      ctx.shadowBlur  = 4 + amp * 6;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(nx, ny);
-      ctx.stroke();
-      ctx.restore();
+      ctx.strokeStyle = 'rgba(216,192,122,' + (0.75 + amp * 0.25) + ')'; ctx.lineWidth = 1.8;
+      ctx.shadowColor = 'rgba(216,192,122,0.7)'; ctx.shadowBlur = 4 + amp * 6; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(nx, ny); ctx.stroke(); ctx.restore();
 
-      /* Cap circle at base */
       ctx.save();
-      ctx.fillStyle = 'rgba(216,192,122,0.80)';
-      ctx.shadowColor = 'rgba(216,192,122,0.6)';
-      ctx.shadowBlur = 4;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
+      ctx.fillStyle = 'rgba(216,192,122,0.80)'; ctx.shadowColor = 'rgba(216,192,122,0.6)'; ctx.shadowBlur = 4;
+      ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fill(); ctx.restore();
 
-      /* Center Hz label below gauge */
       const hz = Math.round(200 + freq * 800);
-      ctx.save();
-      ctx.font = '400 11px IBM Plex Mono, monospace';
-      ctx.fillStyle = 'rgba(238,233,220,0.45)';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillText('f = ' + hz + ' Hz', cx, cy + R * 0.22);
-      ctx.restore();
-
-      /* "RESONANCE METER" label above arc */
-      ctx.save();
-      ctx.font = '400 9px IBM Plex Mono, monospace';
-      ctx.fillStyle = 'rgba(143,221,234,0.30)';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      ctx.fillText('RESONANCE METER', cx, cy - R * 0.88);
-      ctx.restore();
+      ctx.save(); ctx.font = '400 11px IBM Plex Mono, monospace';
+      ctx.fillStyle = 'rgba(238,233,220,0.45)'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText('f = ' + hz + ' Hz', cx, cy + R * 0.22); ctx.restore();
+      ctx.save(); ctx.font = '400 9px IBM Plex Mono, monospace';
+      ctx.fillStyle = 'rgba(143,221,234,0.28)'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.fillText('RESONANCE METER', cx, cy - R * 0.88); ctx.restore();
     }
 
-    /* ── Draw: Resonance curve (bottom zone) ──────────────── */
     function drawResonanceCurve(w, h, amp) {
-      const zoneTop    = h * 0.78;
-      const baseline   = h * 0.95;
-      const zoneH      = baseline - zoneTop;
-      const Q          = 1 / (damp * 0.8 + 0.08);
-      const numPts     = 300;
-      const peakX0     = F0;
-
-      /* Build curve points */
+      const zoneTop = h * 0.78; const baseline = h * 0.95; const zoneH = baseline - zoneTop;
+      const Q = 1 / (damp * 0.8 + 0.08); const numPts = 300;
       const pts = [];
       for (let i = 0; i <= numPts; i++) {
-        const xNorm  = i / numPts;
-        const d      = xNorm - F0;
-        const yNorm  = 1 / (1 + Math.pow(d * Q * 8, 2));
-        const px     = xNorm * w;
-        const py     = baseline - yNorm * zoneH * 0.92;
-        pts.push({ px, py, yNorm });
+        const xNorm = i / numPts;
+        const d = xNorm - F0;
+        const yNorm = 1 / (1 + Math.pow(d * Q * 8, 2));
+        pts.push({ px: xNorm * w, py: baseline - yNorm * zoneH * 0.92, yNorm });
       }
 
-      /* Glow layer near peak */
       if (amp > 0.5) {
-        ctx.save();
-        ctx.strokeStyle = `rgba(216,192,122,${amp * 0.25})`;
-        ctx.lineWidth   = 8;
-        ctx.filter      = 'blur(6px)';
-        ctx.beginPath();
-        pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.px, p.py) : ctx.lineTo(p.px, p.py));
-        ctx.stroke();
-        ctx.restore();
+        ctx.save(); ctx.strokeStyle = 'rgba(216,192,122,' + (amp * 0.25) + ')';
+        ctx.lineWidth = 8; ctx.filter = 'blur(6px)';
+        ctx.beginPath(); pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.px, p.py) : ctx.lineTo(p.px, p.py));
+        ctx.stroke(); ctx.restore();
       }
 
-      /* Main Lorentzian curve */
       ctx.save();
-      const curveGrad = ctx.createLinearGradient(0, zoneTop, 0, baseline);
-      curveGrad.addColorStop(0, `rgba(216,192,122,${0.5 + amp * 0.45})`);
-      curveGrad.addColorStop(0.6, `rgba(143,221,234,${0.25 + amp * 0.20})`);
-      curveGrad.addColorStop(1, 'rgba(143,221,234,0.08)');
-      ctx.strokeStyle = curveGrad;
-      ctx.lineWidth   = 1.8;
-      ctx.lineJoin    = 'round';
-      ctx.beginPath();
-      pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.px, p.py) : ctx.lineTo(p.px, p.py));
-      ctx.stroke();
-      ctx.restore();
+      const cg = ctx.createLinearGradient(0, zoneTop, 0, baseline);
+      cg.addColorStop(0, 'rgba(216,192,122,' + (0.5 + amp * 0.45) + ')');
+      cg.addColorStop(0.6, 'rgba(143,221,234,' + (0.25 + amp * 0.20) + ')');
+      cg.addColorStop(1, 'rgba(143,221,234,0.08)');
+      ctx.strokeStyle = cg; ctx.lineWidth = 1.8; ctx.lineJoin = 'round';
+      ctx.beginPath(); pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.px, p.py) : ctx.lineTo(p.px, p.py));
+      ctx.stroke(); ctx.restore();
 
-      /* Baseline axis */
-      ctx.save();
-      ctx.strokeStyle = 'rgba(238,233,220,0.12)';
-      ctx.lineWidth   = 1;
-      ctx.beginPath();
-      ctx.moveTo(0, baseline);
-      ctx.lineTo(w, baseline);
-      ctx.stroke();
-      ctx.restore();
+      ctx.save(); ctx.strokeStyle = 'rgba(238,233,220,0.12)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, baseline); ctx.lineTo(w, baseline); ctx.stroke(); ctx.restore();
 
-      /* Current frequency marker: vertical gold line */
       const markerX = freq * w;
-      /* interpolate peak y at this x */
-      const dFreq    = freq - F0;
+      const dFreq = freq - F0;
       const yNormHere = 1 / (1 + Math.pow(dFreq * Q * 8, 2));
-      const markerY  = baseline - yNormHere * zoneH * 0.92;
+      const markerY = baseline - yNormHere * zoneH * 0.92;
+      ctx.save(); ctx.strokeStyle = 'rgba(216,192,122,' + (0.50 + amp * 0.45) + ')'; ctx.lineWidth = 1.2;
+      ctx.setLineDash([3, 4]); ctx.beginPath(); ctx.moveTo(markerX, baseline); ctx.lineTo(markerX, markerY); ctx.stroke(); ctx.restore();
+      ctx.save(); ctx.fillStyle = 'rgba(216,192,122,0.90)'; ctx.shadowColor = 'rgba(216,192,122,0.7)'; ctx.shadowBlur = 4 + amp * 8;
+      ctx.beginPath(); ctx.arc(markerX, markerY, 3.5, 0, Math.PI * 2); ctx.fill(); ctx.restore();
 
-      ctx.save();
-      ctx.strokeStyle = `rgba(216,192,122,${0.50 + amp * 0.45})`;
-      ctx.lineWidth   = 1.2;
-      ctx.setLineDash([3, 4]);
-      ctx.beginPath();
-      ctx.moveTo(markerX, baseline);
-      ctx.lineTo(markerX, markerY);
-      ctx.stroke();
-      ctx.restore();
-
-      /* Dot at marker intersection with curve */
-      ctx.save();
-      ctx.fillStyle   = 'rgba(216,192,122,0.90)';
-      ctx.shadowColor = 'rgba(216,192,122,0.7)';
-      ctx.shadowBlur  = 4 + amp * 8;
-      ctx.beginPath();
-      ctx.arc(markerX, markerY, 3.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-
-      /* Peak dot */
-      const peakPx = F0 * w;
-      const peakPy = baseline - zoneH * 0.92;
+      const peakPx = F0 * w; const peakPy = baseline - zoneH * 0.92;
       if (amp > 0.3) {
-        ctx.save();
-        ctx.fillStyle   = `rgba(255,244,200,${amp * 0.95})`;
-        ctx.shadowColor = 'rgba(216,192,122,0.9)';
-        ctx.shadowBlur  = 6 + amp * 12;
-        ctx.beginPath();
-        ctx.arc(peakPx, peakPy, 3, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
+        ctx.save(); ctx.fillStyle = 'rgba(255,244,200,' + (amp * 0.95) + ')';
+        ctx.shadowColor = 'rgba(216,192,122,0.9)'; ctx.shadowBlur = 6 + amp * 12;
+        ctx.beginPath(); ctx.arc(peakPx, peakPy, 3, 0, Math.PI * 2); ctx.fill(); ctx.restore();
       }
 
-      /* Q-value annotation */
       const qDisplay = Math.round(1 / (damp * 0.8 + 0.08) * 5) / 5;
-      ctx.save();
-      ctx.font        = '400 9.5px IBM Plex Mono, monospace';
-      ctx.fillStyle   = `rgba(143,221,234,${0.35 + amp * 0.35})`;
-      ctx.textAlign   = 'center';
-      ctx.fillText('Q ≈ ' + qDisplay.toFixed(1), peakPx + 28, peakPy - 8);
-      ctx.restore();
+      ctx.save(); ctx.font = '400 9.5px IBM Plex Mono, monospace';
+      ctx.fillStyle = 'rgba(143,221,234,' + (0.35 + amp * 0.35) + ')'; ctx.textAlign = 'center';
+      ctx.fillText('Q ≈ ' + qDisplay.toFixed(1), peakPx + 28, peakPy - 8); ctx.restore();
 
-      /* x-axis labels */
-      ctx.save();
-      ctx.font      = '400 9px IBM Plex Mono, monospace';
-      ctx.fillStyle = 'rgba(238,233,220,0.22)';
-      ctx.textAlign = 'center';
-      const xLabels = [
-        { v: 0.0, t: '0' },
-        { v: 0.25, t: '250' },
-        { v: F0, t: 'f₀' },
-        { v: 0.75, t: '750' },
-        { v: 1.0, t: '1k' }
-      ];
-      xLabels.forEach(l => {
-        ctx.fillStyle = l.v === F0
-          ? `rgba(216,192,122,${0.45 + amp * 0.30})`
-          : 'rgba(238,233,220,0.22)';
-        ctx.fillText(l.t, l.v * w, baseline + 14);
-      });
+      ctx.save(); ctx.font = '400 9px IBM Plex Mono, monospace'; ctx.textAlign = 'center';
+      [{ v: 0.0, t: '0' }, { v: 0.25, t: '250' }, { v: F0, t: 'f₀' }, { v: 0.75, t: '750' }, { v: 1.0, t: '1k' }]
+        .forEach(l => {
+          ctx.fillStyle = l.v === F0 ? 'rgba(216,192,122,' + (0.45 + amp * 0.30) + ')' : 'rgba(238,233,220,0.22)';
+          ctx.fillText(l.t, l.v * w, baseline + 14);
+        });
       ctx.restore();
     }
 
-    /* ── Main draw loop ───────────────────────────────────── */
     function draw(now) {
-      if (!lastTime) lastTime = now;
-      const t   = now;
+      if (!W || !H) { requestAnimationFrame(draw); return; }
+      if (document.hidden) { requestAnimationFrame(draw); return; }
       const amp = resonanceAmp();
       const detune = Math.abs(freq - F0);
-
-      /* Clear */
       ctx.clearRect(0, 0, W, H);
 
-      /* Jitter when near resonance */
       let jx = 0, jy = 0;
       if (detune < 0.06) {
         const jScale = (1 - detune / 0.06) * amp * 1.5;
-        jx = (Math.random() - 0.5) * jScale;
-        jy = (Math.random() - 0.5) * jScale;
+        jx = (Math.random() - 0.5) * jScale; jy = (Math.random() - 0.5) * jScale;
       }
+      ctx.save(); ctx.translate(jx, jy);
 
-      ctx.save();
-      ctx.translate(jx, jy);
-
-      /* Subtle canvas veil when near resonance */
       if (amp > 0.6) {
         const veil = ctx.createRadialGradient(W * 0.5, H * 0.48, 0, W * 0.5, H * 0.48, W * 0.55);
-        veil.addColorStop(0, `rgba(238,233,220,${(amp - 0.6) * 0.04})`);
-        veil.addColorStop(0.5, `rgba(216,192,122,${(amp - 0.6) * 0.02})`);
+        veil.addColorStop(0, 'rgba(238,233,220,' + ((amp - 0.6) * 0.04) + ')');
+        veil.addColorStop(0.5, 'rgba(216,192,122,' + ((amp - 0.6) * 0.02) + ')');
         veil.addColorStop(1, 'rgba(3,3,2,0)');
-        ctx.fillStyle = veil;
-        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = veil; ctx.fillRect(0, 0, W, H);
       }
 
-      drawAtomicClock(W, H, amp, t);
-      drawGauge(W, H, amp, t);
+      drawAtomicClock(W, H, amp, now);
+      drawGauge(W, H, amp, now);
       drawResonanceCurve(W, H, amp);
-
       ctx.restore();
-
       updateReadout();
       requestAnimationFrame(draw);
     }
 
-    /* ── Event listeners ──────────────────────────────────── */
-    freqSl.addEventListener('input', () => {
-      freq = parseFloat(freqSl.value);
-      updateLabels();
-    });
-
-    dampSl.addEventListener('input', () => {
-      damp = parseFloat(dampSl.value);
-      updateLabels();
-    });
-
-    altSl.addEventListener('input', () => {
-      alt = parseFloat(altSl.value);
-      updateLabels();
-    });
+    freqSl.addEventListener('input', () => { freq = parseFloat(freqSl.value); updateLabels(); });
+    dampSl.addEventListener('input', () => { damp = parseFloat(dampSl.value); updateLabels(); });
+    altSl.addEventListener('input',  () => { alt  = parseFloat(altSl.value);  updateLabels(); });
 
     relBtn.addEventListener('click', () => {
       relMode = !relMode;
       relBtn.classList.toggle('active', relMode);
-      relBtn.textContent = relMode
-        ? 'RELATIVISTIC CALIBRATION ✓'
-        : 'RELATIVISTIC CALIBRATION';
-      updateReadout();
+      relBtn.textContent = relMode ? 'RELATIVITY ON' : 'RELATIVITY OFF';
+      updateLabels();
     });
 
-    /* ── Init ─────────────────────────────────────────────── */
+    resetBtn.addEventListener('click', () => {
+      freq = 0.44; damp = 0.28; alt = 0.36; relMode = false;
+      freqSl.value = freq; dampSl.value = damp; altSl.value = alt;
+      relBtn.classList.remove('active'); relBtn.textContent = 'RELATIVITY OFF';
+      updateLabels();
+    });
+
     resize();
     window.addEventListener('resize', resize);
     updateLabels();
     requestAnimationFrame(draw);
-
   })();
   </script>
 
