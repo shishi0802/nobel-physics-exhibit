@@ -80,11 +80,13 @@
       transition: opacity .4s ease;
       pointer-events: none;
     }
-    .img-layer.pet-tint { object-fit: cover; }
+    .img-layer.pet-tint {
+      object-fit: cover;
+    }
     .img-layer.visible { opacity: 1; }
     .img-layer.xray-tint { filter: grayscale(1) brightness(var(--bright, 1)) contrast(var(--ctr, 1.1)); }
-    .img-layer.mri-tint { filter: grayscale(.5) brightness(var(--bright, .9)) contrast(var(--ctr, 1.2)) sepia(.25) hue-rotate(165deg); }
-    .img-layer.pet-tint { filter: brightness(var(--bright, 1)) contrast(var(--ctr, 1.1)) saturate(var(--sat, 1.4)); }
+    .img-layer.mri-tint { filter: grayscale(.6) brightness(var(--bright, .9)) contrast(var(--ctr, 1.2)) sepia(.3) hue-rotate(160deg); }
+    .img-layer.pet-tint { filter: brightness(var(--bright, 1)) contrast(var(--ctr, 1.1)) saturate(1.3); }
     .scanline {
       position: absolute; left: 10%; right: 10%; top: var(--scan, 45%); height: 1px;
       background: linear-gradient(90deg, transparent, rgba(143,221,234,.82), transparent);
@@ -122,6 +124,18 @@
     }
     .mode.active { color: var(--ink); background: linear-gradient(180deg, rgba(238,233,220,.055), rgba(238,233,220,.018)); }
     .mode.active::after { transform: scaleX(1); }
+    .submode-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(238,233,220,.09);
+    }
+    .submode {
+      border: 0; background: rgba(238,233,220,.012); color: rgba(238,233,220,.40);
+      min-height: 40px; cursor: pointer; font-family: var(--mono); font-size: 10px;
+      letter-spacing: .10em; transition: color .22s ease, background .22s ease;
+    }
+    .submode + .submode { border-left: 1px solid rgba(238,233,220,.06); }
+    .submode.active { color: var(--cyan); background: rgba(143,221,234,.06); }
     .control-row { display: grid; grid-template-columns: 100px 1fr; gap: 16px; align-items: center; margin-bottom: 18px; }
     .control-row label { color: #777168; font-family: var(--mono); font-size: 11px; letter-spacing: .10em; }
     input[type=range] { appearance: none; width: 100%; height: 30px; background: transparent; cursor: pointer; }
@@ -180,22 +194,24 @@
     <section class="title-panel">
       <div class="kicker">IMAGING CHAMBER</div>
       <h1>被重构的<br>身体</h1>
-      <p class="subtitle">三种不同的物理过程，三种不同的身体。X 光测量<b>组织对射线的衰减</b>；MRI 探测<b>氢核的磁共振信号</b>；PET 捕捉<b>正电子湮灭产生的 γ 光子对</b>——每种模式看见的是截然不同的生理现实。</p>
+      <p class="subtitle">同一个身体在不同物理技术下显出不同层次。医学成像不是拍照，是用物理过程重建身体的可见性。</p>
       <div class="guide">
         <div class="guide-title">OBSERVATION GUIDE</div>
         <ol>
           <li>选择成像模式：X 光 / MRI / PET</li>
-          <li>X光：WINDOW 滑杆调节窗宽，感受"调窗位"改变骨骼对比度</li>
-          <li>MRI：SLICE 滑杆平滑浏览脑部连续截面，观察灰白质层次</li>
-          <li>PET：WINDOW 调代谢对比度 · FOCUS 键在三个高代谢热点间跳转</li>
+          <li>X光：点击三个按钮切换层面与窗位</li>
+          <li>MRI：拖动切片滑杆浏览脑部层面</li>
+          <li>PET：脑部与全身视图对比代谢热区</li>
         </ol>
       </div>
     </section>
 
     <section class="viewer">
       <div class="viewer-mask" id="viewerMask">
-        <!-- X-RAY images: bone window only, WINDOW slider controls brightness/contrast -->
-        <img class="img-layer xray-tint visible" data-mode="xray" data-slice="0" src="./assets/imaging/ct-thorax.jpg" alt="CT 胸部轴向切片（骨窗）" />
+        <!-- X-RAY images — 3 CT axial positions -->
+        <img class="img-layer xray-tint visible" data-mode="xray" data-slice="0" src="./assets/imaging/ct-thorax.jpg" alt="CT 胸部 Level 1（骨窗）" />
+        <img class="img-layer xray-tint" data-mode="xray" data-slice="1" src="./assets/imaging/ct-thorax-2.jpg" alt="CT 胸部 Level 2（骨窗）" />
+        <img class="img-layer xray-tint" data-mode="xray" data-slice="2" src="./assets/imaging/ct-lungs.jpg" alt="CT 胸部（肺窗）" />
         <!-- MRI images -->
         <img class="img-layer mri-tint" data-mode="mri" data-slice="0" src="./assets/imaging/mri-t2-03.jpg" alt="MRI T2 脑轴向切片 Level 3" />
         <img class="img-layer mri-tint" data-mode="mri" data-slice="1" src="./assets/imaging/mri-t2-05.jpg" alt="MRI T2 脑轴向切片 Level 5" />
@@ -204,8 +220,9 @@
         <img class="img-layer mri-tint" data-mode="mri" data-slice="4" src="./assets/imaging/mri-t2-17.jpg" alt="MRI T2 脑轴向切片 Level 17" />
         <img class="img-layer mri-tint" data-mode="mri" data-slice="5" src="./assets/imaging/mri-t2-18.jpg" alt="MRI T2 脑轴向切片 Level 18" />
         <img class="img-layer mri-tint" data-mode="mri" data-slice="6" src="./assets/imaging/mri-t2-20.jpg" alt="MRI T2 脑轴向切片 Level 20" />
-        <!-- PET image -->
-        <img class="img-layer pet-tint" data-mode="pet" data-slice="0" src="./assets/imaging/pet-body.jpg" alt="PET/CT 全身代谢成像" />
+        <!-- PET images — brain FDG (focus) + whole body -->
+        <img class="img-layer pet-tint visible-pet" data-mode="pet" data-slice="0" src="./assets/imaging/pet-brain.jpg" alt="PET 脑部 FDG 代谢图" />
+        <img class="img-layer pet-tint" data-mode="pet" data-slice="1" src="./assets/imaging/pet-body.jpg" alt="PET/CT 全身代谢图" />
         <div class="scanline" id="scanline"></div>
         <span class="credit">IMAGE · WIKIMEDIA COMMONS · EDUCATIONAL DISPLAY</span>
       </div>
@@ -218,26 +235,29 @@
         <button class="mode" data-mode="mri" type="button">MRI</button>
         <button class="mode" data-mode="pet" type="button">PET</button>
       </div>
-      <div class="control-row" id="sliceRow">
-        <label for="sliceSlider" id="sliceLabel">SLICE</label>
+      <!-- X-RAY sub-mode: window presets -->
+      <div class="submode-row" id="xraySubRow">
+        <button class="submode active" data-xray="0" type="button">LEVEL 1</button>
+        <button class="submode" data-xray="1" type="button">LEVEL 2</button>
+        <button class="submode" data-xray="2" type="button">LUNG WIN</button>
+      </div>
+      <!-- MRI slice slider -->
+      <div class="control-row" id="mriSliceRow" style="display:none">
+        <label for="sliceSlider">SLICE</label>
         <input id="sliceSlider" type="range" min="0" max="1" value="0" step=".001" />
+      </div>
+      <!-- PET sub-mode: brain vs body -->
+      <div class="submode-row" id="petSubRow" style="display:none">
+        <button class="submode active" data-pet="0" type="button">BRAIN FDG</button>
+        <button class="submode" data-pet="1" type="button">WHOLE BODY</button>
       </div>
       <div class="control-row">
         <label for="windowSlider">WINDOW</label>
         <input id="windowSlider" type="range" min="0" max="1" value=".5" step=".001" />
       </div>
-      <div class="control-row" id="focusRow" style="display:none;">
-        <label>FOCUS</label>
-        <button id="focusBtn" type="button" style="
-          border: 1px solid rgba(238,233,220,.20); background: rgba(238,233,220,.04);
-          color: rgba(238,233,220,.65); font-family: var(--mono); font-size: 10px;
-          letter-spacing: .12em; padding: 7px 14px; cursor: pointer; width: 100%;
-          transition: color .18s, background .18s, border-color .18s;
-        ">BRAIN · HOTSPOT 1/3</button>
-      </div>
       <div class="readout" id="readout">
-        <b>X 光模式</b>：拖动 WINDOW 滑杆调节窗宽（window width）。窗宽窄时骨皮质与骨松质的细节对比最高；窗宽宽时整体灰阶均匀，能看到软组织轮廓。这就是放射科医生每天做的"调窗位"——同一组 CT 数据，呈现完全不同的身体。
-        <span class="physics">物理原理：X 射线衰减系数 · 光电效应（骨）· 康普顿散射（软组织）· 1895 伦琴发现</span>
+        <b>X 光模式</b>：X 射线穿透人体，高密度骨骼吸收最多，在胶片上留下白色影像。切换层面或窗位，观察同一套 CT 数据在不同窗口下呈现出的骨骼与肺组织。
+        <span class="physics">物理原理：X 射线衰减 · 光电效应 · 康普顿散射 · 1895 伦琴发现</span>
       </div>
     </section>
 
@@ -257,17 +277,18 @@
   <script src="./philosophy-inscriptions.js"></script>
   <script src="./ambient-audio.js"></script>
   <script>
-    const sliceSlider  = document.getElementById("sliceSlider");
-    const sliceLabel   = document.getElementById("sliceLabel");
-    const sliceRow     = document.getElementById("sliceRow");
+    const sliceSlider = document.getElementById("sliceSlider");
     const windowSlider = document.getElementById("windowSlider");
-    const focusRow     = document.getElementById("focusRow");
-    const focusBtn     = document.getElementById("focusBtn");
-    const readout      = document.getElementById("readout");
-    const scanline     = document.getElementById("scanline");
-    const viewerLabel  = document.getElementById("viewerLabel");
-    const allLayers    = Array.from(document.querySelectorAll(".img-layer"));
+    const readout = document.getElementById("readout");
+    const scanline = document.getElementById("scanline");
+    const viewerLabel = document.getElementById("viewerLabel");
+    const allLayers = Array.from(document.querySelectorAll(".img-layer"));
+    const xraySubRow = document.getElementById("xraySubRow");
+    const mriSliceRow = document.getElementById("mriSliceRow");
+    const petSubRow = document.getElementById("petSubRow");
     let mode = "xray";
+    let xrayIdx = 0;
+    let petIdx = 0;
 
     const modeSlices = {
       xray: allLayers.filter(el => el.dataset.mode === "xray"),
@@ -275,186 +296,115 @@
       pet:  allLayers.filter(el => el.dataset.mode === "pet")
     };
 
-    const mriLabels = ["LEVEL 03","LEVEL 05","LEVEL 07","LEVEL 15","LEVEL 17","LEVEL 18","LEVEL 20"];
-
-    // PET hotspot definitions: [objectPosition%, label, readout HTML]
-    const petHotspots = [
-      {
-        pos: 20,
-        label: "BRAIN · HIGH METABOLIC ZONE",
-        html: `<b>脑部（高代谢区）</b>：大脑是全身耗糖量最高的器官，占体重 2% 却消耗约 20% 的葡萄糖。FDG（氟代脱氧葡萄糖）被神经元大量摄取，正电子衰变后与电子湮灭，产生方向相反的两个 511 keV γ 光子，由探测器环符合探测定位。
-        <span class="physics">β⁺衰变 → e⁺ + e⁻ → 2γ(511 keV)，符合时间窗 ≈ 6 ns · TOF-PET 可精确定位</span>`
-      },
-      {
-        pos: 45,
-        label: "HEART · MYOCARDIAL UPTAKE",
-        html: `<b>心脏（心肌代谢区）</b>：静息状态下心肌以脂肪酸为主要能源；禁食或注射胰岛素后切换为葡萄糖。PET 心肌显像可评估心肌活性——坏死心肌不摄取 FDG（冷区），存活但缺血的心肌仍有摄取（温区），用于判断冠脉搭桥是否有意义。
-        <span class="physics">心肌活性评估 · 冬眠心肌 vs 疤痕组织 · FDG PET/CT 临床应用</span>`
-      },
-      {
-        pos: 80,
-        label: "BLADDER · TRACER EXCRETION",
-        html: `<b>膀胱（示踪剂排泄区）</b>：未被细胞摄取的 FDG 经肾脏滤过后在膀胱浓聚，形成最亮的热点。这并非代谢活跃，而是正常的肾脏排泄。PET 图像判读时需排除这种生理性高摄取，以免误判为骨盆肿瘤。
-        <span class="physics">肾小球滤过 · 非特异性浓聚 · 排尿前后对比扫描可鉴别</span>`
-      }
-    ];
-    let petFocusIdx = 0;
+    const mriLabels = ["LEVEL 03", "LEVEL 05", "LEVEL 07", "LEVEL 15", "LEVEL 17", "LEVEL 18", "LEVEL 20"];
+    const xrayLabels = ["BONE WINDOW · L1", "BONE WINDOW · L2", "LUNG WINDOW"];
+    const petLabels  = ["BRAIN · FDG", "WHOLE BODY · FDG"];
 
     const modeInfo = {
       xray: {
-        title: "X 光模式",
-        desc: "拖动 WINDOW 滑杆调节窗宽（window width）。窗宽窄时骨骼细节对比最高；窗宽宽时软组织可见。放射科医生每天做的调窗位——同一组 CT 数据，呈现完全不同的身体。",
-        physics: "物理原理：X 射线衰减系数 · 光电效应（骨）· 康普顿散射（软组织）· 1895 伦琴发现"
+        brain: `<b>X 光模式</b>：X 射线穿透人体，高密度骨骼吸收最多，低密度肺组织几乎透明。骨窗突出骨骼结构，肺窗拉低亮度显示气道和肺纹理。同一套 CT 数据，换一种窗位就是完全不同的身体。<span class="physics">物理原理：X 射线衰减 · 光电效应 · 康普顿散射 · 1895 伦琴发现</span>`
       },
       mri: {
-        title: "MRI 模式",
-        desc: "拖动 SLICE 滑杆浏览从颅顶到颅底的连续脑切面。T2 序列中水和脑脊液呈高信号（亮），灰白质层次分明。没有电离辐射，靠磁场和射频脉冲重建图像。",
-        physics: "物理原理：核磁共振 · 拉莫尔进动（ω₀ = γB₀）· T1/T2 弛豫 · 1971 达马迪安提出"
+        brain: `<b>MRI 模式</b>：拖动切片滑杆浏览脑部连续层面。T2 序列中水与脑脊液呈高信号（亮白），灰白质对比鲜明。核磁共振不使用电离辐射，靠氢核在强磁场中的共振信号成像。<span class="physics">物理原理：核磁共振 · 拉莫尔进动 · T1/T2 弛豫 · 1971 达马迪安提出</span>`
       },
       pet: {
-        title: "PET 模式",
-        desc: "全身 FDG 代谢图像。WINDOW 滑杆调节对比度，让高代谢区更突出。点击 FOCUS 键依次跳转到脑部、心脏、膀胱三个热点区域，readout 会解释每个区域为何代谢高。",
-        physics: "物理原理：β⁺衰变 → 正电子湮灭 → 2×511 keV γ · 符合探测 · TOF-PET · FDG 示踪"
+        brain: `<b>PET 脑部模式</b>：注入 FDG 示踪剂后，高代谢区域（大脑皮层、基底节）积累更多正电子标记葡萄糖，显示为亮色热区。图中最亮的区域就是活跃的神经代谢中心。<span class="physics">正电子与电子湮灭 → 一对方向相反的 511 keV γ 光子 → 符合探测定位</span>`,
+        body: `<b>PET 全身模式</b>：全身 FDG 代谢扫描。脑（最亮）、心脏、肝脏和膀胱为正常高代谢区。异常高代谢区可能提示肿瘤病灶。这张图综合了 PET 功能信息与 CT 解剖定位。<span class="physics">物理原理：正电子湮灭 · γ 射线符合探测 · FDG 代谢 · 现代 PET/CT 融合成像</span>`
       }
     };
 
     function setMode(next) {
       mode = next;
-      document.querySelectorAll(".mode").forEach(btn =>
-        btn.classList.toggle("active", btn.dataset.mode === mode)
-      );
+      document.querySelectorAll(".mode").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === mode));
+      // Show/hide sub-controls
+      xraySubRow.style.display = mode === "xray" ? "grid" : "none";
+      mriSliceRow.style.display = mode === "mri"  ? "grid" : "none";
+      petSubRow.style.display  = mode === "pet"   ? "grid" : "none";
+      sliceSlider.value = 0;
+      updateReadout();
+      updateView();
+    }
 
-      // Show/hide SLICE row and FOCUS row per mode
+    function updateReadout() {
       if (mode === "xray") {
-        sliceRow.style.display = "none";
-        focusRow.style.display = "none";
-        windowSlider.value = .5;
+        readout.innerHTML = modeInfo.xray.brain;
       } else if (mode === "mri") {
-        sliceRow.style.display = "";
-        sliceLabel.textContent = "SLICE";
-        focusRow.style.display = "none";
-        sliceSlider.value = 0;
-        windowSlider.value = .5;
+        readout.innerHTML = modeInfo.mri.brain;
       } else {
-        // PET
-        sliceRow.style.display = "none";
-        focusRow.style.display = "";
-        petFocusIdx = 0;
-        windowSlider.value = .6;
-        updateFocusBtn();
+        readout.innerHTML = petIdx === 0 ? modeInfo.pet.brain : modeInfo.pet.body;
       }
-
-      const info = modeInfo[mode];
-      // For PET, the hotspot readout (set by updateFocusBtn) is richer — skip generic text
-      if (mode !== "pet") {
-        readout.innerHTML = `<b>${info.title}</b>：${info.desc}<span class="physics">${info.physics}</span>`;
-      }
-      updateView();
     }
-
-    function updateFocusBtn() {
-      const h = petHotspots[petFocusIdx];
-      focusBtn.textContent = `${h.label} ${petFocusIdx + 1}/3`;
-      viewerLabel.textContent = `PET/CT · ${h.label}`;
-      readout.innerHTML = h.html;
-    }
-
-    focusBtn.addEventListener("click", () => {
-      petFocusIdx = (petFocusIdx + 1) % 3;
-      updateFocusBtn();
-      updateView();
-    });
-
-    // Hover effect on focus button
-    focusBtn.addEventListener("mouseenter", () => {
-      focusBtn.style.color = "var(--ink)";
-      focusBtn.style.borderColor = "rgba(216,192,122,.55)";
-      focusBtn.style.background = "rgba(238,233,220,.08)";
-    });
-    focusBtn.addEventListener("mouseleave", () => {
-      focusBtn.style.color = "rgba(238,233,220,.65)";
-      focusBtn.style.borderColor = "rgba(238,233,220,.20)";
-      focusBtn.style.background = "rgba(238,233,220,.04)";
-    });
 
     function updateView() {
-      const sliceVal  = parseFloat(sliceSlider.value);
       const windowVal = parseFloat(windowSlider.value);
-      const slices    = modeSlices[mode];
-      const count     = slices.length;
-
-      // Hide all layers via class (keeps CSS transition working)
-      allLayers.forEach(el => el.classList.remove("visible"));
+      allLayers.forEach(el => { el.classList.remove("visible"); el.style.opacity = 0; el.style.objectPosition = ""; });
 
       if (mode === "xray") {
-        slices[0].classList.add("visible");
-        viewerLabel.textContent = "X-RAY · BONE WINDOW";
+        const slices = modeSlices.xray;
+        slices[xrayIdx].classList.add("visible");
+        slices[xrayIdx].style.opacity = 1;
+        viewerLabel.textContent = `CT · ${xrayLabels[xrayIdx]}`;
         scanline.style.setProperty("--scan", "45%");
-
       } else if (mode === "mri") {
-        // Smooth crossfade between adjacent slices via opacity custom prop
-        const pos   = sliceVal * (count - 1);
+        const sliceVal = parseFloat(sliceSlider.value);
+        const slices = modeSlices.mri;
+        const pos = sliceVal * (slices.length - 1);
         const lower = Math.floor(pos);
-        const upper = Math.min(lower + 1, count - 1);
+        const upper = Math.min(lower + 1, slices.length - 1);
         const blend = pos - lower;
-        // Show both with per-element opacity override via CSS var
         if (lower === upper) {
           slices[lower].classList.add("visible");
+          slices[lower].style.opacity = 1;
         } else {
-          // Use inline opacity on visible elements (class makes them visible, inline fine-tunes blend)
-          slices[lower].classList.add("visible");
-          slices[lower].style.opacity = (1 - blend).toFixed(3);
-          slices[upper].classList.add("visible");
-          slices[upper].style.opacity = blend.toFixed(3);
+          slices[lower].classList.add("visible"); slices[lower].style.opacity = 1 - blend;
+          slices[upper].classList.add("visible"); slices[upper].style.opacity = blend;
         }
-        // Reset any previously set inline opacity on non-visible
-        slices.forEach((el, i) => {
-          if (i !== lower && i !== upper) el.style.opacity = "";
-        });
-        const labelIdx = Math.round(sliceVal * (mriLabels.length - 1));
-        viewerLabel.textContent = `MRI T2 · ${mriLabels[labelIdx]}`;
+        const li = Math.round(sliceVal * (mriLabels.length - 1));
+        viewerLabel.textContent = `MRI T2 · ${mriLabels[li]}`;
         scanline.style.setProperty("--scan", `${15 + sliceVal * 70}%`);
-
       } else {
-        // PET: jump to focused hotspot
-        const h = petHotspots[petFocusIdx];
-        slices[0].classList.add("visible");
-        slices[0].style.objectPosition = `50% ${h.pos}%`;
-        slices[0].style.transition = "object-position .55s cubic-bezier(.22,1,.36,1), opacity .4s ease";
-        viewerLabel.textContent = `PET/CT · ${h.label}`;
-        scanline.style.setProperty("--scan", `${h.pos}%`);
+        // PET — brain or body
+        const slices = modeSlices.pet;
+        slices[petIdx].classList.add("visible");
+        slices[petIdx].style.opacity = 1;
+        viewerLabel.textContent = `PET · ${petLabels[petIdx]}`;
+        scanline.style.setProperty("--scan", "50%");
       }
 
-      // WINDOW slider → brightness + contrast
-      let brightness, contrast, sat;
-      if (mode === "xray") {
-        brightness = 0.55 + windowVal * 0.70;
-        contrast   = 1.8  - windowVal * 0.90;
-        sat = 1;
-      } else if (mode === "pet") {
-        brightness = 0.50 + windowVal * 0.70;
-        contrast   = 1.0  + windowVal * 1.20;
-        sat = 1.2 + windowVal * 0.4;
-      } else {
-        brightness = .6  + windowVal * .8;
-        contrast   = .8  + windowVal * .5;
-        sat = 1;
-      }
-      slices.forEach(el => {
+      // Window/level
+      const brightness = .55 + windowVal * .90;
+      const contrast   = .75 + windowVal * .55;
+      const currentSlices = modeSlices[mode];
+      currentSlices.forEach(el => {
         el.style.setProperty("--bright", brightness.toFixed(2));
-        el.style.setProperty("--ctr",    contrast.toFixed(2));
-        el.style.setProperty("--sat",    sat.toFixed(2));
+        el.style.setProperty("--ctr", contrast.toFixed(2));
       });
     }
 
-    // Event listeners
+    // Mode buttons
     document.querySelectorAll(".mode").forEach(btn =>
-      btn.addEventListener("click", () => setMode(btn.dataset.mode))
-    );
-    sliceSlider.addEventListener("input",  updateView);
+      btn.addEventListener("click", () => setMode(btn.dataset.mode)));
+
+    // X-RAY sub-mode buttons
+    document.querySelectorAll(".submode[data-xray]").forEach(btn =>
+      btn.addEventListener("click", () => {
+        xrayIdx = parseInt(btn.dataset.xray);
+        document.querySelectorAll(".submode[data-xray]").forEach(b => b.classList.toggle("active", b === btn));
+        updateView();
+      }));
+
+    // PET sub-mode buttons
+    document.querySelectorAll(".submode[data-pet]").forEach(btn =>
+      btn.addEventListener("click", () => {
+        petIdx = parseInt(btn.dataset.pet);
+        document.querySelectorAll(".submode[data-pet]").forEach(b => b.classList.toggle("active", b === btn));
+        updateReadout();
+        updateView();
+      }));
+
+    sliceSlider.addEventListener("input", updateView);
     windowSlider.addEventListener("input", updateView);
 
-    // Init
     setMode("xray");
   </script>
   <script src="./transition-nav.js"></script>
