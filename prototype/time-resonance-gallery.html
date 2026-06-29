@@ -411,10 +411,7 @@
       const hz = Math.round(200 + freq * 800);
       ctx.save(); ctx.font = '400 11px IBM Plex Mono, monospace';
       ctx.fillStyle = 'rgba(238,233,220,0.45)'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-      ctx.fillText('f = ' + hz + ' Hz', cx, cy + R * 0.22); ctx.restore();
-      ctx.save(); ctx.font = '400 9px IBM Plex Mono, monospace';
-      ctx.fillStyle = 'rgba(143,221,234,0.28)'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-      ctx.fillText('RESONANCE METER', cx, cy - R * 0.88); ctx.restore();
+      ctx.fillText('f = ' + hz + ' Hz', cx, cy + R * 0.28); ctx.restore();
     }
 
     function drawResonanceCurve(w, h, amp) {
