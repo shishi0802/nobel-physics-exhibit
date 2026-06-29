@@ -82,7 +82,7 @@
       display: flex; justify-content: space-between; align-items: center;
       color: #6e6860; font-family: var(--mono); font-size: 11px; letter-spacing: .16em;
     }
-    .topline a { color: #bdb49a; text-decoration: none; }
+    .topline a { color: #d9cfb2; text-decoration: none; }
     .topline a:hover { color: var(--gold); }
 
     /* ── 3-column exhibit layout ───────────────────────────── */
@@ -159,7 +159,7 @@
     /* ── Right: controls panel ─────────────────────────────── */
     .controls {
       padding: clamp(14px,2vh,28px) clamp(16px,2vw,28px) 0 10px;
-      display: flex; flex-direction: column; gap: 22px;
+      display: flex; flex-direction: column; gap: 14px;
       pointer-events: auto;
       animation: fadeUp .9s .15s ease both;
     }
@@ -167,10 +167,10 @@
     .controls-title {
       color: var(--gold); font-family: var(--mono);
       font-size: 9.5px; letter-spacing: .18em; opacity: .75;
-      margin-bottom: -8px;
+      margin-bottom: -4px;
     }
 
-    .ctrl-group { display: flex; flex-direction: column; gap: 7px; }
+    .ctrl-group { display: flex; flex-direction: column; gap: 5px; }
 
     .ctrl-label {
       display: flex; justify-content: space-between; align-items: baseline;
@@ -180,7 +180,7 @@
     .ctrl-label .val { color: var(--cyan); }
     .ctrl-note {
       font-family: var(--sans); font-size: 11px; color: #5c5650;
-      margin-top: 1px;
+      margin-top: 0px;
     }
 
     input[type=range] {
@@ -272,8 +272,8 @@
 
   <!-- Topline -->
   <div class="topline" aria-label="展厅导航">
-    <span>EXHIBIT 07 &middot; TIME and RESONANCE</span>
-    <a href="hall.html" data-transition>RETURN TO HALL</a>
+    <a href="./hall.html" data-transition>← HALL</a>
+    <span>EXHIBIT 07 · TIME &amp; RESONANCE</span>
   </div>
 
   <!-- 3-column exhibit layout -->
@@ -352,9 +352,8 @@
 
   <!-- Bottom navline -->
   <nav class="navline" aria-label="展厅导航">
-    <a href="light-micro-gallery.html" data-transition>&larr; EXHIBIT 06 &middot; LIGHT &amp; MICROSCOPY</a>
-    <a href="hall.html" class="hall-link" data-transition>HALL &middot; ATRIUM</a>
-    <span class="nav-disabled">EXHIBIT 08 &middot; — &rarr;</span>
+    <a href="./light-micro-gallery.html" data-transition>← OPTICAL SECURITY</a>
+    <a href="./hall.html" class="hall-link" data-transition>BACK TO HALL</a>
   </nav>
 
   <!-- External scripts -->
