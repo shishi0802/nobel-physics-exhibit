@@ -1,0 +1,311 @@
+/*
+  mobile.css — Responsive overrides for screens ≤ 768px.
+  Included in every page via base.css @import or direct <link>.
+
+  Strategy: convert all absolute 3-column layouts (left title / center canvas / right controls)
+  into a single scrollable vertical column. Topline and navline stay fixed.
+  Each section gets generous padding to avoid overlapping with topline (62px) and navline (56px).
+*/
+
+@media (max-width: 768px) {
+
+  /* ── Global ──────────────────────────────────── */
+  html, body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Remove desktop min-width constraints */
+  .chamber, .test, .corridor, .gallery, .hall, .entrance {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    min-height: 100svh !important;
+  }
+
+  /* Topline: smaller, stays fixed at top */
+  .topline {
+    left: 16px !important;
+    right: 16px !important;
+    top: 18px !important;
+    font-size: 10px !important;
+    letter-spacing: .10em !important;
+  }
+
+  /* Navline: stays fixed at bottom */
+  .navline {
+    left: 16px !important;
+    right: 16px !important;
+    bottom: 18px !important;
+    font-size: 9px !important;
+    letter-spacing: .10em !important;
+  }
+
+  /* ── index.html (Entrance) ───────────────────── */
+  .entrance { height: 100svh !important; min-height: 100svh !important; }
+  .entrance .sign {
+    top: auto !important;
+    bottom: 30vh !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    text-align: center;
+  }
+  .entrance .enter-btn {
+    left: 50% !important;
+    bottom: 18vh !important;
+    transform: translateX(-50%) !important;
+  }
+
+  /* ── hall.html ───────────────────────────────── */
+  .hall {
+    display: flex;
+    flex-direction: column;
+    padding: 70px 0 64px;
+  }
+  .title {
+    position: relative !important;
+    left: auto !important; top: auto !important;
+    width: auto !important;
+    padding: 0 20px;
+    margin-bottom: 24px;
+  }
+  .title h1 { font-size: clamp(32px, 8vw, 48px) !important; }
+  .title p { font-size: 13px !important; margin-top: 12px !important; }
+  .directory {
+    position: relative !important;
+    right: auto !important; top: auto !important; bottom: auto !important;
+    width: auto !important;
+    margin: 0 16px;
+    grid-template-rows: repeat(7, auto) !important;
+  }
+  .entry {
+    padding: 14px 0 !important;
+    min-height: 52px !important;
+  }
+  .entry strong { font-size: 16px !important; }
+  .note {
+    position: relative !important;
+    left: auto !important; bottom: auto !important;
+    padding: 16px 20px 0;
+    font-size: 11px !important;
+  }
+
+  /* ── Shared gallery layout (quantum, imaging, time) ──── */
+  /* Title panel: top of page, compact */
+  .title-panel {
+    position: relative !important;
+    left: auto !important; top: auto !important;
+    width: auto !important;
+    padding: 72px 20px 16px;
+  }
+  .title-panel h1 { font-size: clamp(30px, 7vw, 44px) !important; }
+  .title-panel .subtitle { font-size: 13px !important; margin-top: 12px !important; }
+  .guide { margin-top: 16px !important; }
+  .guide ol { font-size: 12px !important; line-height: 1.9 !important; }
+
+  /* Central experiment / viewer: full-width, square-ish */
+  .experiment {
+    position: relative !important;
+    left: auto !important; top: auto !important;
+    width: calc(100vw - 32px) !important;
+    height: 52vw !important;
+    max-height: 320px !important;
+    transform: none !important;
+    margin: 0 auto 12px;
+  }
+  .viewer {
+    position: relative !important;
+    left: auto !important; top: auto !important;
+    width: calc(100vw - 32px) !important;
+    height: 56vw !important;
+    max-height: 320px !important;
+    transform: none !important;
+    margin: 0 auto 12px;
+  }
+
+  /* Controls panel: below canvas */
+  .controls {
+    position: relative !important;
+    right: auto !important; top: auto !important;
+    width: auto !important;
+    padding: 0 20px 20px;
+  }
+  .controls-label { display: none; }
+
+  /* Inscription: hidden on mobile (too cramped) */
+  .inscription { display: none !important; }
+
+  /* ── quantum-gallery.html ────────────────────── */
+  #quantumCanvas { width: 100% !important; height: 100% !important; }
+  .detector { display: none !important; }
+
+  /* ── imaging-gallery.html ────────────────────── */
+  .viewer-mask {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .submode-row { grid-template-columns: repeat(3, 1fr) !important; }
+
+  /* ── time-resonance-gallery.html ─────────────── */
+  #timeCanvas { width: 100% !important; height: 100% !important; }
+
+  /* ── scale-gallery.html ──────────────────────── */
+  .gallery {
+    display: flex;
+    flex-direction: column;
+    padding-top: 62px;
+    padding-bottom: 64px;
+  }
+  .lens-shell {
+    position: relative !important;
+    left: auto !important; top: auto !important;
+    width: calc(100vw - 32px) !important;
+    height: 56vw !important;
+    max-height: 320px !important;
+    transform: none !important;
+    margin: 0 auto;
+  }
+  #scaleCanvas { width: 100% !important; height: 100% !important; }
+  .readout {
+    position: relative !important;
+    left: auto !important; top: auto !important; right: auto !important;
+    width: auto !important;
+    padding: 16px 20px 0;
+    max-width: 100%;
+  }
+  .controls.gallery-controls, section.controls {
+    position: relative !important;
+    right: auto !important; top: auto !important;
+    width: auto !important;
+    padding: 0 20px 16px;
+  }
+  .ticks { display: none !important; }
+  .measure { display: none !important; }
+  .title {
+    position: relative !important;
+    left: auto !important; top: auto !important;
+    width: auto !important;
+    padding: 0 20px 0;
+  }
+  .gesture-button { width: 100% !important; margin-top: 12px !important; }
+
+  /* ── physicist-corridor.html ─────────────────── */
+  .corridor {
+    display: flex;
+    flex-direction: column;
+    padding-top: 62px;
+    padding-bottom: 64px;
+    overflow-y: auto !important;
+    min-height: 100svh !important;
+  }
+  .intro {
+    position: relative !important;
+    left: auto !important; top: auto !important;
+    width: auto !important;
+    padding: 0 20px 16px;
+  }
+  .intro h1 { font-size: clamp(28px, 7vw, 40px) !important; }
+  .rail-wrap {
+    position: relative !important;
+    left: auto !important; right: auto !important;
+    top: auto !important; bottom: auto !important;
+    height: 48vw !important;
+    max-height: 260px !important;
+    margin: 0 0 16px;
+  }
+  .portrait { transform: translateX(calc(var(--distance, 0) * 70vw)) translateY(10px) scale(.66) !important; }
+  .portrait.active { transform: translateX(0) translateY(-6px) scale(1) !important; }
+  .portrait.active { width: clamp(130px, 32vw, 190px) !important; }
+  .detail {
+    position: relative !important;
+    right: auto !important; top: auto !important;
+    width: auto !important;
+    max-height: none !important;
+    margin: 0 20px;
+    padding: 16px 0 0;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  .detail h2 { font-size: 26px !important; }
+  .detail p { font-size: 13px !important; }
+  .controls.corridor-controls {
+    position: relative !important;
+    left: auto !important; bottom: auto !important;
+    padding: 12px 20px 0;
+  }
+
+  /* ── physicist-test.html ─────────────────────── */
+  .test {
+    display: flex;
+    flex-direction: column;
+    padding-top: 62px;
+    padding-bottom: 64px;
+    overflow-y: auto !important;
+    min-height: 100svh !important;
+  }
+  .stage {
+    position: relative !important;
+    left: auto !important; top: auto !important; bottom: auto !important;
+    width: auto !important;
+    padding: 0 20px;
+  }
+  .stage h1 { font-size: clamp(36px, 8vw, 52px) !important; }
+  .stage h2 { font-size: clamp(22px, 5.5vw, 32px) !important; }
+  .stage.question-mode {
+    grid-template-rows: auto auto 1fr !important;
+    bottom: auto !important;
+    min-height: calc(100svh - 130px) !important;
+  }
+  .panel {
+    position: relative !important;
+    right: auto !important; top: auto !important;
+    width: auto !important;
+    margin: 0 20px;
+    padding: 16px 0 0;
+  }
+  .result-view {
+    padding: 0 20px !important;
+  }
+  .loading { border-radius: 0 !important; }
+
+  /* ── light-micro-gallery.html ────────────────── */
+  .chamber.light-chamber {
+    display: flex;
+    flex-direction: column;
+    padding-top: 62px;
+    padding-bottom: 64px;
+    overflow-y: auto !important;
+  }
+  .stage.bill-stage {
+    position: relative !important;
+    left: auto !important; top: auto !important;
+    width: auto !important; height: auto !important;
+    transform: none !important;
+    margin: 0 16px 16px;
+  }
+  .bill-rig {
+    width: calc(100vw - 48px) !important;
+    margin: 0 auto !important;
+    transform: rotateX(20deg) rotateZ(-2deg) !important;
+  }
+
+  /* ── Ambient disc button: stay fixed top-right on mobile ── */
+  .ambient-audio {
+    left: auto !important;
+    right: 18px !important;
+    top: 16px !important;
+  }
+  .ambient-hint {
+    left: auto !important;
+    right: 60px !important;
+    top: 22px !important;
+    font-size: 9px !important;
+    line-height: 32px !important;
+  }
+
+  /* ── Room decorative layers: hide on mobile for performance ── */
+  .room, .grain, .ambient-glow { display: none !important; }
+
+  /* ── Portal transition ───────────────────────── */
+  .portal-transition { display: none !important; }
+}
