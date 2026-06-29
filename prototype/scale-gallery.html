@@ -341,9 +341,7 @@
       bottom: 18vh;
       width: min(72vw, 980px);
       transform: translateX(-50%);
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 1px;
+      height: 26px;
       z-index: 5;
       pointer-events: none;
       color: #5f5a53;
@@ -352,9 +350,11 @@
       letter-spacing: .08em;
     }
     .ticks div {
+      position: absolute;
       border-left: 1px solid rgba(238,233,220,.12);
       padding-left: 8px;
       height: 26px;
+      transform: translateX(0);
     }
 
     .gesture-overlay {
@@ -652,7 +652,14 @@
     </section>
     <div class="measure" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
     <div class="ticks" aria-hidden="true">
-      <div>10^-15</div><div>10^-10</div><div>10^-6</div><div>10^0</div><div>10^6</div><div>10^12</div><div>10^27</div>
+      <div style="left:0%">10⁻¹⁵</div>
+      <div style="left:11.9%">10⁻¹⁰</div>
+      <div style="left:21.4%">10⁻⁶</div>
+      <div style="left:35.7%">10⁰</div>
+      <div style="left:50%">10⁶</div>
+      <div style="left:64.3%">10¹²</div>
+      <div style="left:85.7%">10²¹</div>
+      <div style="left:100%;border-left:0;padding-left:0;padding-right:8px;text-align:right">10²⁷</div>
     </div>
 
     <section class="controls">
