@@ -1,6 +1,9 @@
 .DS_Store
-.rollback-snapshot-*/
-node_modules/
-.env
-.env.*
-.claude/worktrees/
+.claude/
+课程ppt/
+（已压缩）诺奖物理ppt合集.pdf
+*.preview.png
+prototype/*preview*.png
+prototype/*check*.png
+诺奖物理学家人格图鉴-设计全案.docx
+AGENTS.md
