@@ -62,28 +62,28 @@
     flex-direction: column;
     padding: 70px 0 64px;
   }
-  .title {
+  .hall .title {
     position: relative !important;
     left: auto !important; top: auto !important;
     width: auto !important;
     padding: 0 20px;
     margin-bottom: 24px;
   }
-  .title h1 { font-size: clamp(32px, 8vw, 48px) !important; }
-  .title p { font-size: 13px !important; margin-top: 12px !important; }
-  .directory {
+  .hall .title h1 { font-size: clamp(32px, 8vw, 48px) !important; }
+  .hall .title p { font-size: 13px !important; margin-top: 12px !important; }
+  .hall .directory {
     position: relative !important;
     right: auto !important; top: auto !important; bottom: auto !important;
     width: auto !important;
     margin: 0 16px;
     grid-template-rows: repeat(7, auto) !important;
   }
-  .entry {
+  .hall .entry {
     padding: 14px 0 !important;
     min-height: 52px !important;
   }
-  .entry strong { font-size: 16px !important; }
-  .note {
+  .hall .entry strong { font-size: 16px !important; }
+  .hall .note {
     position: relative !important;
     left: auto !important; bottom: auto !important;
     padding: 16px 20px 0;
@@ -198,14 +198,14 @@
     overflow-y: auto !important;
     min-height: 100svh !important;
   }
-  .intro {
+  .corridor .intro {
     position: relative !important;
     left: auto !important; top: auto !important;
     width: auto !important;
     padding: 0 20px 16px;
   }
-  .intro h1 { font-size: clamp(28px, 7vw, 40px) !important; }
-  .rail-wrap {
+  .corridor .intro h1 { font-size: clamp(28px, 7vw, 40px) !important; }
+  .corridor .rail-wrap {
     position: relative !important;
     left: auto !important; right: auto !important;
     top: auto !important; bottom: auto !important;
@@ -213,10 +213,9 @@
     max-height: 260px !important;
     margin: 0 0 16px;
   }
-  .portrait { transform: translateX(calc(var(--distance, 0) * 70vw)) translateY(10px) scale(.66) !important; }
-  .portrait.active { transform: translateX(0) translateY(-6px) scale(1) !important; }
-  .portrait.active { width: clamp(130px, 32vw, 190px) !important; }
-  .detail {
+  .corridor .portrait { transform: translateX(calc(var(--distance, 0) * 70vw)) translateY(10px) scale(.66) !important; width: 80px !important; }
+  .corridor .portrait.active { transform: translateX(0) translateY(-6px) scale(1) !important; width: clamp(130px, 32vw, 190px) !important; }
+  .corridor .detail {
     position: relative !important;
     right: auto !important; top: auto !important;
     width: auto !important;
@@ -226,9 +225,9 @@
     background: transparent !important;
     box-shadow: none !important;
   }
-  .detail h2 { font-size: 26px !important; }
-  .detail p { font-size: 13px !important; }
-  .controls.corridor-controls {
+  .corridor .detail h2 { font-size: 26px !important; }
+  .corridor .detail p { font-size: 13px !important; }
+  .corridor .controls {
     position: relative !important;
     left: auto !important; bottom: auto !important;
     padding: 12px 20px 0;
