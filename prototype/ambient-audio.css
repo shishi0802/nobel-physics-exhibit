@@ -122,26 +122,19 @@ body.is-leaving .ambient-audio,
   }
 }
 
-/* Music hint tooltip — appears beside the disc button, fades after 5s */
+/* Music hint — positioned right of disc button, pulsing until user clicks */
 .ambient-hint {
   position: fixed;
-  left: calc(clamp(178px, 17vw, 268px) + 42px);
-  top: 30px;
-  z-index: 71;
-  color: rgba(238, 233, 220, .48);
+  left: calc(clamp(178px, 17vw, 268px) + 44px);
+  top: 33px;
+  z-index: 73;
+  color: rgba(238, 233, 220, .52);
   font-family: "IBM Plex Mono", monospace;
   font-size: 10px;
-  letter-spacing: .13em;
+  letter-spacing: .14em;
   pointer-events: none;
   white-space: nowrap;
-  opacity: 1;
-  transition: opacity 1.2s ease;
-}
-.ambient-hint.is-faded {
-  opacity: 0;
-}
-body.is-entering .ambient-hint {
-  opacity: 0;
+  line-height: 34px;
 }
 
 @media (max-width: 760px) {
@@ -149,5 +142,6 @@ body.is-entering .ambient-hint {
     left: auto;
     right: 58px;
     top: 26px;
+    line-height: 32px;
   }
 }
