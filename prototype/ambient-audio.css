@@ -1,0 +1,177 @@
+.ambient-audio {
+  position: fixed;
+  left: clamp(178px, 17vw, 268px);
+  top: 27px;
+  z-index: 72;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: rgba(238, 233, 220, .88);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(3,3,3,.98) 0 18%, rgba(216,192,122,.22) 19% 20%, rgba(8,8,7,.94) 21% 49%, rgba(238,233,220,.30) 50% 51%, rgba(5,5,5,.86) 52% 100%);
+  box-shadow:
+    0 0 0 1px rgba(238,233,220,.10),
+    0 12px 30px rgba(0,0,0,.34),
+    inset 0 0 20px rgba(255,255,255,.035);
+  cursor: pointer;
+  transform: translateY(0) scale(1);
+  opacity: .54;
+  transition:
+    opacity .42s ease,
+    filter .28s ease,
+    box-shadow .28s ease,
+    transform .52s cubic-bezier(.16,1,.3,1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ambient-audio:hover,
+.ambient-audio:focus-visible {
+  opacity: 1;
+  outline: none;
+  filter: brightness(1.08);
+  box-shadow:
+    0 0 0 1px rgba(238,233,220,.20),
+    0 14px 34px rgba(0,0,0,.42),
+    0 0 28px rgba(216,192,122,.12),
+    inset 0 0 24px rgba(255,255,255,.05);
+}
+
+.ambient-audio::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background:
+    conic-gradient(from 120deg, rgba(238,233,220,.02), rgba(238,233,220,.20), rgba(143,221,234,.08), rgba(238,233,220,.02), rgba(216,192,122,.16), rgba(238,233,220,.02));
+  mask-image: radial-gradient(circle, transparent 0 18%, #000 19% 82%, transparent 83%);
+  opacity: .62;
+}
+
+.ambient-audio::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(238,233,220,.72);
+  box-shadow: 0 0 14px rgba(238,233,220,.32);
+  transform: translate(-50%, -50%);
+}
+
+.ambient-audio .ambient-needle {
+  position: absolute;
+  right: 5px;
+  top: 7px;
+  width: 13px;
+  height: 1px;
+  border-radius: 999px;
+  background: rgba(216,192,122,.64);
+  box-shadow: 0 0 10px rgba(216,192,122,.16);
+  transform-origin: 100% 50%;
+  transform: rotate(-30deg);
+  transition: transform .32s cubic-bezier(.16,1,.3,1), opacity .32s ease;
+  opacity: .48;
+}
+
+.ambient-audio.is-playing {
+  opacity: .96;
+}
+
+.ambient-audio.is-loading {
+  opacity: .88;
+}
+
+.ambient-audio.is-playing::before {
+  animation: ambientRecordSpin 5.4s linear infinite;
+}
+
+.ambient-audio.is-loading::before {
+  animation: ambientRecordSpin 1.8s linear infinite;
+}
+
+.ambient-audio.is-playing .ambient-needle {
+  opacity: .82;
+  transform: rotate(-46deg);
+}
+
+.ambient-audio.is-muted {
+  opacity: .42;
+}
+
+.ambient-audio:hover + .ambient-hint,
+.ambient-audio:focus-visible + .ambient-hint {
+  opacity: 1 !important;
+  transform: translateY(0) scale(1);
+}
+
+body.is-entering:not(.ambient-ready) .ambient-audio,
+body.is-entering:not(.ambient-ready) .ambient-hint {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px) scale(.88);
+}
+
+body.is-leaving .ambient-audio,
+body.is-leaving .ambient-hint,
+.hall.is-leaving ~ .ambient-audio,
+.hall.is-leaving ~ .ambient-hint {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-7px) scale(.90);
+}
+
+@keyframes ambientRecordSpin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 760px) {
+  .ambient-audio {
+    left: auto;
+    right: 18px;
+    top: 22px;
+    transform: none;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* Music hint — positioned right of disc button, pulsing until user clicks */
+.ambient-hint {
+  position: fixed;
+  left: calc(clamp(178px, 17vw, 268px) + 44px);
+  top: 30px;
+  z-index: 73;
+  color: rgba(238, 233, 220, .78);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: .12em;
+  pointer-events: none;
+  white-space: nowrap;
+  line-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(5, 5, 4, .68);
+  box-shadow: 0 0 0 1px rgba(238, 233, 220, .13), 0 12px 26px rgba(0,0,0,.30), 0 0 22px rgba(216,192,122,.08);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transform: translateY(-2px) scale(.98);
+  transition: opacity .8s ease, transform .52s cubic-bezier(.16,1,.3,1);
+}
+
+.ambient-hint.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+@media (max-width: 760px) {
+  .ambient-hint {
+    left: auto;
+    right: 58px;
+    top: 24px;
+    line-height: 26px;
+  }
+}

@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>身体成像展厅 · Imaging Chamber</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23020202'/%3E%3Cpath d='M32 9c9 0 15 8 15 18 0 17-8 28-15 28S17 44 17 27C17 17 23 9 32 9z' fill='none' stroke='%23d8c07a' stroke-width='3'/%3E%3Cpath d='M24 31h16M32 20v28' stroke='%238fddea' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./base.css" />
+  <style>
+    .chamber {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      min-width: 1080px;
+      min-height: 720px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 54% 43%, rgba(143,221,234,.08), transparent 19%),
+        radial-gradient(circle at 40% 66%, rgba(216,192,122,.05), transparent 24%),
+        linear-gradient(180deg, #080807 0%, #020202 66%, #000 100%);
+    }
+    .room { position: absolute; inset: 0; pointer-events: none; perspective: 1200px; }
+    .wall {
+      position: absolute; left: 11vw; right: 11vw; top: 8vh; height: 66vh;
+      background: linear-gradient(180deg, rgba(17,17,16,.94), rgba(4,4,4,.96));
+      border-top: 1px solid rgba(238,233,220,.07);
+      box-shadow: inset 0 0 160px rgba(255,255,255,.018), 0 46px 160px rgba(0,0,0,.72);
+      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    }
+    .floor {
+      position: absolute; left: -16vw; right: -16vw; bottom: -34vh; height: 58vh;
+      transform: rotateX(65deg); transform-origin: 50% 0;
+      border-top: 1px solid rgba(238,233,220,.06);
+      background: linear-gradient(180deg, rgba(22,22,20,.48), #020202 68%);
+    }
+    .light {
+      position: absolute; left: 50%; top: 3vh; width: 60vw; height: 72vh;
+      transform: translateX(-50%);
+      background: conic-gradient(from 180deg at 50% 0%, transparent 0 35%, rgba(143,221,234,.12) 44%, rgba(238,233,220,.10) 50%, rgba(143,221,234,.12) 56%, transparent 65% 100%);
+      filter: blur(20px); opacity: .70; mix-blend-mode: screen;
+    }
+    .topline {
+      position: absolute; left: clamp(40px, 5vw, 80px); right: clamp(40px, 5vw, 80px);
+      top: 34px; z-index: 10; display: flex; justify-content: space-between;
+      color: #8d887f; font-family: var(--mono); font-size: 11px; letter-spacing: .15em;
+    }
+    .topline a { color: #d9cfb2; }
+
+    /* Left panel */
+    .title-panel {
+      position: absolute; left: clamp(48px, 6vw, 90px); top: clamp(88px, 14vh, 136px);
+      z-index: 8; width: min(360px, 27vw);
+    }
+    .kicker { color: var(--gold); font-family: var(--mono); font-size: 12px; letter-spacing: .18em; margin-bottom: 20px; }
+    h1 { margin: 0; font-family: var(--serif); font-size: clamp(40px, 4.6vw, 68px); line-height: 1.06; }
+    .title-panel .subtitle { margin: 18px 0 0; color: var(--muted); font-size: 15px; line-height: 1.85; }
+    .guide { margin-top: 24px; padding-top: 14px; border-top: 1px solid rgba(238,233,220,.14); }
+    .guide-title { color: var(--gold); font-family: var(--mono); font-size: 10px; letter-spacing: .14em; margin-bottom: 10px; }
+    .guide ol { margin: 0; padding-left: 18px; color: #928b80; font-size: 13px; line-height: 2.0; }
+    .guide ol li::marker { color: var(--cyan); }
+
+    /* Central viewer — image-based */
+    .viewer {
+      position: absolute; left: 50%; top: 50%;
+      width: min(48vw, 640px); height: min(60vh, 560px);
+      transform: translate(-36%, -46%); z-index: 4;
+      display: grid; place-items: center;
+    }
+    .viewer-mask {
+      position: relative; width: 100%; height: 100%;
+      mask-image: radial-gradient(ellipse at 50% 50%, #000 0 56%, rgba(0,0,0,.6) 74%, transparent 100%);
+      overflow: hidden; border-radius: 8px;
+    }
+    .img-layer {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: contain; opacity: 0;
+      transition: opacity .4s ease;
+      pointer-events: none;
+    }
+    .img-layer.pet-tint {
+      object-fit: cover;
+    }
+    .img-layer.visible { opacity: 1; }
+    .img-layer.xray-tint { filter: grayscale(1) brightness(var(--bright, 1)) contrast(var(--ctr, 1.1)); }
+    .img-layer.mri-tint { filter: grayscale(.6) brightness(var(--bright, .9)) contrast(var(--ctr, 1.2)) sepia(.3) hue-rotate(160deg); }
+    .img-layer.pet-tint { filter: brightness(var(--bright, 1)) contrast(var(--ctr, 1.1)) saturate(1.3); }
+    .scanline {
+      position: absolute; left: 10%; right: 10%; top: var(--scan, 45%); height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(143,221,234,.82), transparent);
+      box-shadow: 0 0 22px rgba(143,221,234,.28);
+      transition: top .2s cubic-bezier(.16,1,.3,1); pointer-events: none;
+    }
+    .viewer-label {
+      position: absolute; left: 50%; bottom: -24px; transform: translateX(-50%);
+      color: #6d675f; font-family: var(--mono); font-size: 10px; letter-spacing: .12em; white-space: nowrap;
+    }
+    .credit {
+      position: absolute; right: 8px; bottom: 8px;
+      color: rgba(238,233,220,.18); font-family: var(--mono); font-size: 8px; letter-spacing: .08em;
+    }
+
+    /* Right controls */
+    .controls {
+      position: absolute; right: clamp(46px, 5vw, 86px); top: clamp(118px, 16vh, 170px);
+      width: min(340px, 27vw); z-index: 11;
+    }
+    .modes {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+      background: transparent; margin-bottom: 20px;
+      border-top: 1px solid rgba(238,233,220,.16); border-bottom: 1px solid rgba(238,233,220,.09);
+    }
+    .mode {
+      border: 0; background: rgba(238,233,220,.018); color: rgba(238,233,220,.46);
+      min-height: 52px; cursor: pointer; font-family: var(--mono); font-size: 11px;
+      letter-spacing: .12em; position: relative; transition: color .22s ease, background .22s ease;
+    }
+    .mode + .mode { border-left: 1px solid rgba(238,233,220,.08); }
+    .mode::after {
+      content: ""; position: absolute; left: 18%; right: 18%; bottom: 0; height: 1px;
+      background: rgba(216,192,122,.70); transform: scaleX(0); transition: transform .24s ease;
+    }
+    .mode.active { color: var(--ink); background: linear-gradient(180deg, rgba(238,233,220,.055), rgba(238,233,220,.018)); }
+    .mode.active::after { transform: scaleX(1); }
+    .submode-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(238,233,220,.09);
+    }
+    .submode {
+      border: 0; background: rgba(238,233,220,.012); color: rgba(238,233,220,.40);
+      min-height: 40px; cursor: pointer; font-family: var(--mono); font-size: 10px;
+      letter-spacing: .10em; transition: color .22s ease, background .22s ease;
+    }
+    .submode + .submode { border-left: 1px solid rgba(238,233,220,.06); }
+    .submode.active { color: var(--cyan); background: rgba(143,221,234,.06); }
+    .control-row { display: grid; grid-template-columns: 100px 1fr; gap: 16px; align-items: center; margin-bottom: 18px; }
+    .control-row label { color: #777168; font-family: var(--mono); font-size: 11px; letter-spacing: .10em; }
+    input[type=range] { appearance: none; width: 100%; height: 30px; background: transparent; cursor: pointer; }
+    input[type=range]::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(90deg, var(--cyan), rgba(238,233,220,.18), var(--gold)); }
+    input[type=range]::-webkit-slider-thumb {
+      appearance: none; width: 15px; height: 15px; margin-top: -6.5px; border-radius: 50%;
+      border: 1px solid #050505; background: var(--ink); box-shadow: 0 0 20px rgba(238,233,220,.30);
+    }
+    .readout { margin-top: 6px; padding: 14px 0; border-top: 1px solid rgba(238,233,220,.10); color: #928b80; font-size: 13px; line-height: 1.85; }
+    .readout b { color: #eee4c7; font-weight: 500; }
+    .readout .physics { display: block; margin-top: 8px; color: #6d675f; font-family: var(--mono); font-size: 10px; letter-spacing: .06em; line-height: 1.6; }
+
+    /* Inscription */
+    .inscription {
+      position: absolute; left: clamp(48px, 6vw, 90px); bottom: clamp(56px, 8vh, 92px);
+      z-index: 10; width: min(340px, 27vw);
+      border-top: 1px solid rgba(216,192,122,.30); padding-top: 16px;
+    }
+    .inscription .label { color: var(--gold); font-family: var(--mono); font-size: 10px; letter-spacing: .16em; margin-bottom: 13px; }
+    .quote { font-family: var(--serif); color: #d8d1bf; font-size: 17px; line-height: 1.65; transition: opacity .35s ease; }
+    .source { margin-top: 10px; color: #777168; font-family: var(--mono); font-size: 10px; letter-spacing: .09em; transition: opacity .35s ease; }
+    .fade { opacity: 0; }
+
+    /* Nav */
+    .navline {
+      position: absolute; left: clamp(40px, 5vw, 80px); right: clamp(40px, 5vw, 80px);
+      bottom: 28px; z-index: 20; display: flex; justify-content: space-between;
+      color: #6d675f; font-family: var(--mono); font-size: 10px; letter-spacing: .13em;
+    }
+    .navline a { color: #a79d86; }
+
+    /* Transition overrides */
+    .portal-transition.active { opacity: 1; animation: pageVeil .52s cubic-bezier(.22,1,.36,1) forwards; }
+    .portal-transition.active::before { animation: none; opacity: 0; transform: none; }
+    body.is-entering::before {
+      content: ""; position: fixed; inset: 0; z-index: 99; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.045) 34%, rgba(3,3,2,.28) 100%);
+      animation: pageReveal .72s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    body.is-leaving main > :not(.portal-transition) { opacity: .72; filter: none !important; transition: opacity .52s cubic-bezier(.22,1,.36,1); }
+    @keyframes pageVeil { 0% { background: rgba(0,0,0,0); } 100% { background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.050) 36%, rgba(3,3,2,.18) 100%); } }
+    @keyframes pageReveal { from { opacity: 1; } to { opacity: 0; } }
+  </style>
+  <link rel="stylesheet" href="./gallery-transition.css" />
+  <link rel="stylesheet" href="./ambient-audio.css?v=20260630-audio5" />
+</head>
+<body class="is-entering" data-ambient-scene="imaging">
+  <main class="chamber">
+    <div class="room" aria-hidden="true"><div class="wall"></div><div class="floor"></div><div class="light"></div></div>
+    <div class="grain"></div>
+    <header class="topline">
+      <a href="./hall.html" data-transition>← HALL</a>
+      <span>EXHIBIT 05 · MEDICAL IMAGING</span>
+    </header>
+
+    <section class="title-panel">
+      <div class="kicker">IMAGING CHAMBER</div>
+      <h1>被重构的<br>身体</h1>
+      <p class="subtitle">同一个身体在不同物理技术下显出不同层次。医学成像用物理过程重建身体的可见性，每种技术看见的都是截然不同的结构。</p>
+      <div class="guide">
+        <div class="guide-title">OBSERVATION GUIDE</div>
+        <ol>
+          <li>选择成像模式：X 光 / MRI / PET</li>
+          <li>X光：点击三个按钮切换层面与窗位</li>
+          <li>MRI：拖动切片滑杆浏览脑部层面</li>
+          <li>PET：脑部与全身视图对比代谢热区</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="viewer">
+      <div class="viewer-mask" id="viewerMask">
+        <!-- X-RAY images — 3 CT axial positions -->
+        <img class="img-layer xray-tint visible" data-mode="xray" data-slice="0" src="./assets/imaging/ct-thorax.jpg" alt="CT 胸部 Level 1（骨窗）" />
+        <img class="img-layer xray-tint" data-mode="xray" data-slice="1" src="./assets/imaging/ct-thorax-2.jpg" alt="CT 胸部 Level 2（骨窗）" />
+        <img class="img-layer xray-tint" data-mode="xray" data-slice="2" src="./assets/imaging/ct-lungs.jpg" alt="CT 胸部（肺窗）" />
+        <!-- MRI images -->
+        <img class="img-layer mri-tint" data-mode="mri" data-slice="0" src="./assets/imaging/mri-t2-03.jpg" alt="MRI T2 脑轴向切片 Level 3" />
+        <img class="img-layer mri-tint" data-mode="mri" data-slice="1" src="./assets/imaging/mri-t2-05.jpg" alt="MRI T2 脑轴向切片 Level 5" />
+        <img class="img-layer mri-tint" data-mode="mri" data-slice="2" src="./assets/imaging/mri-t2-07.jpg" alt="MRI T2 脑轴向切片 Level 7" />
+        <img class="img-layer mri-tint" data-mode="mri" data-slice="3" src="./assets/imaging/mri-t2-15.jpg" alt="MRI T2 脑轴向切片 Level 15" />
+        <img class="img-layer mri-tint" data-mode="mri" data-slice="4" src="./assets/imaging/mri-t2-17.jpg" alt="MRI T2 脑轴向切片 Level 17" />
+        <img class="img-layer mri-tint" data-mode="mri" data-slice="5" src="./assets/imaging/mri-t2-18.jpg" alt="MRI T2 脑轴向切片 Level 18" />
+        <img class="img-layer mri-tint" data-mode="mri" data-slice="6" src="./assets/imaging/mri-t2-20.jpg" alt="MRI T2 脑轴向切片 Level 20" />
+        <!-- PET images — brain FDG (focus) + whole body -->
+        <img class="img-layer pet-tint visible-pet" data-mode="pet" data-slice="0" src="./assets/imaging/pet-brain.jpg" alt="PET 脑部 FDG 代谢图" />
+        <img class="img-layer pet-tint" data-mode="pet" data-slice="1" src="./assets/imaging/pet-body.jpg" alt="PET/CT 全身代谢图" />
+        <div class="scanline" id="scanline"></div>
+        <span class="credit">IMAGE · WIKIMEDIA COMMONS · EDUCATIONAL DISPLAY</span>
+      </div>
+      <div class="viewer-label" id="viewerLabel">X-RAY · BONE WINDOW</div>
+    </section>
+
+    <section class="controls">
+      <div class="modes">
+        <button class="mode active" data-mode="xray" type="button">X-RAY</button>
+        <button class="mode" data-mode="mri" type="button">MRI</button>
+        <button class="mode" data-mode="pet" type="button">PET</button>
+      </div>
+      <!-- X-RAY sub-mode: window presets -->
+      <div class="submode-row" id="xraySubRow">
+        <button class="submode active" data-xray="0" type="button">LEVEL 1</button>
+        <button class="submode" data-xray="1" type="button">LEVEL 2</button>
+        <button class="submode" data-xray="2" type="button">LUNG WIN</button>
+      </div>
+      <!-- MRI slice slider -->
+      <div class="control-row" id="mriSliceRow" style="display:none">
+        <label for="sliceSlider">SLICE</label>
+        <input id="sliceSlider" type="range" min="0" max="1" value="0" step=".001" />
+      </div>
+      <!-- PET sub-mode: brain vs body -->
+      <div class="submode-row" id="petSubRow" style="display:none">
+        <button class="submode active" data-pet="0" type="button">BRAIN FDG</button>
+        <button class="submode" data-pet="1" type="button">WHOLE BODY</button>
+      </div>
+      <div class="control-row">
+        <label for="windowSlider">WINDOW</label>
+        <input id="windowSlider" type="range" min="0" max="1" value=".5" step=".001" />
+      </div>
+      <div class="readout" id="readout">
+        <b>X 光模式</b>：X 射线穿透人体，高密度骨骼吸收最多，在胶片上留下白色影像。切换层面或窗位，观察同一套 CT 数据在不同窗口下呈现出的骨骼与肺组织。
+        <span class="physics">物理原理：X 射线衰减 · 光电效应 · 康普顿散射 · 1895 伦琴发现</span>
+      </div>
+    </section>
+
+    <aside class="inscription" data-inscription-topic="imaging">
+      <div class="label">PHILOSOPHICAL INSCRIPTION</div>
+      <div class="quote" id="quoteText"></div>
+      <div class="source" id="quoteSource"></div>
+    </aside>
+
+    <nav class="navline">
+      <a href="./quantum-gallery.html" data-transition>← MEASUREMENT CHAMBER</a>
+      <a href="./light-micro-gallery.html" data-transition>LIGHT EXHIBIT →</a>
+    </nav>
+    <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
+  </main>
+
+  <script src="./philosophy-inscriptions.js"></script>
+  <script src="./ambient-audio.js?v=20260630-audio5"></script>
+  <script>
+    const sliceSlider = document.getElementById("sliceSlider");
+    const windowSlider = document.getElementById("windowSlider");
+    const readout = document.getElementById("readout");
+    const scanline = document.getElementById("scanline");
+    const viewerLabel = document.getElementById("viewerLabel");
+    const allLayers = Array.from(document.querySelectorAll(".img-layer"));
+    const xraySubRow = document.getElementById("xraySubRow");
+    const mriSliceRow = document.getElementById("mriSliceRow");
+    const petSubRow = document.getElementById("petSubRow");
+    let mode = "xray";
+    let xrayIdx = 0;
+    let petIdx = 0;
+
+    const modeSlices = {
+      xray: allLayers.filter(el => el.dataset.mode === "xray"),
+      mri:  allLayers.filter(el => el.dataset.mode === "mri"),
+      pet:  allLayers.filter(el => el.dataset.mode === "pet")
+    };
+
+    const mriLabels = ["LEVEL 03", "LEVEL 05", "LEVEL 07", "LEVEL 15", "LEVEL 17", "LEVEL 18", "LEVEL 20"];
+    const xrayLabels = ["BONE WINDOW · L1", "BONE WINDOW · L2", "LUNG WINDOW"];
+    const petLabels  = ["BRAIN · FDG", "WHOLE BODY · FDG"];
+
+    const modeInfo = {
+      xray: {
+        brain: `<b>X 光模式</b>：X 射线穿透人体，高密度骨骼吸收最多，低密度肺组织几乎透明。骨窗突出骨骼结构，肺窗拉低亮度显示气道和肺纹理。同一套 CT 数据，换一种窗位就是完全不同的身体。<span class="physics">物理原理：X 射线衰减 · 光电效应 · 康普顿散射 · 1895 伦琴发现</span>`
+      },
+      mri: {
+        brain: `<b>MRI 模式</b>：拖动切片滑杆浏览脑部连续层面。T2 序列中水与脑脊液呈高信号（亮白），灰白质对比鲜明。核磁共振不使用电离辐射，靠氢核在强磁场中的共振信号成像。<span class="physics">物理原理：核磁共振 · 拉莫尔进动 · T1/T2 弛豫 · 1971 达马迪安提出</span>`
+      },
+      pet: {
+        brain: `<b>PET 脑部模式</b>：注入 FDG 示踪剂后，高代谢区域（大脑皮层、基底节）积累更多正电子标记葡萄糖，显示为亮色热区。图中最亮的区域就是活跃的神经代谢中心。<span class="physics">正电子与电子湮灭 → 一对方向相反的 511 keV γ 光子 → 符合探测定位</span>`,
+        body: `<b>PET 全身模式</b>：全身 FDG 代谢扫描。脑（最亮）、心脏、肝脏和膀胱为正常高代谢区。异常高代谢区可能提示肿瘤病灶。这张图综合了 PET 功能信息与 CT 解剖定位。<span class="physics">物理原理：正电子湮灭 · γ 射线符合探测 · FDG 代谢 · 现代 PET/CT 融合成像</span>`
+      }
+    };
+
+    function setMode(next) {
+      mode = next;
+      document.querySelectorAll(".mode").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === mode));
+      // Show/hide sub-controls
+      xraySubRow.style.display = mode === "xray" ? "grid" : "none";
+      mriSliceRow.style.display = mode === "mri"  ? "grid" : "none";
+      petSubRow.style.display  = mode === "pet"   ? "grid" : "none";
+      sliceSlider.value = 0;
+      updateReadout();
+      updateView();
+    }
+
+    function updateReadout() {
+      if (mode === "xray") {
+        readout.innerHTML = modeInfo.xray.brain;
+      } else if (mode === "mri") {
+        readout.innerHTML = modeInfo.mri.brain;
+      } else {
+        readout.innerHTML = petIdx === 0 ? modeInfo.pet.brain : modeInfo.pet.body;
+      }
+    }
+
+    function updateView() {
+      const windowVal = parseFloat(windowSlider.value);
+      allLayers.forEach(el => { el.classList.remove("visible"); el.style.opacity = 0; el.style.objectPosition = ""; });
+
+      if (mode === "xray") {
+        const slices = modeSlices.xray;
+        slices[xrayIdx].classList.add("visible");
+        slices[xrayIdx].style.opacity = 1;
+        viewerLabel.textContent = `CT · ${xrayLabels[xrayIdx]}`;
+        scanline.style.setProperty("--scan", "45%");
+      } else if (mode === "mri") {
+        const sliceVal = parseFloat(sliceSlider.value);
+        const slices = modeSlices.mri;
+        const pos = sliceVal * (slices.length - 1);
+        const lower = Math.floor(pos);
+        const upper = Math.min(lower + 1, slices.length - 1);
+        const blend = pos - lower;
+        if (lower === upper) {
+          slices[lower].classList.add("visible");
+          slices[lower].style.opacity = 1;
+        } else {
+          slices[lower].classList.add("visible"); slices[lower].style.opacity = 1 - blend;
+          slices[upper].classList.add("visible"); slices[upper].style.opacity = blend;
+        }
+        const li = Math.round(sliceVal * (mriLabels.length - 1));
+        viewerLabel.textContent = `MRI T2 · ${mriLabels[li]}`;
+        scanline.style.setProperty("--scan", `${15 + sliceVal * 70}%`);
+      } else {
+        // PET — brain or body
+        const slices = modeSlices.pet;
+        slices[petIdx].classList.add("visible");
+        slices[petIdx].style.opacity = 1;
+        viewerLabel.textContent = `PET · ${petLabels[petIdx]}`;
+        scanline.style.setProperty("--scan", "50%");
+      }
+
+      // Window/level
+      const brightness = .55 + windowVal * .90;
+      const contrast   = .75 + windowVal * .55;
+      const currentSlices = modeSlices[mode];
+      currentSlices.forEach(el => {
+        el.style.setProperty("--bright", brightness.toFixed(2));
+        el.style.setProperty("--ctr", contrast.toFixed(2));
+      });
+    }
+
+    // Mode buttons
+    document.querySelectorAll(".mode").forEach(btn =>
+      btn.addEventListener("click", () => setMode(btn.dataset.mode)));
+
+    // X-RAY sub-mode buttons
+    document.querySelectorAll(".submode[data-xray]").forEach(btn =>
+      btn.addEventListener("click", () => {
+        xrayIdx = parseInt(btn.dataset.xray);
+        document.querySelectorAll(".submode[data-xray]").forEach(b => b.classList.toggle("active", b === btn));
+        updateView();
+      }));
+
+    // PET sub-mode buttons
+    document.querySelectorAll(".submode[data-pet]").forEach(btn =>
+      btn.addEventListener("click", () => {
+        petIdx = parseInt(btn.dataset.pet);
+        document.querySelectorAll(".submode[data-pet]").forEach(b => b.classList.toggle("active", b === btn));
+        updateReadout();
+        updateView();
+      }));
+
+    sliceSlider.addEventListener("input", updateView);
+    windowSlider.addEventListener("input", updateView);
+
+    setMode("xray");
+  </script>
+  <script src="./transition-nav.js"></script>
+</body>
+</html>

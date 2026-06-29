@@ -1,0 +1,22 @@
+window.PhysicistPortraits = {
+  feynman: { src: "./assets/portraits/feynman.jpg", pos: "50% 38%", credit: "WIKIMEDIA" },
+  bohr: { src: "./assets/portraits/bohr.jpg", pos: "50% 35%", credit: "WIKIMEDIA" },
+  einstein: { src: "./assets/portraits/einstein.jpg", pos: "50% 42%", credit: "WIKIMEDIA" },
+  fermi: { src: "./assets/portraits/fermi.jpg", pos: "50% 38%", credit: "WIKIMEDIA" },
+  pauli: { src: "./assets/portraits/pauli.jpg", pos: "50% 34%", credit: "WIKIMEDIA" },
+  millikan: { src: "./assets/portraits/millikan.jpg", pos: "50% 38%", credit: "WIKIMEDIA" },
+  schrodinger: { src: "./assets/portraits/schrodinger.jpg", pos: "50% 37%", credit: "WIKIMEDIA" },
+  franklin: { src: "./assets/portraits/franklin.jpg", pos: "50% 40%", credit: "WIKIMEDIA" },
+  maxwell: { src: "./assets/portraits/maxwell.jpg", pos: "50% 34%", credit: "WIKIMEDIA" },
+  dirac: { src: "./assets/portraits/dirac.jpg", pos: "50% 36%", credit: "WIKIMEDIA" },
+  curie: { src: "./assets/portraits/curie.jpg", pos: "50% 36%", credit: "WIKIMEDIA" },
+  vonneumann: { src: "./assets/portraits/vonneumann.gif", pos: "50% 38%", credit: "WIKIMEDIA" },
+  wood: { src: "./assets/portraits/wood.jpg", pos: "50% 40%", credit: "WIKIMEDIA" },
+  lorentz: { src: "./assets/portraits/lorentz.jpg", pos: "50% 34%", credit: "WIKIMEDIA" },
+  planck: { src: "./assets/portraits/planck.jpg", pos: "50% 38%", credit: "WIKIMEDIA" },
+  galileo: { src: "./assets/portraits/galileo.jpg", pos: "50% 33%", credit: "WIKIMEDIA" },
+  sagan: { src: "./assets/portraits/sagan.jpg", pos: "50% 36%", credit: "WIKIMEDIA" },
+  wu: { src: "./assets/portraits/wu.jpg", pos: "50% 38%", credit: "WIKIMEDIA" },
+  hawking: { src: "./assets/portraits/hawking.jpg", pos: "50% 36%", credit: "WIKIMEDIA" },
+  heisenberg: { src: "./assets/portraits/heisenberg.jpg", pos: "50% 36%", credit: "WIKIMEDIA" }
+};

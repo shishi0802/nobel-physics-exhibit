@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>光与微缩展厅 · Anti-Counterfeit Microscope</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23020202'/%3E%3Cpath d='M10 40h44M18 24h28M24 12h16' stroke='%23d8c07a' stroke-width='3'/%3E%3Ccircle cx='32' cy='40' r='5' fill='%238fddea'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./base.css" />
+  <style>
+.chamber {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      min-width: 1080px;
+      min-height: 720px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 54% 40%, rgba(216,192,122,.11), transparent 17%),
+        radial-gradient(circle at 45% 62%, rgba(143,221,234,.08), transparent 27%),
+        linear-gradient(180deg, #080807 0%, #020202 66%, #000 100%);
+    }
+    .grain {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      opacity: .13;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E");
+    }
+    .wall {
+      position: absolute;
+      left: 10vw;
+      right: 10vw;
+      top: 8vh;
+      height: 66vh;
+      background: linear-gradient(180deg, rgba(17,17,16,.94), rgba(4,4,4,.96));
+      border-top: 1px solid rgba(238,233,220,.07);
+      box-shadow: inset 0 0 160px rgba(255,255,255,.018), 0 46px 160px rgba(0,0,0,.72);
+      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    }
+    .light {
+      position: absolute;
+      left: 50%;
+      top: 3vh;
+      width: 62vw;
+      height: 72vh;
+      transform: translateX(-50%);
+      background: conic-gradient(from 180deg at 50% 0%, transparent 0 35%, rgba(216,192,122,.12) 44%, rgba(143,221,234,.09) 50%, rgba(216,192,122,.12) 56%, transparent 65% 100%);
+      filter: blur(20px);
+      opacity: .70;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+    .topline {
+      position: absolute;
+      left: clamp(40px, 5vw, 80px);
+      right: clamp(40px, 5vw, 80px);
+      top: 34px;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      color: #8d887f;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .15em;
+    }
+    .topline a { color: #d9cfb2; }
+    .title {
+      position: absolute;
+      left: clamp(48px, 6vw, 90px);
+      top: clamp(88px, 14vh, 142px);
+      z-index: 8;
+      width: min(410px, 31vw);
+    }
+    .kicker {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .18em;
+      margin-bottom: 24px;
+    }
+    h1 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(38px, 4.2vw, 58px);
+      line-height: 1.04;
+      letter-spacing: 0;
+      text-wrap: pretty;
+    }
+    .title p {
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.85;
+      text-wrap: pretty;
+    }
+    .stage {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(52vw, 760px);
+      height: min(58vh, 590px);
+      transform: translate(-56%, -41%);
+      z-index: 4;
+      transition: width .55s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1), opacity .45s ease;
+    }
+    .bill-rig {
+      position: absolute;
+      left: 50%;
+      top: 52%;
+      width: min(540px, 42vw);
+      aspect-ratio: 1200 / 505;
+      transform: translate(-50%, -50%) rotateX(48deg) rotateZ(-8deg);
+      transform-style: preserve-3d;
+      filter: drop-shadow(0 56px 80px rgba(0,0,0,.64));
+      transition: width .55s cubic-bezier(.22,1,.36,1), filter .55s ease;
+    }
+    .bill {
+      position: absolute;
+      inset: 0;
+      background-image: url("./assets/currency/usd-100-front.jpg");
+      background-size: 100% 100%;
+      background-position: center;
+      overflow: hidden;
+      opacity: .88;
+      filter: saturate(.72) contrast(1.05) brightness(.86);
+    }
+    .bill::before {
+      content: "SPECIMEN · EDUCATIONAL DISPLAY";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: rgba(80, 20, 20, .36);
+      font-family: var(--mono);
+      font-size: clamp(24px, 4vw, 58px);
+      letter-spacing: .12em;
+      transform: rotate(-17deg);
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+    .bill::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: var(--overlay-opacity, .12);
+      background:
+        linear-gradient(100deg, transparent 0 43%, rgba(143,221,234,.45) 47%, rgba(216,192,122,.20) 50%, rgba(143,221,234,.36) 53%, transparent 57%),
+        radial-gradient(circle at 79% 67%, rgba(121,216,166,.38), transparent 12%);
+      mix-blend-mode: screen;
+      transform: translateX(var(--tilt-shift, 0));
+      transition: opacity .25s;
+    }
+    .bill-mark {
+      position: absolute;
+      pointer-events: none;
+      opacity: var(--mark-opacity, .18);
+      mix-blend-mode: screen;
+      transition: opacity .25s ease, transform .25s ease, filter .25s ease;
+    }
+    .mark-ribbon {
+      left: 46.2%;
+      top: 17%;
+      width: 7.2%;
+      height: 66%;
+      background:
+        repeating-linear-gradient(180deg, rgba(143,221,234,.84) 0 7px, rgba(216,192,122,.22) 7px 14px),
+        linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+      filter: blur(.15px) drop-shadow(0 0 16px rgba(143,221,234,.42));
+      transform: translateX(calc(var(--tilt-shift, 0) * .55)) skewX(calc(var(--angle-skew, 0deg)));
+    }
+    .mark-ink {
+      right: 13.5%;
+      bottom: 21%;
+      width: 10%;
+      height: 13%;
+      border-radius: 42%;
+      background: radial-gradient(circle, rgba(121,216,166,.80), rgba(216,192,122,.30) 48%, transparent 72%);
+      transform: translateX(calc(var(--tilt-shift, 0) * -.35)) scale(calc(1 + var(--angle-abs, 0) * .08));
+      filter: hue-rotate(calc(var(--angle-hue, 0deg))) drop-shadow(0 0 18px rgba(121,216,166,.36));
+    }
+    .mark-watermark {
+      left: 18%;
+      top: 25%;
+      width: 17%;
+      height: 38%;
+      border-radius: 50%;
+      background:
+        radial-gradient(ellipse at 48% 38%, rgba(238,233,220,.56), transparent 38%),
+        radial-gradient(ellipse at 52% 70%, rgba(238,233,220,.25), transparent 44%);
+      opacity: var(--watermark-opacity, .08);
+      filter: blur(1.2px);
+    }
+    .mark-thread {
+      left: 53.8%;
+      top: 16%;
+      width: 1.4%;
+      height: 70%;
+      background: linear-gradient(180deg, transparent, rgba(184,156,255,.88), rgba(143,221,234,.58), transparent);
+      opacity: var(--thread-opacity, .10);
+      filter: drop-shadow(0 0 12px rgba(184,156,255,.70));
+    }
+    .mark-microprint {
+      left: 50%;
+      top: 59%;
+      width: 19%;
+      height: 7%;
+      background:
+        repeating-linear-gradient(90deg, rgba(238,233,220,.62) 0 2px, transparent 2px 5px),
+        repeating-linear-gradient(0deg, transparent 0 7px, rgba(143,221,234,.22) 7px 8px);
+      opacity: var(--microprint-opacity, .12);
+      transform: translateX(calc(var(--tilt-shift, 0) * .12));
+    }
+    .uv .bill {
+      filter: saturate(.35) contrast(1.25) brightness(.46);
+    }
+    .uv .bill::after {
+      opacity: .82;
+      background:
+        linear-gradient(90deg, transparent 0 47%, rgba(184,156,255,.78) 49%, transparent 51%),
+        radial-gradient(circle at 80% 66%, rgba(121,216,166,.62), transparent 14%);
+      mix-blend-mode: screen;
+    }
+    .transmit .bill {
+      filter: saturate(.45) contrast(.92) brightness(1.12);
+      opacity: .66;
+    }
+    .transmit .bill::after {
+      opacity: .72;
+      background:
+        radial-gradient(ellipse at 24% 47%, rgba(238,233,220,.50), transparent 18%),
+        linear-gradient(90deg, transparent 0 50%, rgba(238,233,220,.34) 51%, transparent 54%);
+      mix-blend-mode: screen;
+    }
+    .hotspot {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border: 1px solid rgba(238,233,220,.55);
+      border-radius: 50%;
+      background: rgba(0,0,0,.18);
+      box-shadow: 0 0 26px rgba(216,192,122,.30);
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      z-index: 4;
+    }
+    .hotspot.active {
+      border-color: var(--gold);
+      background: rgba(216,192,122,.20);
+    }
+    .scope {
+      position: absolute;
+      left: var(--mx, 52%);
+      top: var(--my, 48%);
+      width: 142px;
+      height: 142px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 12;
+      pointer-events: none;
+      border: 0;
+      box-shadow: 0 18px 70px rgba(0,0,0,.42), inset 0 0 26px rgba(0,0,0,.20);
+      overflow: hidden;
+      opacity: 0;
+      clip-path: circle(48% at 50% 50%);
+      transition: opacity .22s ease;
+    }
+    .scope.active { opacity: .88; }
+    .scope-view {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(238,233,220,.10) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(238,233,220,.10) 1px, transparent 1px),
+        url("./assets/currency/usd-100-front.jpg");
+      background-size:
+        18px 18px,
+        18px 18px,
+        calc(760px * var(--zoom, 3.5)) calc(319.833px * var(--zoom, 3.5));
+      background-position:
+        center,
+        center,
+        var(--bx, 50%) var(--by, 50%);
+      filter: contrast(1.25) saturate(.72) brightness(.94);
+    }
+    .scope-view::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, transparent 0 58%, rgba(0,0,0,.42) 100%);
+      pointer-events: none;
+    }
+    .scope-view::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(16deg, rgba(238,233,220,.24) 0 1px, transparent 1px 8px),
+        radial-gradient(circle at 45% 42%, rgba(143,221,234,.24), transparent 36%);
+      mix-blend-mode: screen;
+      opacity: .55;
+    }
+    .controls {
+      position: absolute;
+      right: clamp(46px, 5vw, 86px);
+      bottom: clamp(78px, 11vh, 118px);
+      width: min(420px, 31vw);
+      z-index: 11;
+      border-top: 1px solid rgba(238,233,220,.18);
+      padding-top: 18px;
+    }
+    .observe-launch {
+      width: 100%;
+      min-height: 42px;
+      margin: 0 0 20px;
+      border: 0;
+      border-top: 1px solid rgba(216,192,122,.30);
+      border-bottom: 1px solid rgba(238,233,220,.08);
+      background:
+        linear-gradient(90deg, transparent, rgba(216,192,122,.075) 46%, rgba(143,221,234,.035) 54%, transparent);
+      color: rgba(238,233,220,.82);
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      transition: background .24s ease, color .24s ease, transform .24s ease, border-color .24s ease;
+    }
+    .observe-launch:hover {
+      color: var(--ink);
+      border-top-color: rgba(238,233,220,.42);
+      background:
+        linear-gradient(90deg, transparent, rgba(216,192,122,.13) 46%, rgba(143,221,234,.055) 54%, transparent);
+      transform: translateY(-1px);
+    }
+    .modes {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      background: transparent;
+      margin-bottom: 22px;
+      border-top: 1px solid rgba(238,233,220,.16);
+      border-bottom: 1px solid rgba(238,233,220,.09);
+    }
+    .mode, .tool-toggle {
+      border: 0;
+      background: rgba(238,233,220,.018);
+      color: rgba(238,233,220,.46);
+      min-height: 48px;
+      cursor: pointer;
+      font-size: 12px;
+      letter-spacing: .10em;
+      position: relative;
+      transition: color .22s ease, background .22s ease;
+    }
+    .mode + .mode { border-left: 1px solid rgba(238,233,220,.08); }
+    .mode::after, .tool-toggle::after {
+      content: "";
+      position: absolute;
+      left: 18%;
+      right: 18%;
+      bottom: 0;
+      height: 1px;
+      background: rgba(216,192,122,.70);
+      transform: scaleX(0);
+      transform-origin: 50% 50%;
+      transition: transform .24s ease;
+    }
+    .mode.active {
+      color: var(--ink);
+      background: linear-gradient(180deg, rgba(238,233,220,.055), rgba(238,233,220,.018));
+    }
+    .mode.active::after, .tool-toggle.active::after {
+      transform: scaleX(1);
+    }
+    .tool-toggle {
+      width: 100%;
+      margin: -4px 0 18px;
+      border-top: 1px solid rgba(143,221,234,.25);
+      border-bottom: 1px solid rgba(143,221,234,.08);
+      color: rgba(184,215,217,.70);
+      background: linear-gradient(90deg, transparent, rgba(143,221,234,.050), transparent);
+    }
+    .tool-toggle.active {
+      color: var(--ink);
+      background: linear-gradient(90deg, transparent, rgba(143,221,234,.11), transparent);
+    }
+    .control-row {
+      display: grid;
+      grid-template-columns: 118px 1fr;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .control-row label {
+      color: #777168;
+      font-size: 12px;
+      letter-spacing: .08em;
+    }
+    .panel-hint {
+      margin: -4px 0 18px;
+      color: #807970;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    input[type=range] {
+      appearance: none;
+      width: 100%;
+      height: 30px;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan), rgba(238,233,220,.18), var(--gold));
+    }
+    input[type=range]::-webkit-slider-thumb {
+      appearance: none;
+      width: 17px;
+      height: 17px;
+      margin-top: -7.5px;
+      border-radius: 50%;
+      border: 1px solid #050505;
+      background: var(--ink);
+      box-shadow: 0 0 26px rgba(238,233,220,.34);
+    }
+    .readout {
+      color: #928b80;
+      font-size: 13px;
+      line-height: 1.75;
+    }
+    .readout b { color: #eee4c7; font-weight: 500; }
+    .readout .source {
+      display: block;
+      margin-top: 10px;
+      color: #6e675f;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .08em;
+    }
+    .inscription {
+      position: absolute;
+      left: clamp(48px, 6vw, 90px);
+      bottom: clamp(44px, 7vh, 82px);
+      width: min(430px, 34vw);
+      z-index: 9;
+      border-top: 1px solid rgba(238,233,220,.16);
+      padding-top: 16px;
+      color: #827b71;
+      font-family: var(--serif);
+      font-size: 13px;
+      line-height: 1.85;
+    }
+    .inscription span {
+      display: block;
+      margin-top: 10px;
+      color: #6f685f;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .12em;
+    }
+    .navline {
+      position: absolute;
+      left: clamp(40px, 5vw, 80px);
+      right: clamp(40px, 5vw, 80px);
+      bottom: 28px;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      color: #6d675f;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .13em;
+    }
+    .navline a { color: #a79d86; }
+    .topline, .title, .controls, .inscription, .navline {
+      transition: opacity .46s ease, filter .46s ease, transform .46s cubic-bezier(.22,1,.36,1);
+    }
+    .observe-tools {
+      position: absolute;
+      top: clamp(34px, 5vh, 54px);
+      right: clamp(42px, 5vw, 78px);
+      z-index: 32;
+      display: flex;
+      gap: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity .46s ease, transform .46s cubic-bezier(.22,1,.36,1);
+    }
+    .observe-tool.exit {
+      min-width: 82px;
+      color: rgba(238,233,220,.56);
+    }
+    .observe-tool {
+      min-width: 92px;
+      min-height: 38px;
+      border: 0;
+      border-top: 1px solid rgba(238,233,220,.18);
+      border-bottom: 1px solid rgba(238,233,220,.06);
+      background: linear-gradient(90deg, rgba(3,3,3,.12), rgba(238,233,220,.045), rgba(3,3,3,.12));
+      color: rgba(238,233,220,.72);
+      backdrop-filter: blur(14px);
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .08em;
+      transition: color .2s ease, background .2s ease, border-color .2s ease;
+    }
+    .observe-tool:hover,
+    .observe-tool.active {
+      color: var(--ink);
+      border-top-color: rgba(216,192,122,.40);
+      background: linear-gradient(90deg, rgba(3,3,3,.12), rgba(216,192,122,.10), rgba(3,3,3,.12));
+    }
+    .chamber.observing .topline,
+    .chamber.observing .title,
+    .chamber.observing .controls,
+    .chamber.observing .inscription,
+    .chamber.observing .navline {
+      opacity: 0;
+      filter: blur(8px);
+      pointer-events: none;
+    }
+    .chamber.observing .title { transform: translateY(-16px); }
+    .chamber.observing .controls { transform: translateY(16px); }
+    .chamber.observing .stage {
+      width: min(78vw, 1180px);
+      transform: translate(-50%, -52%);
+      z-index: 16;
+    }
+    .chamber.observing .bill-rig {
+      width: min(880px, 72vw);
+      filter: drop-shadow(0 70px 110px rgba(0,0,0,.74));
+    }
+    .chamber.observing .observe-tools {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    .portal-transition {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0;
+      background: #000;
+    }
+    .portal-transition.active { opacity: 1; animation: portalBlackout .92s cubic-bezier(.76,0,.24,1) forwards; }
+    .portal-transition::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 10vmin;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%) scale(.08);
+      border-radius: 50%;
+      border: 1px solid rgba(238,233,220,.72);
+      box-shadow: 0 0 90px rgba(238,233,220,.30), inset 0 0 38px rgba(143,221,234,.20);
+      opacity: 0;
+    }
+    .portal-transition.active::before { animation: portalOpen .82s cubic-bezier(.16,1,.3,1) forwards; }
+    @keyframes portalOpen {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(.08); }
+      18% { opacity: 1; }
+      100% { opacity: .18; transform: translate(-50%, -50%) scale(24); }
+    }
+    @keyframes portalBlackout {
+      0% { background: rgba(0,0,0,0); }
+      62% { background: rgba(0,0,0,.26); }
+      100% { background: rgba(0,0,0,1); }
+    }
+  </style>
+  <link rel="stylesheet" href="./gallery-transition.css" />
+  <link rel="stylesheet" href="./ambient-audio.css?v=20260630-audio5" />
+</head>
+<body class="is-entering" data-ambient-scene="light">
+  <main class="chamber" id="chamber">
+    <div class="wall"></div>
+    <div class="light"></div>
+    <div class="grain"></div>
+    <header class="topline">
+      <a href="./hall.html" data-transition>← HALL</a>
+      <span>EXHIBIT 06 · LIGHT & MICRO</span>
+    </header>
+    <section class="title">
+      <div class="kicker">EXHIBIT 06 · 光与微缩</div>
+      <h1>防伪显微台</h1>
+      <p>纸币表面集合了微透镜、结构色、透光水印与材料荧光。移动镜头、改变倾斜角、切换紫外与透光条件，观察复制机难以同时复现的光谱和微结构。</p>
+    </section>
+    <section class="stage" id="stage">
+      <div class="bill-rig" id="billRig">
+        <div class="bill" id="bill">
+          <i class="bill-mark mark-ribbon" aria-hidden="true"></i>
+          <i class="bill-mark mark-ink" aria-hidden="true"></i>
+          <i class="bill-mark mark-watermark" aria-hidden="true"></i>
+          <i class="bill-mark mark-thread" aria-hidden="true"></i>
+          <i class="bill-mark mark-microprint" aria-hidden="true"></i>
+        </div>
+        <button class="hotspot active" style="left:50%;top:45%" data-feature="ribbon" type="button" aria-label="安全条带"></button>
+        <button class="hotspot" style="left:80%;top:68%" data-feature="ink" type="button" aria-label="变色墨水"></button>
+        <button class="hotspot" style="left:31%;top:43%" data-feature="watermark" type="button" aria-label="水印"></button>
+        <button class="hotspot" style="left:57%;top:63%" data-feature="microprint" type="button" aria-label="微缩文字"></button>
+        <button class="hotspot" style="left:55%;top:28%" data-feature="thread" type="button" aria-label="安全线"></button>
+      </div>
+      <div class="scope" id="scope"><div class="scope-view" id="scopeView"></div></div>
+    </section>
+    <section class="controls">
+      <button class="observe-launch" id="observeLaunch" type="button">进入观察模式</button>
+      <div class="modes">
+        <button class="mode active" data-mode="visible" type="button">可见光</button>
+        <button class="mode" data-mode="tilt" type="button">倾斜</button>
+        <button class="mode" data-mode="uv" type="button">紫外</button>
+        <button class="mode" data-mode="transmit" type="button">透光</button>
+      </div>
+      <button class="tool-toggle" id="microscopeToggle" type="button">开启显微镜</button>
+      <p class="panel-hint">点击纸币上的防伪区域，再切换观察条件。显微镜是独立工具，开启后移动鼠标查看局部线条、纤维和微结构。</p>
+      <div class="control-row">
+        <label for="zoomSlider">放大倍率</label>
+        <input id="zoomSlider" type="range" min="2" max="9" value="4.6" step=".01" />
+      </div>
+      <div class="control-row">
+        <label for="angleSlider">倾斜角度</label>
+        <input id="angleSlider" type="range" min="-2" max="2" value="0" step=".001" />
+      </div>
+      <div class="readout" id="readout"></div>
+    </section>
+    <aside class="inscription">
+      物体的颜色并不在物体之中，而在光与眼的关系之中。
+      <span>约翰·洛克</span>
+    </aside>
+    <nav class="navline">
+      <a href="./imaging-gallery.html" data-transition>← IMAGING</a>
+      <a href="./time-resonance-gallery.html" data-transition>NEXT · TIME</a>
+      <a href="./hall.html" data-transition>BACK TO HALL</a>
+    </nav>
+    <div class="observe-tools" aria-label="观察模式工具">
+      <button class="observe-tool" id="observeMicroscope" type="button">显微镜</button>
+      <button class="observe-tool exit" id="observeExit" type="button">退出</button>
+    </div>
+    <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
+  </main>
+
+  <script>
+    const chamber = document.getElementById("chamber");
+    const stage = document.getElementById("stage");
+    const billRig = document.getElementById("billRig");
+    const bill = document.getElementById("bill");
+    const scope = document.getElementById("scope");
+    const scopeView = document.getElementById("scopeView");
+    const zoomSlider = document.getElementById("zoomSlider");
+    const angleSlider = document.getElementById("angleSlider");
+    const readout = document.getElementById("readout");
+    const observeLaunch = document.getElementById("observeLaunch");
+    const observeExit = document.getElementById("observeExit");
+    const microscopeToggle = document.getElementById("microscopeToggle");
+    const observeMicroscope = document.getElementById("observeMicroscope");
+    let mode = "visible";
+    let feature = "ribbon";
+    let zoom = 4.6;
+    let angle = 0;
+    let microscopeOn = false;
+    let pointer = { x: .52, y: .48 };
+
+    const features = {
+      ribbon: {
+        title: "3-D 安全条带",
+        copy: "蓝色安全条带利用微透镜阵列制造运动视差。倾斜时，条带里的钟形图案和 100 字样会呈现相对移动。",
+        physics: "微光学阵列 / 运动视差 / 角度选择"
+      },
+      ink: {
+        title: "变色墨水",
+        copy: "右下角的墨水区域在不同观察角下改变颜色。微结构和薄膜会选择性反射不同波长，让颜色随视角漂移。",
+        physics: "结构色 / 薄膜干涉 / 波长选择"
+      },
+      watermark: {
+        title: "水印与透光",
+        copy: "把纸币放到透光环境下，纸张厚度和纤维密度差异会显出隐约图像。它利用的是吸收、散射和透射强度的空间分布。",
+        physics: "透射成像 / 散射 / 材料密度"
+      },
+      microprint: {
+        title: "微缩文字",
+        copy: "微缩文字依赖高精度制版和印刷。扫描复制会损失边缘锐度，显微镜下能看到普通打印难以保留的线条和断裂特征。",
+        physics: "显微成像 / 分辨率 / 调制传递"
+      },
+      thread: {
+        title: "安全线",
+        copy: "安全线埋入纸张内部，在透光或紫外环境下显现。它把光谱响应、材料位置和纸张结构绑定在一起。",
+        physics: "荧光响应 / 透光检测 / 材料防伪"
+      }
+    };
+
+    function setMode(next) {
+      mode = next;
+      chamber.classList.toggle("uv", mode === "uv");
+      chamber.classList.toggle("transmit", mode === "transmit");
+      document.querySelectorAll(".mode").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === mode));
+      updateView();
+    }
+
+    function setMicroscope(active) {
+      microscopeOn = active;
+      scope.classList.toggle("active", microscopeOn);
+      microscopeToggle.classList.toggle("active", microscopeOn);
+      observeMicroscope.classList.toggle("active", microscopeOn);
+      microscopeToggle.textContent = microscopeOn ? "关闭显微镜" : "开启显微镜";
+      observeMicroscope.textContent = microscopeOn ? "关闭显微镜" : "显微镜";
+      updateView();
+    }
+
+    function setObserving(active) {
+      chamber.classList.toggle("observing", active);
+      if (active) setMicroscope(false);
+    }
+
+    function setFeature(next) {
+      feature = next;
+      document.querySelectorAll(".hotspot").forEach(btn => btn.classList.toggle("active", btn.dataset.feature === feature));
+      const target = {
+        ribbon: [.50, .45],
+        ink: [.80, .68],
+        watermark: [.31, .43],
+        microprint: [.57, .63],
+        thread: [.55, .28]
+      }[feature];
+      pointer = { x: target[0], y: target[1] };
+      updateView();
+    }
+
+    function updateView() {
+      zoom = parseFloat(zoomSlider.value);
+      angle = parseFloat(angleSlider.value);
+      const x = pointer.x * 100;
+      const y = pointer.y * 100;
+      const absAngle = Math.abs(angle);
+      scope.style.setProperty("--mx", `${x}%`);
+      scope.style.setProperty("--my", `${y}%`);
+      scopeView.style.setProperty("--zoom", zoom.toFixed(2));
+      scopeView.style.setProperty("--bx", `${x}%`);
+      scopeView.style.setProperty("--by", `${y}%`);
+      bill.style.setProperty("--tilt-shift", `${angle * 46}px`);
+      bill.style.setProperty("--angle-skew", `${angle * 7}deg`);
+      bill.style.setProperty("--angle-hue", `${angle * 54}deg`);
+      bill.style.setProperty("--angle-abs", absAngle.toFixed(3));
+      bill.style.setProperty("--overlay-opacity", mode === "tilt" ? .68 : mode === "visible" ? .10 : .30);
+      bill.style.setProperty("--mark-opacity", mode === "visible" ? .12 : .34 + absAngle * .10);
+      bill.style.setProperty("--watermark-opacity", mode === "transmit" ? .62 : mode === "visible" ? .06 : .18);
+      bill.style.setProperty("--thread-opacity", mode === "uv" || mode === "transmit" ? .82 : .12);
+      bill.style.setProperty("--microprint-opacity", microscopeOn ? Math.min(.72, .22 + zoom * .065) : .12);
+      billRig.style.transform = `translate(-50%, -50%) rotateX(${48 - angle * 14}deg) rotateY(${angle * 14}deg) rotateZ(${-8 + angle * 8}deg)`;
+      const f = features[feature];
+      const modeCopy = {
+        visible: "可见光下先定位防伪区域。",
+        tilt: "倾斜模式改变观察角，突出角度依赖的光学效果。",
+        uv: "紫外模式模拟安全线与材料荧光。",
+        transmit: "透光模式模拟水印和埋入式安全线。"
+      };
+      const toolCopy = microscopeOn ? "显微镜已开启，移动鼠标检查局部细节。" : "可开启显微镜作为附加观察工具。";
+      readout.innerHTML = `<b>${f.title}</b>：${f.copy}<br>${modeCopy[mode]}${toolCopy}<span class="source">物理机制：${f.physics} · 图像来源：WIKIMEDIA COMMONS / 教育展示样张</span>`;
+    }
+
+    stage.addEventListener("pointermove", (event) => {
+      if (!microscopeOn) return;
+      const rect = stage.getBoundingClientRect();
+      pointer = {
+        x: Math.max(.08, Math.min(.92, (event.clientX - rect.left) / rect.width)),
+        y: Math.max(.12, Math.min(.86, (event.clientY - rect.top) / rect.height))
+      };
+      updateView();
+    });
+    document.querySelectorAll(".hotspot").forEach(btn => btn.addEventListener("click", () => setFeature(btn.dataset.feature)));
+    document.querySelectorAll(".mode").forEach(btn => btn.addEventListener("click", () => setMode(btn.dataset.mode)));
+    microscopeToggle.addEventListener("click", () => setMicroscope(!microscopeOn));
+    observeMicroscope.addEventListener("click", () => setMicroscope(!microscopeOn));
+    observeLaunch.addEventListener("click", () => setObserving(true));
+    observeExit.addEventListener("click", () => setObserving(false));
+    zoomSlider.addEventListener("input", updateView);
+    angleSlider.addEventListener("input", updateView);
+setFeature("ribbon");
+    setMode("visible");
+    setMicroscope(false);
+  </script>
+  <script src="./ambient-audio.js?v=20260630-audio5"></script>
+  <script src="./transition-nav.js"></script>
+</body>
+</html>

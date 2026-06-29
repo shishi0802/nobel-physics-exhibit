@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>你是哪位物理学家 · Atlas Test</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23020202'/%3E%3Ccircle cx='32' cy='32' r='22' fill='none' stroke='%23d8c07a' stroke-width='3'/%3E%3Cpath d='M20 34h24M32 20v24' stroke='%238fddea' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./base.css" />
+  <style>
+.test {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      min-width: 1080px;
+      min-height: 720px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 38%, rgba(216,192,122,.10), transparent 16%),
+        radial-gradient(circle at 60% 64%, rgba(143,221,234,.08), transparent 27%),
+        linear-gradient(180deg, #080807 0%, #020202 66%, #000 100%);
+    }
+    canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
+    .grain {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      opacity: .13;
+      mix-blend-mode: screen;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E");
+    }
+    .topline {
+      position: absolute;
+      left: clamp(40px, 5vw, 80px);
+      right: clamp(40px, 5vw, 80px);
+      top: 34px;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      color: #8d887f;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .15em;
+    }
+    .topline a { color: #d9cfb2; }
+    .stage {
+      position: absolute;
+      z-index: 6;
+      left: clamp(54px, 6vw, 92px);
+      top: clamp(96px, 15vh, 150px);
+      width: min(690px, 48vw);
+      transition: transform .42s cubic-bezier(.16,1,.3,1), opacity .32s;
+    }
+    .stage.question-mode {
+      top: clamp(88px, 12vh, 118px);
+      bottom: 86px;
+      display: grid;
+      grid-template-rows: auto minmax(92px, 128px) minmax(330px, 1fr);
+      align-content: start;
+      row-gap: 22px;
+      overflow: hidden;
+    }
+    .stage.switching { transform: translateX(-22px); opacity: 0; }
+    .kicker {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .18em;
+      margin-bottom: 24px;
+    }
+    h1, h2 {
+      margin: 0;
+      font-family: var(--serif);
+      line-height: 1.05;
+      letter-spacing: 0;
+      text-wrap: pretty;
+    }
+    h1 { font-size: clamp(54px, 5.8vw, 84px); }
+    h2 { font-size: clamp(36px, 4.2vw, 60px); }
+    .question-title {
+      align-self: start;
+      max-width: 660px;
+      overflow: hidden;
+      color: var(--ink);
+      font-size: clamp(27px, 2.35vw, 34px);
+      line-height: 1.24;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+    .lead, .question-text {
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.85;
+      text-wrap: pretty;
+    }
+    .start, .restart, .corridor-link {
+      margin-top: 30px;
+      border: 0;
+      border-top: 1px solid rgba(238,233,220,.26);
+      padding: 12px 0 0;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .14em;
+    }
+    .start { width: 190px; }
+    .answers {
+      margin-top: 34px;
+      display: grid;
+      gap: 1px;
+      background: rgba(238,233,220,.10);
+      border-top: 1px solid rgba(238,233,220,.16);
+    }
+    .stage.question-mode .kicker { margin-bottom: 0; }
+    .stage.question-mode .answers {
+      margin-top: 0;
+      height: 100%;
+      min-height: 318px;
+      max-height: 390px;
+      grid-template-rows: repeat(4, minmax(76px, 1fr));
+      align-self: start;
+      overflow: hidden;
+    }
+    .answer {
+      min-height: 74px;
+      border: 0;
+      background: rgba(4,4,3,.86);
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      padding: 17px 20px;
+      transition: transform .22s cubic-bezier(.16,1,.3,1), background .22s;
+    }
+    .stage.question-mode .answer {
+      min-height: 0;
+      padding: 13px 18px 12px;
+      overflow: hidden;
+    }
+    .answer:hover, .answer:focus-visible {
+      transform: translateX(6px);
+      background: rgba(22,22,20,.92);
+      outline: 0;
+    }
+    .answer small {
+      display: block;
+      color: #746e65;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .12em;
+      margin-bottom: 6px;
+    }
+    .answer span {
+      font-size: 15px;
+      line-height: 1.55;
+      color: #d8d1bf;
+    }
+    .stage.question-mode .answer span {
+      display: -webkit-box;
+      overflow: hidden;
+      font-size: 14px;
+      line-height: 1.48;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+    .panel {
+      position: absolute;
+      right: clamp(48px, 6vw, 92px);
+      top: clamp(118px, 18vh, 170px);
+      width: min(430px, 32vw);
+      z-index: 8;
+      border-top: 1px solid rgba(216,192,122,.30);
+      padding-top: 18px;
+    }
+    .progress {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .15em;
+      margin-bottom: 18px;
+    }
+    .meter {
+      height: 2px;
+      background: rgba(238,233,220,.10);
+      margin-bottom: 22px;
+    }
+    .meter i {
+      display: block;
+      height: 100%;
+      width: var(--w, 0%);
+      background: linear-gradient(90deg, var(--cyan), var(--gold));
+      transition: width .35s cubic-bezier(.16,1,.3,1);
+    }
+    .axis-row { margin-bottom: 17px; }
+    .axis-row label {
+      display: flex;
+      justify-content: space-between;
+      color: #8d867b;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .10em;
+      margin-bottom: 8px;
+    }
+    .axis-bar {
+      position: relative;
+      height: 2px;
+      background: rgba(238,233,220,.12);
+    }
+    .axis-bar::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -4px;
+      width: 1px;
+      height: 10px;
+      background: rgba(238,233,220,.20);
+    }
+    .axis-bar i {
+      position: absolute;
+      top: 0;
+      left: min(50%, var(--pos, 50%));
+      width: max(1px, var(--delta, 0%));
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan), var(--gold));
+      transform-origin: 0 50%;
+    }
+    .loading {
+      position: absolute;
+      inset: 0;
+      z-index: 30;
+      display: grid;
+      place-items: center;
+      background: rgba(0,0,0,.50);
+      backdrop-filter: blur(8px);
+    }
+    .loading[hidden] { display: none; }
+    .loading-core {
+      position: relative;
+      width: 340px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .14em;
+    }
+    .loading-core::before, .loading-core::after {
+      content: "";
+      position: absolute;
+      inset: 38px;
+      border-radius: 50%;
+      border: 1px solid rgba(238,233,220,.18);
+      animation: collapse 2.2s cubic-bezier(.16,1,.3,1) infinite;
+    }
+    .loading-core::after {
+      inset: 72px;
+      animation-delay: -.8s;
+      border-color: rgba(216,192,122,.22);
+    }
+    @keyframes collapse {
+      0% { transform: scale(1.2); opacity: 0; }
+      28% { opacity: 1; }
+      100% { transform: scale(.22); opacity: 0; }
+    }
+    .result-view {
+      position: absolute;
+      inset: 86px clamp(46px, 5vw, 86px) 72px clamp(54px, 6vw, 92px);
+      z-index: 9;
+      display: grid;
+      grid-template-columns: minmax(310px, 31vw) minmax(520px, 1fr);
+      gap: clamp(30px, 4vw, 56px);
+    }
+    .result-view[hidden] { display: none; }
+    .result-hero {
+      align-self: stretch;
+      border-top: 1px solid rgba(216,192,122,.30);
+      padding-top: 18px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      align-content: start;
+      overflow: hidden;
+    }
+    .result-id {
+      display: grid;
+      grid-template-columns: 112px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .result-portrait {
+      position: relative;
+      width: 112px;
+      height: 148px;
+      margin-bottom: 0;
+      background:
+        radial-gradient(circle at 50% 27%, rgba(238,233,220,.58), rgba(238,233,220,.12) 24%, transparent 43%),
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.02)),
+        #080808;
+      box-shadow: 0 34px 90px rgba(0,0,0,.46), inset 0 0 80px rgba(255,255,255,.025);
+      filter: grayscale(1);
+      display: grid;
+      place-items: center;
+      color: rgba(238,233,220,.24);
+      font-family: var(--serif);
+      font-size: 42px;
+      overflow: hidden;
+    }
+    .result-portrait img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: var(--photo-pos, 50% 50%);
+      opacity: .82;
+      filter: grayscale(1) contrast(.88) brightness(.76) sepia(.08);
+      transform: scale(1.035);
+    }
+    .result-portrait.has-image::after {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border: 1px solid rgba(238,233,220,.10);
+      background: linear-gradient(180deg, rgba(238,233,220,.08), transparent 25%, rgba(0,0,0,.26) 100%);
+    }
+    .result-hero h1 {
+      font-size: clamp(30px, 3vw, 44px);
+      line-height: 1.05;
+      margin-bottom: 8px;
+    }
+    .result-hero .lead {
+      margin-top: 0;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .result-totem {
+      margin: 14px 0 0;
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 13px;
+      align-items: center;
+      border-top: 1px solid rgba(238,233,220,.15);
+      padding-top: 12px;
+    }
+    .totem {
+      width: 48px;
+      height: 48px;
+      color: var(--gold);
+      filter: drop-shadow(0 0 22px rgba(216,192,122,.20));
+    }
+    .totem svg { width: 100%; height: 100%; display: block; }
+    .result-totem b {
+      display: block;
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .12em;
+      margin-bottom: 6px;
+    }
+    .result-totem span {
+      display: block;
+      color: #91887b;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .result-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      align-self: end;
+      margin-top: 12px;
+    }
+    .result-actions .restart,
+    .result-actions .corridor-link {
+      margin-top: 0;
+      width: 100%;
+      min-width: 0;
+      padding-inline: 12px;
+      letter-spacing: .12em;
+    }
+    .result-summary {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      align-content: stretch;
+      margin-top: 16px;
+    }
+    .summary-chip {
+      display: grid;
+      grid-template-columns: minmax(128px, .8fr) 1fr;
+      gap: 14px;
+      align-items: center;
+      color: #cfc4ad;
+      border-top: 1px solid rgba(238,233,220,.15);
+      padding: 8px 0 0;
+      font-family: var(--sans);
+      font-size: 13px;
+      line-height: 1.3;
+    }
+    .summary-chip b {
+      color: var(--gold);
+      font-family: var(--serif);
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.1;
+    }
+    .summary-chip small {
+      display: block;
+      margin-top: 0;
+      color: #726b62;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .08em;
+    }
+    .result-copy {
+      align-self: stretch;
+      overflow: auto;
+      padding-right: 18px;
+      scrollbar-color: rgba(216,192,122,.42) transparent;
+    }
+    .result-copy p {
+      color: #a29a8d;
+      line-height: 1.9;
+      font-size: 15px;
+      margin: 0 0 18px;
+      text-wrap: pretty;
+    }
+    .relic {
+      margin: 22px 0 24px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(238,233,220,.16);
+    }
+    .relic b {
+      display: block;
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .12em;
+      margin-bottom: 10px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .chip {
+      color: #bdb39d;
+      border-top: 1px solid rgba(238,233,220,.18);
+      padding-top: 6px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .10em;
+    }
+    .axis-copy {
+      display: block;
+      color: #c8beaa;
+      font-family: var(--sans);
+      font-size: 12px;
+      letter-spacing: 0;
+    }
+    .axis-copy small {
+      display: block;
+      margin-top: 3px;
+      color: #746e65;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: .08em;
+    }
+    .inscription {
+      position: absolute;
+      left: clamp(54px, 6vw, 92px);
+      bottom: clamp(62px, 10vh, 110px);
+      z-index: 8;
+      width: min(430px, 34vw);
+      border-top: 1px solid rgba(238,233,220,.16);
+      padding-top: 16px;
+      color: #827b71;
+      font-family: var(--serif);
+      font-size: 13px;
+      line-height: 1.85;
+      transition: opacity .4s ease;
+    }
+    .inscription.hidden-by-stage {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .inscription .label {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      margin-bottom: 10px;
+    }
+    .quote, .source { transition: opacity .35s ease; }
+    .source {
+      margin-top: 10px;
+      color: #6f685f;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .12em;
+    }
+    .quote.fade, .source.fade { opacity: 0; }
+    .navline {
+      position: absolute;
+      left: clamp(40px, 5vw, 80px);
+      right: clamp(40px, 5vw, 80px);
+      bottom: 28px;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      color: #6d675f;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .13em;
+    }
+    .navline a { color: #a79d86; }
+    .portal-transition {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0;
+      background: #000;
+    }
+    .portal-transition.active { opacity: 1; animation: walkBlackout .96s cubic-bezier(.76,0,.24,1) forwards; }
+    .portal-transition::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 10vmin;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%) scale(.08);
+      border-radius: 50%;
+      border: 1px solid rgba(238,233,220,.72);
+      box-shadow: 0 0 90px rgba(238,233,220,.30), inset 0 0 38px rgba(143,221,234,.20);
+      opacity: 0;
+    }
+    .portal-transition.active::before { animation: portalOpen .82s cubic-bezier(.16,1,.3,1) forwards; }
+    @keyframes portalOpen {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(.08); }
+      18% { opacity: 1; }
+      100% { opacity: .18; transform: translate(-50%, -50%) scale(24); }
+    }
+    @keyframes portalBlackout {
+      0% { background: rgba(0,0,0,0); }
+      62% { background: rgba(0,0,0,.26); }
+      100% { background: rgba(0,0,0,1); }
+    }
+      body.is-entering::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 99;
+      pointer-events: none;
+      background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.045) 34%, rgba(3,3,2,.28) 100%);
+      animation: pageReveal .72s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    body.is-leaving main > :not(.portal-transition) {
+      opacity: .72;
+      filter: none !important;
+      transition: opacity .52s cubic-bezier(.22,1,.36,1);
+    }
+    .portal-transition.active { opacity: 1; animation: pageVeil .52s cubic-bezier(.22,1,.36,1) forwards !important; }
+    .portal-transition.active::before { animation: none !important; opacity: 0 !important; transform: none !important; }
+    @keyframes pageVeil {
+      0% { background: rgba(0,0,0,0); }
+      100% { background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.050) 36%, rgba(3,3,2,.18) 100%); }
+    }
+     @keyframes pageReveal {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+  </style>
+  <link rel="stylesheet" href="./gallery-transition.css" />
+  <link rel="stylesheet" href="./ambient-audio.css?v=20260630-audio5" />
+</head>
+<body class="is-entering" data-ambient-scene="test">
+  <main class="test">
+    <canvas id="testCanvas"></canvas>
+    <div class="grain"></div>
+    <header class="topline">
+      <a href="./hall.html" data-transition>← HALL</a>
+      <span>EXHIBIT 01 · PHYSICIST TYPE</span>
+    </header>
+    <section class="stage" id="stage"></section>
+    <aside class="panel" id="panel"></aside>
+    <section class="result-view" id="resultView" hidden></section>
+    <section class="loading" id="loading" hidden>
+      <div class="loading-core" id="loadingText">正在观测你的叠加态……</div>
+    </section>
+    <aside class="inscription" data-inscription-topic="test">
+      <div class="label">PHILOSOPHICAL INSCRIPTION</div>
+      <div class="quote"></div>
+      <div class="source"></div>
+    </aside>
+    <nav class="navline">
+      <a href="./physicist-corridor.html" data-transition>ATLAS CORRIDOR</a>
+      <a href="./hall.html" data-transition>BACK TO HALL</a>
+    </nav>
+    <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
+  </main>
+
+  <script src="./physicist-data.js"></script>
+  <script src="./physicist-portraits.js"></script>
+  <script src="./philosophy-inscriptions.js"></script>
+  <script src="./ambient-audio.js?v=20260630-audio5"></script>
+  <script>
+    const atlas = window.PhysicistAtlasData;
+    const portraitPhotos = window.PhysicistPortraits || {};
+    const storageKey = "physicistAtlas:v1";
+    const axes = [
+      { id: "method", left: "E", right: "T", label: "方法论", pair: "实验操作 / 理论推演", en: "EXPERIMENT / THEORY", leftName: "实验操作", rightName: "理论推演" },
+      { id: "style", left: "L", right: "I", label: "思维流派", pair: "严谨逻辑 / 直觉飞跃", en: "LOGIC / INTUITION", leftName: "严谨逻辑", rightName: "直觉飞跃" },
+      { id: "world", left: "C", right: "Q", label: "宇宙观", pair: "决定秩序 / 概率宇宙", en: "CLASSICAL / QUANTUM", leftName: "决定秩序", rightName: "概率宇宙" },
+      { id: "ecology", left: "S", right: "Le", label: "工作生态", pair: "孤狼学者 / 团队领袖", en: "SOLO / LEADER", leftName: "孤狼学者", rightName: "团队领袖" },
+      { id: "life", left: "R", right: "A", label: "生活做派", pair: "传统刻苦 / 跨界整活", en: "RIGOR / ABSTRACT", leftName: "传统刻苦", rightName: "跨界整活" }
+    ];
+    const scoreKeys = ["T", "E", "I", "L", "Q", "C", "S", "Le", "A", "R"];
+    const loadingLines = [
+      "正在观测你的叠加态……",
+      "计算费米分布中……",
+      "排查微波炉干扰……",
+      "量子退相干进行中……",
+      "等待波函数坍缩……"
+    ];
+    const stage = document.getElementById("stage");
+    const panel = document.getElementById("panel");
+    const resultView = document.getElementById("resultView");
+    const loading = document.getElementById("loading");
+    const loadingText = document.getElementById("loadingText");
+    const canvas = document.getElementById("testCanvas");
+    const ctx = canvas.getContext("2d");
+    let step = -1;
+    let scores = freshScores();
+    let t = 0;
+
+    function freshScores() {
+      return Object.fromEntries(scoreKeys.map(key => [key, 0]));
+    }
+
+    function readAtlasState() {
+      try {
+        return JSON.parse(localStorage.getItem(storageKey)) || { unlocked: [], totalTests: 0, lastResult: null, unlockedAt: {} };
+      } catch {
+        return { unlocked: [], totalTests: 0, lastResult: null, unlockedAt: {} };
+      }
+    }
+
+    function writeAtlasState(resultId) {
+      const state = readAtlasState();
+      const isNew = !state.unlocked.includes(resultId);
+      if (isNew) {
+        state.unlocked.push(resultId);
+        state.unlockedAt[resultId] = new Date().toISOString();
+      }
+      state.totalTests += 1;
+      state.lastResult = resultId;
+      localStorage.setItem(storageKey, JSON.stringify(state));
+      return isNew;
+    }
+
+    function signedAxis(axis, source = scores) {
+      return (source[axis.right] || 0) - (source[axis.left] || 0);
+    }
+
+    function axisPercent(axis, source = scores) {
+      return Math.max(8, Math.min(92, 50 + signedAxis(axis, source) * 5));
+    }
+
+    function axisLeaning(axis, source = scores) {
+      const value = signedAxis(axis, source);
+      if (Math.abs(value) <= 1) return "两端均衡";
+      const name = value >= 0 ? axis.rightName : axis.leftName;
+      const strength = Math.abs(value) >= 5 ? "极高" : Math.abs(value) >= 3 ? "偏高" : "中等";
+      return `${name}${strength}`;
+    }
+
+    function axisDisplay(axis, source = scores) {
+      const value = signedAxis(axis, source);
+      if (Math.abs(value) <= 1) return "两端均衡";
+      return value >= 0 ? axis.rightName : axis.leftName;
+    }
+
+    function renderIntro() {
+      step = -1;
+      scores = freshScores();
+      resultView.hidden = true;
+      stage.hidden = false;
+      panel.hidden = false;
+      stage.classList.remove("question-mode");
+      document.querySelector(".inscription").classList.remove("hidden-by-stage");
+      stage.innerHTML = `<div class="kicker">MEASUREMENT TEST</div><h1>你是哪位物理学家</h1><p class="lead">这是一台展厅里的风格测量仪。20 个选择会把你投影到理论、实验、直觉、概率、协作与生活做派的坐标中。</p><button class="start" id="startBtn" type="button">BEGIN TEST</button>`;
+      document.getElementById("startBtn").addEventListener("click", () => { step = 0; renderQuestion(); });
+      renderPanel();
+    }
+
+    function renderQuestion() {
+      const q = atlas.questions[step];
+      stage.classList.remove("switching");
+      stage.classList.add("question-mode");
+      document.querySelector(".inscription").classList.add("hidden-by-stage");
+      stage.innerHTML = `<div class="kicker">QUESTION ${String(step + 1).padStart(2, "0")} / ${String(atlas.questions.length).padStart(2, "0")}</div><h2 class="question-title">${q.title}</h2><div class="answers">${q.answers.map((a, i) => `<button class="answer" type="button" data-index="${i}"><small>OPTION ${a.key}</small><span>${a.text}</span></button>`).join("")}</div>`;
+      stage.querySelectorAll(".answer").forEach(btn => {
+        btn.addEventListener("click", () => chooseAnswer(Number(btn.dataset.index)));
+      });
+      renderPanel();
+    }
+
+    function chooseAnswer(answerIndex) {
+      const q = atlas.questions[step];
+      q.answers[answerIndex].scores.forEach(({ key, delta }) => {
+        scores[key] += delta;
+      });
+      stage.classList.add("switching");
+      window.setTimeout(() => {
+        step += 1;
+        if (step >= atlas.questions.length) renderLoading();
+        else renderQuestion();
+      }, 210);
+    }
+
+    function renderPanel() {
+      const progress = step < 0 ? 0 : Math.min(atlas.questions.length, step);
+      panel.innerHTML = `<div class="progress">${step < 0 ? "WAITING" : `PROGRESS ${progress}/${atlas.questions.length}`}</div><div class="meter"><i style="--w:${(progress / atlas.questions.length) * 100}%"></i></div>${axes.map(axis => {
+        const pct = axisPercent(axis);
+        const delta = pct - 50;
+        return `<div class="axis-row"><label><span>${axis.label}</span><span>${axis.pair}</span></label><div class="axis-bar"><i style="--pos:${Math.min(pct, 50)}%; --delta:${Math.abs(delta)}%"></i></div></div>`;
+      }).join("")}`;
+    }
+
+    function renderLoading() {
+      stage.hidden = true;
+      stage.classList.remove("question-mode");
+      panel.hidden = true;
+      loading.hidden = false;
+      let i = 0;
+      loadingText.textContent = loadingLines[0];
+      const timer = window.setInterval(() => {
+        i += 1;
+        loadingText.textContent = loadingLines[i % loadingLines.length];
+      }, 640);
+      window.setTimeout(() => {
+        window.clearInterval(timer);
+        loading.hidden = true;
+        renderResult(matchProfile());
+      }, 3600);
+    }
+
+    function distanceTo(person) {
+      return scoreKeys.reduce((sum, key) => sum + Math.pow((scores[key] || 0) - (person.target[key] || 0), 2), 0);
+    }
+
+    function matchProfile() {
+      const ranked = atlas.people
+        .map(person => ({
+          person,
+          distance: distanceTo(person),
+          intensity: Object.values(person.target).reduce((sum, n) => sum + Math.abs(n), 0)
+        }))
+        .sort((a, b) => a.distance - b.distance || b.intensity - a.intensity);
+      return ranked[0].person;
+    }
+
+    function renderResult(person) {
+      const isNew = writeAtlasState(person.id);
+      const photo = portraitPhotos[person.id];
+      const bars = axes.map(axis => {
+        const pct = axisPercent(axis);
+        return `<div class="axis-row"><label><span class="axis-copy">${axis.label}：${axisDisplay(axis)}<small>${axis.pair} · ${axis.en}</small></span><span>${Math.round(pct)}%</span></label><div class="axis-bar"><i style="--pos:${Math.min(pct, 50)}%; --delta:${Math.abs(pct - 50)}%"></i></div></div>`;
+      }).join("");
+      const summary = axes.map(axis => `<span class="summary-chip"><b>${axis.label}</b><span>${axisLeaning(axis)}<small>${axis.pair}</small></span></span>`).join("");
+      resultView.hidden = false;
+      resultView.innerHTML = `
+        <section class="result-hero">
+          <div class="result-id">
+            <div class="result-portrait ${photo ? "has-image" : ""}" style="${photo ? `--photo-pos:${photo.pos}` : ""}">
+              ${photo ? `<img src="${photo.src}" alt="${person.name}肖像" referrerpolicy="no-referrer" onerror="this.remove(); this.parentElement.classList.remove('has-image'); this.parentElement.textContent='${person.initials}';">` : person.initials}
+            </div>
+            <div>
+              <div class="kicker">${isNew ? "RELIC UNLOCKED" : "RELIC ALREADY STORED"}</div>
+              <h1>${person.name}</h1>
+              <p class="lead">${person.title}</p>
+              <div class="result-totem">${renderTotem(person)}<div><b>专属信物已点亮</b><span>${person.relic.name}</span></div></div>
+            </div>
+          </div>
+          <div class="result-summary">${summary}</div>
+          <div class="result-actions">
+            <button class="restart" id="restartBtn" type="button">重新测量</button>
+            <a class="corridor-link" href="./physicist-corridor.html" data-transition>进入走廊</a>
+          </div>
+        </section>
+        <section class="result-copy">
+          ${bars}
+          <div class="relic"><b>专属信物：${person.relic.name}</b><p>${person.relic.description}</p></div>
+          ${person.analysis.map(p => `<p>${p}</p>`).join("")}
+        </section>`;
+      document.getElementById("restartBtn").addEventListener("click", renderIntro);
+      attachTransitions(resultView);
+    }
+
+    function renderTotem(person) {
+      const n = person.index;
+      const rotation = (n * 17) % 180;
+      const sides = 3 + (n % 6);
+      const inner = 18 + (n % 5) * 3;
+      const points = Array.from({ length: sides }, (_, i) => {
+        const a = -Math.PI / 2 + i * Math.PI * 2 / sides;
+        return `${50 + Math.cos(a) * 29},${50 + Math.sin(a) * 29}`;
+      }).join(" ");
+      const small = Array.from({ length: 4 + (n % 4) }, (_, i) => {
+        const a = i * Math.PI * 2 / (4 + (n % 4)) + n;
+        return `<circle cx="${50 + Math.cos(a) * inner}" cy="${50 + Math.sin(a) * inner}" r="1.8" fill="currentColor" opacity=".9"/>`;
+      }).join("");
+      return `<div class="totem" aria-hidden="true">
+        <svg viewBox="0 0 100 100">
+          <polygon points="${points}" fill="none" stroke="currentColor" stroke-width="2.2" opacity=".86" transform="rotate(${rotation} 50 50)"/>
+          <circle cx="50" cy="50" r="${12 + (n % 4) * 4}" fill="none" stroke="currentColor" stroke-width="1.8" opacity=".72"/>
+          <path d="M50 16 L50 84 M16 50 L84 50" stroke="currentColor" stroke-width="1.4" opacity=".36"/>
+          ${small}
+        </svg>
+      </div>`;
+    }
+
+    function resize() {
+      const dpr = 1;
+      canvas.width = Math.floor(window.innerWidth * dpr);
+      canvas.height = Math.floor(window.innerHeight * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function draw(now) {
+      t = now || 0;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      ctx.clearRect(0, 0, w, h);
+      const cx = w * .58;
+      const cy = h * .44;
+      const glow = ctx.createRadialGradient(cx, cy, 20, cx, cy, Math.max(w, h) * .44);
+      glow.addColorStop(0, "rgba(238,233,220,.15)");
+      glow.addColorStop(.32, "rgba(216,192,122,.06)");
+      glow.addColorStop(.62, "rgba(143,221,234,.05)");
+      glow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = "rgba(238,233,220,.07)";
+      for (let i = 0; i < 12; i++) {
+        const r = 70 + i * 45;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, r * 1.3, r * .48, -.18 + Math.sin(t * .0002) * .05, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", resize);
+    resize();
+    renderIntro();
+    requestAnimationFrame(draw);
+  </script>
+  <script src="./transition-nav.js"></script>
+</body>
+</html>

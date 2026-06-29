@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>量子展厅 · Measurement Chamber</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23020202'/%3E%3Cpath d='M8 32c12-18 36 18 48 0' fill='none' stroke='%238fddea' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23d8c07a'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./base.css" />
+  <style>
+    .chamber {
+      position: relative; width: 100vw; height: 100vh;
+      min-width: 1080px; min-height: 720px; overflow: hidden;
+      background:
+        radial-gradient(circle at 52% 44%, rgba(143,221,234,.09), transparent 19%),
+        radial-gradient(circle at 44% 58%, rgba(216,192,122,.06), transparent 22%),
+        linear-gradient(180deg, #080807 0%, #020202 66%, #000 100%);
+      isolation: isolate;
+    }
+    .room { position: absolute; inset: 0; z-index: 1; perspective: 1200px; pointer-events: none; }
+    .wall {
+      position: absolute; left: 11vw; right: 11vw; top: 8vh; height: 66vh;
+      background: linear-gradient(180deg, rgba(17,17,16,.94), rgba(4,4,4,.96));
+      border-top: 1px solid rgba(238,233,220,.07);
+      box-shadow: inset 0 0 160px rgba(255,255,255,.018), 0 46px 160px rgba(0,0,0,.72);
+      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    }
+    .floor {
+      position: absolute; left: -16vw; right: -16vw; bottom: -34vh; height: 58vh;
+      transform: rotateX(65deg); transform-origin: 50% 0;
+      border-top: 1px solid rgba(238,233,220,.06);
+      background: linear-gradient(180deg, rgba(22,22,20,.48), #020202 68%);
+    }
+    .light {
+      position: absolute; left: 50%; top: 3vh; width: 60vw; height: 72vh;
+      transform: translateX(-50%);
+      background: conic-gradient(from 180deg at 50% 0%, transparent 0 35%, rgba(143,221,234,.12) 44%, rgba(238,233,220,.10) 50%, rgba(143,221,234,.12) 56%, transparent 65% 100%);
+      filter: blur(20px); opacity: .70; mix-blend-mode: screen;
+    }
+    .topline {
+      position: absolute; left: clamp(40px, 5vw, 80px); right: clamp(40px, 5vw, 80px);
+      top: 34px; z-index: 9; display: flex; justify-content: space-between;
+      color: #8d887f; font-family: var(--mono); font-size: 11px; letter-spacing: .15em;
+    }
+    .topline a { color: #d9cfb2; }
+
+    /* Left panel */
+    .title-panel {
+      position: absolute; left: clamp(48px, 6vw, 90px); top: clamp(88px, 14vh, 136px);
+      z-index: 8; width: min(300px, 23vw);
+    }
+    .kicker { color: var(--gold); font-family: var(--mono); font-size: 12px; letter-spacing: .18em; margin-bottom: 20px; }
+    h1 { margin: 0; font-family: var(--serif); font-size: clamp(42px, 5vw, 72px); line-height: 1.04; }
+    .title-panel .subtitle { margin: 18px 0 0; color: var(--muted); font-size: 15px; line-height: 1.85; }
+    .guide { margin-top: 24px; padding-top: 14px; border-top: 1px solid rgba(238,233,220,.14); }
+    .guide-title { color: var(--gold); font-family: var(--mono); font-size: 10px; letter-spacing: .14em; margin-bottom: 10px; }
+    .guide ol { margin: 0; padding-left: 18px; color: #928b80; font-size: 13px; line-height: 2.0; }
+    .guide ol li::marker { color: var(--cyan); }
+
+    /* Central experiment — shifted left so it doesn't overlap right controls */
+    .experiment {
+      position: absolute; left: 50%; top: 50%;
+      width: min(50vw, 680px); height: min(58vh, 560px);
+      transform: translate(-52%, -46%); z-index: 4;
+      mask-image: radial-gradient(ellipse at 50% 50%, #000 0 58%, rgba(0,0,0,.6) 78%, transparent 100%);
+    }
+    #quantumCanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .detector {
+      position: absolute; right: 13%; top: 50%; width: 3px; height: 42%;
+      transform: translateY(-50%); border-radius: 2px;
+      background: rgba(255,107,95,.15);
+      box-shadow: 0 0 16px rgba(255,107,95,.08);
+      opacity: .3; transition: opacity .4s, background .4s, box-shadow .4s;
+      pointer-events: none;
+    }
+    .detector.active {
+      opacity: 1;
+      background: rgba(255,107,95,.55);
+      box-shadow: 0 0 32px rgba(255,107,95,.25), 0 0 8px rgba(255,107,95,.4);
+    }
+    .detector::before, .detector::after {
+      content: ""; position: absolute; left: -4px; width: 11px; height: 1px;
+      background: rgba(255,107,95,.5);
+    }
+    .detector::before { top: 0; }
+    .detector::after { bottom: 0; }
+
+    /* Right controls */
+    .controls {
+      position: absolute; right: clamp(46px, 5vw, 86px); top: clamp(100px, 14vh, 150px);
+      width: min(310px, 25vw); z-index: 11;
+    }
+    .control-row { display: grid; grid-template-columns: 100px 1fr; gap: 16px; align-items: center; margin-bottom: 18px; }
+    .control-row label { color: #777168; font-family: var(--mono); font-size: 11px; letter-spacing: .10em; }
+    input[type=range] { appearance: none; width: 100%; height: 30px; background: transparent; cursor: pointer; }
+    input[type=range]::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(90deg, var(--cyan), rgba(238,233,220,.18), var(--red)); }
+    input[type=range]::-webkit-slider-thumb {
+      appearance: none; width: 15px; height: 15px; margin-top: -6.5px; border-radius: 50%;
+      border: 1px solid #050505; background: var(--ink); box-shadow: 0 0 20px rgba(238,233,220,.30);
+    }
+    .toggle-row { display: flex; gap: 12px; margin-bottom: 18px; }
+    .toggle-btn {
+      flex: 1; border: 0; border-top: 1px solid rgba(238,233,220,.16); padding: 12px 0 0;
+      background: transparent; color: rgba(238,233,220,.5); cursor: pointer;
+      font-family: var(--mono); font-size: 11px; letter-spacing: .10em; text-align: left;
+      transition: color .3s;
+    }
+    .toggle-btn.active { color: var(--ink); border-top-color: rgba(143,221,234,.5); }
+    .readout {
+      margin-top: 10px; padding: 14px 0; border-top: 1px solid rgba(238,233,220,.10);
+      color: #928b80; font-size: 13px; line-height: 1.85;
+    }
+    .readout b { color: #eee4c7; font-weight: 500; }
+    .readout .physics { display: block; margin-top: 8px; color: #6d675f; font-family: var(--mono); font-size: 10px; letter-spacing: .06em; line-height: 1.6; }
+    .particle-counter {
+      margin-top: 12px; color: #6d675f; font-family: var(--mono); font-size: 10px; letter-spacing: .08em;
+    }
+    .particle-counter b { color: var(--cyan); }
+
+    /* Inscription */
+    .inscription {
+      position: absolute; left: clamp(48px, 6vw, 90px); bottom: clamp(62px, 9vh, 100px);
+      z-index: 10; width: min(300px, 23vw);
+      border-top: 1px solid rgba(216,192,122,.30); padding-top: 16px;
+    }
+    .inscription .label { color: var(--gold); font-family: var(--mono); font-size: 10px; letter-spacing: .16em; margin-bottom: 13px; }
+    .quote { font-family: var(--serif); color: #d8d1bf; font-size: 17px; line-height: 1.65; transition: opacity .35s ease; }
+    .source { margin-top: 10px; color: #777168; font-family: var(--mono); font-size: 10px; letter-spacing: .09em; transition: opacity .35s ease; }
+    .fade { opacity: 0; }
+
+    /* Nav */
+    .navline {
+      position: absolute; left: clamp(40px, 5vw, 80px); right: clamp(40px, 5vw, 80px);
+      bottom: 28px; z-index: 20; display: flex; justify-content: space-between;
+      color: #6d675f; font-family: var(--mono); font-size: 10px; letter-spacing: .13em;
+    }
+    .navline a { color: #a79d86; }
+
+    /* Transitions */
+    .portal-transition.active { opacity: 1; animation: pageVeil .52s cubic-bezier(.22,1,.36,1) forwards; }
+    .portal-transition.active::before { animation: none; opacity: 0; transform: none; }
+    body.is-entering::before {
+      content: ""; position: fixed; inset: 0; z-index: 99; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.045) 34%, rgba(3,3,2,.28) 100%);
+      animation: pageReveal .72s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    body.is-leaving main > :not(.portal-transition) { opacity: .72; filter: none !important; transition: opacity .52s cubic-bezier(.22,1,.36,1); }
+    @keyframes pageVeil { 0% { background: rgba(0,0,0,0); } 100% { background: radial-gradient(ellipse at 50% 48%, rgba(238,233,220,.14), rgba(216,192,122,.050) 36%, rgba(3,3,2,.18) 100%); } }
+    @keyframes pageReveal { from { opacity: 1; } to { opacity: 0; } }
+  </style>
+  <link rel="stylesheet" href="./gallery-transition.css" />
+  <link rel="stylesheet" href="./ambient-audio.css?v=20260630-audio5" />
+</head>
+<body class="is-entering" data-ambient-scene="quantum">
+  <main class="chamber">
+    <div class="room" aria-hidden="true"><div class="wall"></div><div class="floor"></div><div class="light"></div></div>
+    <div class="grain"></div>
+
+    <header class="topline">
+      <a href="./hall.html" data-transition>← HALL</a>
+      <span>EXHIBIT 04 · MEASUREMENT</span>
+    </header>
+
+    <section class="title-panel">
+      <div class="kicker">QUANTUM GALLERY</div>
+      <h1>测量之前</h1>
+      <p class="subtitle">同一个粒子实验，在是否获取路径信息时呈现出不同图样。测量改变可见结果——这是量子力学最核心的经验。</p>
+      <div class="guide">
+        <div class="guide-title">OBSERVATION GUIDE</div>
+        <ol>
+          <li>观察默认干涉条纹（无探测器）</li>
+          <li>拖动测量滑杆增强路径获取</li>
+          <li>点击 DETECTOR 按钮瞬间切换</li>
+          <li>调节相位观察条纹整体平移</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="experiment" aria-label="双缝与测量可视化">
+      <canvas id="quantumCanvas"></canvas>
+      <div class="detector" id="detector"></div>
+    </section>
+
+    <section class="controls">
+      <div class="control-row">
+        <label for="measureSlider">MEASURE</label>
+        <input id="measureSlider" type="range" min="0" max="1" value="0" step=".001" />
+      </div>
+      <div class="control-row">
+        <label for="phaseSlider">PHASE</label>
+        <input id="phaseSlider" type="range" min="-1" max="1" value="0" step=".001" />
+      </div>
+      <div class="toggle-row">
+        <button class="toggle-btn active" id="btnWave" type="button">WAVE MODE</button>
+        <button class="toggle-btn" id="btnDetect" type="button">DETECTOR ON</button>
+      </div>
+      <div class="readout" id="readout">
+        <b>干涉模式</b>：路径信息未被记录。从两条狭缝出发的概率波叠加，在屏幕上产生明暗交替的干涉条纹。每个粒子落点不可预测，但大量粒子的统计分布呈现波动规律。
+        <span class="physics">物理原理：波粒二象性 · 量子叠加 · 概率幅干涉 · 1927 戴维森-革末实验</span>
+      </div>
+      <div class="particle-counter" id="counter">DETECTED PARTICLES: <b>0</b></div>
+    </section>
+
+    <aside class="inscription" data-inscription-topic="quantum">
+      <div class="label">PHILOSOPHICAL INSCRIPTION</div>
+      <div class="quote" id="quoteText"></div>
+      <div class="source" id="quoteSource"></div>
+    </aside>
+
+    <nav class="navline">
+      <a href="./scale-gallery.html" data-transition>← SCALE LENS</a>
+      <a href="./imaging-gallery.html" data-transition>IMAGING CHAMBER →</a>
+    </nav>
+    <div class="portal-transition" id="portalTransition" aria-hidden="true"></div>
+  </main>
+
+  <script src="./philosophy-inscriptions.js"></script>
+  <script src="./ambient-audio.js?v=20260630-audio5"></script>
+  <script>
+    const canvas = document.getElementById("quantumCanvas");
+    const ctx = canvas.getContext("2d");
+    const measureSlider = document.getElementById("measureSlider");
+    const phaseSlider = document.getElementById("phaseSlider");
+    const btnWave = document.getElementById("btnWave");
+    const btnDetect = document.getElementById("btnDetect");
+    const detector = document.getElementById("detector");
+    const readout = document.getElementById("readout");
+    const counter = document.getElementById("counter");
+
+    let measurement = 0;
+    let targetMeasurement = 0;
+    let phase = 0;
+    let t = 0;
+    let particleCount = 0;
+    let particles = [];
+    let idleFrames = 0;
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.floor(rect.width);
+      canvas.height = Math.floor(rect.height);
+    }
+
+    function setMeasurement(value) {
+      targetMeasurement = Math.max(0, Math.min(1, value));
+      measureSlider.value = targetMeasurement.toFixed(3);
+      detector.classList.toggle("active", targetMeasurement > .5);
+      btnWave.classList.toggle("active", targetMeasurement <= .5);
+      btnDetect.classList.toggle("active", targetMeasurement > .5);
+      idleFrames = 0;
+      updateReadout();
+    }
+
+    function updateReadout() {
+      if (targetMeasurement < .25) {
+        readout.innerHTML = `<b>干涉模式</b>：路径信息未被记录。概率波从两条狭缝叠加，屏幕呈现明暗交替的干涉条纹。每个粒子落点不可预测，但统计分布呈现波动规律。<span class="physics">波粒二象性 · 量子叠加 · 概率幅干涉 · 1927 戴维森-革末实验</span>`;
+      } else if (targetMeasurement < .70) {
+        readout.innerHTML = `<b>互补过渡</b>：测量强度增加，路径信息被部分获取。干涉条纹可见度下降，粒子性逐渐显现。波动性与粒子性此消彼长——这就是互补原理。<span class="physics">互补原理 · 玻尔 1928 · 路径-条纹互斥 · 量子擦除</span>`;
+      } else {
+        readout.innerHTML = `<b>路径模式</b>：探测器记录每个粒子通过哪条狭缝。"知道路径"本身就破坏了干涉——屏幕只剩两团粒子堆叠分布，不再有条纹。<span class="physics">测量坍缩 · 退相干 · 惠勒延迟选择 · 哪条路径信息 = 无干涉</span>`;
+      }
+    }
+
+    function emitParticle() {
+      const w = canvas.width, h = canvas.height;
+      const screenX = w * .77;
+      const cy = h * .5;
+      const visibility = 1 - measurement;
+      // Determine landing position based on current mode
+      let y;
+      if (Math.random() < visibility) {
+        // Interference distribution
+        const slot = Math.floor(Math.random() * 200) - 100;
+        const prob = Math.pow(Math.cos(slot * .055 + phase * 2.5), 2) * Math.exp(-Math.abs(slot) / 120);
+        if (Math.random() < prob) y = slot;
+        else y = (Math.random() - .5) * 300;
+      } else {
+        // Particle distribution (two bands)
+        const band = Math.random() < .5 ? -55 : 55;
+        y = band + (Math.random() - .5) * 60;
+      }
+      particles.push({
+        x: screenX + 12 + Math.random() * 8,
+        y: cy + y,
+        age: 0,
+        bright: .3 + Math.random() * .5
+      });
+      if (particles.length > 600) particles.shift();
+      particleCount++;
+      counter.innerHTML = `DETECTED PARTICLES: <b>${particleCount}</b>`;
+    }
+
+    function draw(now) {
+      const dt = now - t;
+      t = now;
+
+      // Smooth measurement transition
+      measurement += (targetMeasurement - measurement) * Math.min(1, dt / 200);
+
+      const w = canvas.width, h = canvas.height;
+      if (!w || !h) { requestAnimationFrame(draw); return; }
+
+      ctx.clearRect(0, 0, w, h);
+      const cx = w * .48, cy = h * .50;
+
+      // Background glow
+      const glow = ctx.createRadialGradient(cx, cy, 20, cx, cy, w * .50);
+      glow.addColorStop(0, "rgba(238,233,220,.08)");
+      glow.addColorStop(.36, "rgba(143,221,234,.05)");
+      glow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(cx, cy, w * .50, 0, Math.PI * 2);
+      ctx.fill();
+
+      drawApparatus(w, h);
+      drawWaveField(w, h);
+      drawScreenPattern(w, h);
+      drawParticles(w, h, dt);
+
+      // Emit particles over time
+      if (Math.random() < .3) emitParticle();
+
+      requestAnimationFrame(draw);
+    }
+
+    function drawApparatus(w, h) {
+      const sourceX = w * .13, slitX = w * .36, screenX = w * .77, cy = h * .5;
+      ctx.save();
+      // Source cone
+      ctx.strokeStyle = "rgba(238,233,220,.10)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(sourceX, cy);
+      ctx.lineTo(slitX, cy - 56);
+      ctx.moveTo(sourceX, cy);
+      ctx.lineTo(slitX, cy + 56);
+      ctx.stroke();
+
+      // Source dot
+      const sg = ctx.createRadialGradient(sourceX, cy, 0, sourceX, cy, 16);
+      sg.addColorStop(0, "rgba(216,192,122,.7)");
+      sg.addColorStop(.5, "rgba(216,192,122,.2)");
+      sg.addColorStop(1, "rgba(216,192,122,0)");
+      ctx.fillStyle = sg;
+      ctx.beginPath();
+      ctx.arc(sourceX, cy, 16, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Double slit barrier
+      ctx.strokeStyle = "rgba(238,233,220,.30)";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(slitX, cy - 160);
+      ctx.lineTo(slitX, cy - 68);
+      ctx.moveTo(slitX, cy - 36);
+      ctx.lineTo(slitX, cy + 36);
+      ctx.moveTo(slitX, cy + 68);
+      ctx.lineTo(slitX, cy + 160);
+      ctx.stroke();
+
+      // Slit openings (glow)
+      ctx.fillStyle = "rgba(143,221,234,.15)";
+      ctx.fillRect(slitX - 2, cy - 68, 4, 32);
+      ctx.fillRect(slitX - 2, cy + 36, 4, 32);
+
+      // Detection screen
+      ctx.strokeStyle = "rgba(238,233,220,.14)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(screenX, cy - 200);
+      ctx.lineTo(screenX, cy + 200);
+      ctx.stroke();
+
+      // Screen label
+      ctx.fillStyle = "rgba(238,233,220,.12)";
+      ctx.font = "9px 'IBM Plex Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.fillText("SCREEN", screenX, cy + 216);
+      ctx.fillText("SOURCE", sourceX, cy + 32);
+      ctx.fillText("SLITS", slitX, cy - 170);
+      ctx.restore();
+    }
+
+    function drawWaveField(w, h) {
+      const slitX = w * .36, screenX = w * .77, cy = h * .5;
+      const visibility = 1 - measurement;
+      if (visibility < .05) return;
+
+      ctx.save();
+      ctx.globalAlpha = visibility;
+
+      // Circular wavefronts from each slit
+      for (let i = 0; i < 8; i++) {
+        const r = 30 + i * 34 + (t * .03) % 34;
+        const alpha = (.08 + visibility * .08) * (1 - i / 10);
+        ctx.strokeStyle = `rgba(143,221,234,${alpha})`;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(slitX, cy - 52, r, -Math.PI * .32, Math.PI * .32);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(slitX, cy + 52, r, -Math.PI * .32, Math.PI * .32);
+        ctx.stroke();
+      }
+
+      // Interference field lines (flowing)
+      ctx.strokeStyle = "rgba(143,221,234,.12)";
+      ctx.lineWidth = 1;
+      for (let y = -140; y <= 140; y += 40) {
+        ctx.beginPath();
+        for (let x = slitX + 20; x <= screenX - 20; x += 14) {
+          const p = (x - slitX) / (screenX - slitX);
+          const wave = Math.sin(x * .02 + y * .025 + phase * 3 + t * .002) * 8 * visibility * (1 - p * .3);
+          const yy = cy + y * (1 - p * .12) + wave;
+          if (x === slitX + 20) ctx.moveTo(x, yy);
+          else ctx.lineTo(x, yy);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawScreenPattern(w, h) {
+      const screenX = w * .77, cy = h * .5;
+      const visibility = 1 - measurement;
+
+      ctx.save();
+      // Intensity profile on screen
+      for (let i = 0; i < 100; i++) {
+        const y = -180 + i * 3.6;
+        const interference = Math.pow(Math.cos(y * .055 + phase * 2.5), 2);
+        const envelope = Math.exp(-Math.abs(y) / 140);
+        const particleBands = Math.exp(-Math.pow((y - 55) / 42, 2)) + Math.exp(-Math.pow((y + 55) / 42, 2));
+        const intensity = visibility * interference * envelope + measurement * particleBands * .5;
+
+        // Soft glow bars instead of fillRect
+        const barW = 20 + intensity * 100;
+        const grad = ctx.createLinearGradient(screenX + 6, 0, screenX + 6 + barW, 0);
+        grad.addColorStop(0, `rgba(238,233,220,${Math.min(.6, intensity * .4)})`);
+        grad.addColorStop(1, "rgba(238,233,220,0)");
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.ellipse(screenX + 6 + barW * .4, cy + y, barW * .5, 1.8, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function drawParticles(w, h, dt) {
+      const cy = h * .5;
+      ctx.save();
+      particles.forEach(p => {
+        p.age += dt;
+        const fade = Math.min(1, p.age / 300) * Math.max(0, 1 - p.age / 12000);
+        if (fade <= 0) return;
+        ctx.fillStyle = `rgba(143,221,234,${fade * p.bright})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      // Remove dead particles
+      particles = particles.filter(p => p.age < 12000);
+      ctx.restore();
+    }
+
+    // Events
+    measureSlider.addEventListener("input", () => setMeasurement(parseFloat(measureSlider.value)));
+    phaseSlider.addEventListener("input", () => { phase = parseFloat(phaseSlider.value); idleFrames = 0; });
+    btnWave.addEventListener("click", () => setMeasurement(0));
+    btnDetect.addEventListener("click", () => setMeasurement(1));
+
+    window.addEventListener("resize", resize);
+    resize();
+    setMeasurement(0);
+    requestAnimationFrame(draw);
+  </script>
+  <script src="./transition-nav.js"></script>
+</body>
+</html>
