@@ -615,14 +615,13 @@
       <button class="observe-launch" id="observeLaunch" type="button">进入观察模式</button>
       <div class="modes">
         <button class="mode active" data-mode="visible" type="button">可见光</button>
-        <button class="mode" data-mode="tilt" type="button">倾斜</button>
         <button class="mode" data-mode="uv" type="button">紫外</button>
         <button class="mode" data-mode="transmit" type="button">透光</button>
       </div>
       <button class="tool-toggle" id="microscopeToggle" type="button">开启显微镜</button>
-      <p class="panel-hint">点击纸币上的防伪区域，再切换观察条件。显微镜是独立工具，开启后移动鼠标查看局部线条、纤维和微结构。</p>
+      <p class="panel-hint">点击纸币上的防伪区域，再切换观察条件。显微镜是独立工具，开启后拖动手指或鼠标查看局部线条、纤维和微结构。</p>
       <div class="control-row">
-        <label for="zoomSlider">放大倍率</label>
+        <label for="zoomSlider">显微镜倍率</label>
         <input id="zoomSlider" type="range" min="2" max="9" value="4.6" step=".01" />
       </div>
       <div class="control-row">
@@ -667,6 +666,7 @@
     let angle = 0;
     let microscopeOn = false;
     let pointer = { x: .52, y: .48 };
+    let pointerCaptured = false;
 
     const features = {
       ribbon: {
@@ -711,6 +711,8 @@
       observeMicroscope.classList.toggle("active", microscopeOn);
       microscopeToggle.textContent = microscopeOn ? "关闭显微镜" : "开启显微镜";
       observeMicroscope.textContent = microscopeOn ? "关闭显微镜" : "显微镜";
+      stage.classList.toggle("microscope-active", microscopeOn);
+      stage.style.touchAction = microscopeOn ? "none" : "";
       updateView();
     }
 
@@ -748,8 +750,8 @@
       bill.style.setProperty("--angle-skew", `${angle * 7}deg`);
       bill.style.setProperty("--angle-hue", `${angle * 54}deg`);
       bill.style.setProperty("--angle-abs", absAngle.toFixed(3));
-      bill.style.setProperty("--overlay-opacity", mode === "tilt" ? .68 : mode === "visible" ? .10 : .30);
-      bill.style.setProperty("--mark-opacity", mode === "visible" ? .12 : .34 + absAngle * .10);
+      bill.style.setProperty("--overlay-opacity", mode === "visible" ? (.10 + absAngle * .18) : (.30 + absAngle * .10));
+      bill.style.setProperty("--mark-opacity", (mode === "visible" ? .12 : .34) + absAngle * .10);
       bill.style.setProperty("--watermark-opacity", mode === "transmit" ? .62 : mode === "visible" ? .06 : .18);
       bill.style.setProperty("--thread-opacity", mode === "uv" || mode === "transmit" ? .82 : .12);
       bill.style.setProperty("--microprint-opacity", microscopeOn ? Math.min(.72, .22 + zoom * .065) : .12);
@@ -757,22 +759,39 @@
       const f = features[feature];
       const modeCopy = {
         visible: "可见光下先定位防伪区域。",
-        tilt: "倾斜模式改变观察角，突出角度依赖的光学效果。",
         uv: "紫外模式模拟安全线与材料荧光。",
         transmit: "透光模式模拟水印和埋入式安全线。"
       };
-      const toolCopy = microscopeOn ? "显微镜已开启，移动鼠标检查局部细节。" : "可开启显微镜作为附加观察工具。";
-      readout.innerHTML = `<b>${f.title}</b>：${f.copy}<br>${modeCopy[mode]}${toolCopy}<span class="source">物理机制：${f.physics} · 图像来源：WIKIMEDIA COMMONS / 教育展示样张</span>`;
+      const angleCopy = absAngle > .12 ? "当前倾斜角正在放大视差与薄膜反射差异。" : "可拖动下方倾斜角度滑杆增强视差与结构色变化。";
+      const toolCopy = microscopeOn ? "显微镜已开启，拖动手指或鼠标检查局部细节。" : "可开启显微镜作为附加观察工具。";
+      readout.innerHTML = `<b>${f.title}</b>：${f.copy}<br>${modeCopy[mode]}${angleCopy}${toolCopy}<span class="source">物理机制：${f.physics} · 图像来源：WIKIMEDIA COMMONS / 教育展示样张</span>`;
     }
 
-    stage.addEventListener("pointermove", (event) => {
-      if (!microscopeOn) return;
+    function updatePointerFromEvent(event) {
       const rect = stage.getBoundingClientRect();
       pointer = {
         x: Math.max(.08, Math.min(.92, (event.clientX - rect.left) / rect.width)),
         y: Math.max(.12, Math.min(.86, (event.clientY - rect.top) / rect.height))
       };
       updateView();
+    }
+
+    stage.addEventListener("pointerdown", (event) => {
+      if (!microscopeOn) return;
+      pointerCaptured = true;
+      stage.setPointerCapture?.(event.pointerId);
+      updatePointerFromEvent(event);
+    });
+    stage.addEventListener("pointermove", (event) => {
+      if (!microscopeOn || (!pointerCaptured && event.pointerType !== "mouse")) return;
+      updatePointerFromEvent(event);
+    });
+    stage.addEventListener("pointerup", (event) => {
+      pointerCaptured = false;
+      stage.releasePointerCapture?.(event.pointerId);
+    });
+    stage.addEventListener("pointercancel", () => {
+      pointerCaptured = false;
     });
     document.querySelectorAll(".hotspot").forEach(btn => btn.addEventListener("click", () => setFeature(btn.dataset.feature)));
     document.querySelectorAll(".mode").forEach(btn => btn.addEventListener("click", () => setMode(btn.dataset.mode)));

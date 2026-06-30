@@ -32,6 +32,102 @@
   let hintDismissed = false;
   let fadeInterval = null;
   let hintTimer = null;
+  let dragState = null;
+  let sceneKey = '';
+  const storagePrefix = 'ambientAudioDock:';
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function syncHintPosition() {
+    if (!button || !hintEl) return;
+    const buttonRect = button.getBoundingClientRect();
+    const hintWidth = hintEl.offsetWidth || 120;
+    const gap = 12;
+    const leftCandidate = buttonRect.left - hintWidth - gap;
+    const maxLeft = window.innerWidth - hintWidth - 12;
+    const left = leftCandidate > 12 ? leftCandidate : Math.min(buttonRect.right + gap, maxLeft);
+    const top = clamp(buttonRect.top + (buttonRect.height - 32) / 2, 12, window.innerHeight - 44);
+    hintEl.style.left = `${left}px`;
+    hintEl.style.top = `${top}px`;
+  }
+
+  function persistDockPosition() {
+    if (!button || !sceneKey) return;
+    const left = parseFloat(button.style.left || '0');
+    const top = parseFloat(button.style.top || '0');
+    localStorage.setItem(`${storagePrefix}${sceneKey}`, JSON.stringify({ left, top }));
+  }
+
+  function placeDock(left, top) {
+    if (!button) return;
+    const width = button.offsetWidth || 34;
+    const height = button.offsetHeight || 34;
+    const clampedLeft = clamp(left, 10, window.innerWidth - width - 10);
+    const clampedTop = clamp(top, 10, window.innerHeight - height - 10);
+    button.style.left = `${clampedLeft}px`;
+    button.style.top = `${clampedTop}px`;
+    button.style.right = 'auto';
+    syncHintPosition();
+  }
+
+  function snapDock() {
+    if (!button) return;
+    const width = button.offsetWidth || 34;
+    const rect = button.getBoundingClientRect();
+    const margin = window.innerWidth <= 760 ? 18 : 26;
+    const centerX = rect.left + rect.width / 2;
+    const left = centerX < window.innerWidth / 2 ? margin : window.innerWidth - width - margin;
+    placeDock(left, rect.top);
+    persistDockPosition();
+  }
+
+  function defaultDockPosition() {
+    const mobile = window.innerWidth <= 760;
+    return mobile
+      ? { left: window.innerWidth - 32 - 18, top: 98 }
+      : { left: Math.min(Math.max(window.innerWidth * 0.17, 178), 268), top: 27 };
+  }
+
+  function restoreDockPosition() {
+    let stored = null;
+    try {
+      stored = JSON.parse(localStorage.getItem(`${storagePrefix}${sceneKey}`) || 'null');
+    } catch {}
+    const fallback = defaultDockPosition();
+    placeDock(stored?.left ?? fallback.left, stored?.top ?? fallback.top);
+    if (!stored) persistDockPosition();
+  }
+
+  function startDrag(event) {
+    if (!button || event.button > 0) return;
+    const rect = button.getBoundingClientRect();
+    dragState = {
+      pointerId: event.pointerId,
+      offsetX: event.clientX - rect.left,
+      offsetY: event.clientY - rect.top,
+      moved: false
+    };
+    button.classList.add('is-dragging');
+    button.setPointerCapture?.(event.pointerId);
+  }
+
+  function moveDrag(event) {
+    if (!dragState || event.pointerId !== dragState.pointerId) return;
+    dragState.moved = true;
+    placeDock(event.clientX - dragState.offsetX, event.clientY - dragState.offsetY);
+  }
+
+  function endDrag(event) {
+    if (!dragState || event.pointerId !== dragState.pointerId) return;
+    button.releasePointerCapture?.(event.pointerId);
+    button.classList.remove('is-dragging');
+    const moved = dragState.moved;
+    dragState = null;
+    snapDock();
+    if (moved) dismissHint();
+  }
 
   function showHint(text, durationMs = 3600) {
     if (!hintEl || hintDismissed) return;
@@ -128,6 +224,7 @@
   function boot() {
     const key = document.body.dataset.ambientScene;
     if (!key || key === 'entrance') return;
+    sceneKey = key;
 
     const src = musicFiles[key];
     if (!src) return;
@@ -157,10 +254,21 @@
     button.addEventListener('click', () => setPlaying(!playing));
     button.addEventListener('mouseenter', () => showHint(sceneLabels[key] || '背景音乐', 2200));
     button.addEventListener('focus', () => showHint(sceneLabels[key] || '背景音乐', 2200));
+    button.addEventListener('pointerdown', startDrag);
+    button.addEventListener('pointermove', moveDrag);
+    button.addEventListener('pointerup', endDrag);
+    button.addEventListener('pointercancel', endDrag);
+
+    restoreDockPosition();
+    syncHintPosition();
 
     // Pause when tab goes to background
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && playing) setPlaying(false);
+    });
+    window.addEventListener('resize', () => {
+      restoreDockPosition();
+      syncHintPosition();
     });
 
     setTimeout(() => {
