@@ -114,10 +114,15 @@
       top: 52%;
       width: min(540px, 42vw);
       aspect-ratio: 1200 / 505;
-      transform: translate(-50%, -50%) rotateX(48deg) rotateZ(-8deg);
+      transform:
+        translate(-50%, -50%)
+        rotateX(var(--rig-rotate-x, 48deg))
+        rotateY(var(--rig-rotate-y, 0deg))
+        rotateZ(var(--rig-rotate-z, -8deg))
+        scale(var(--rig-scale, 1));
       transform-style: preserve-3d;
       filter: drop-shadow(0 56px 80px rgba(0,0,0,.64));
-      transition: width .55s cubic-bezier(.22,1,.36,1), filter .55s ease;
+      transition: width .55s cubic-bezier(.22,1,.36,1), filter .55s ease, transform .25s ease;
     }
     .bill {
       position: absolute;
@@ -577,8 +582,8 @@
     }
   </style>
   <link rel="stylesheet" href="./gallery-transition.css" />
-  <link rel="stylesheet" href="./ambient-audio.css?v=20260630-audio5" />
-  <link rel="stylesheet" href="./mobile.css" />
+  <link rel="stylesheet" href="./ambient-audio.css?v=20260630-audio7" />
+  <link rel="stylesheet" href="./mobile.css?v=20260630-mobile7" />
 </head>
 <body class="is-entering" data-ambient-scene="light">
   <main class="chamber" id="chamber">
@@ -755,7 +760,9 @@
       bill.style.setProperty("--watermark-opacity", mode === "transmit" ? .62 : mode === "visible" ? .06 : .18);
       bill.style.setProperty("--thread-opacity", mode === "uv" || mode === "transmit" ? .82 : .12);
       bill.style.setProperty("--microprint-opacity", microscopeOn ? Math.min(.72, .22 + zoom * .065) : .12);
-      billRig.style.transform = `translate(-50%, -50%) rotateX(${48 - angle * 14}deg) rotateY(${angle * 14}deg) rotateZ(${-8 + angle * 8}deg)`;
+      billRig.style.setProperty("--rig-rotate-x", `${48 - angle * 14}deg`);
+      billRig.style.setProperty("--rig-rotate-y", `${angle * 14}deg`);
+      billRig.style.setProperty("--rig-rotate-z", `${-8 + angle * 8}deg`);
       const f = features[feature];
       const modeCopy = {
         visible: "可见光下先定位防伪区域。",
@@ -768,10 +775,10 @@
     }
 
     function updatePointerFromEvent(event) {
-      const rect = stage.getBoundingClientRect();
+      const rect = bill.getBoundingClientRect();
       pointer = {
-        x: Math.max(.08, Math.min(.92, (event.clientX - rect.left) / rect.width)),
-        y: Math.max(.12, Math.min(.86, (event.clientY - rect.top) / rect.height))
+        x: Math.max(.04, Math.min(.96, (event.clientX - rect.left) / rect.width)),
+        y: Math.max(.06, Math.min(.94, (event.clientY - rect.top) / rect.height))
       };
       updateView();
     }
@@ -805,7 +812,7 @@ setFeature("ribbon");
     setMode("visible");
     setMicroscope(false);
   </script>
-  <script src="./ambient-audio.js?v=20260630-audio5"></script>
+  <script src="./ambient-audio.js?v=20260630-audio7"></script>
   <script src="./transition-nav.js"></script>
 </body>
 </html>

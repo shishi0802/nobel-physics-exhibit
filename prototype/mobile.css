@@ -258,6 +258,12 @@
       0 0 0 8px rgba(216,192,122,.10),
       inset 0 0 58px rgba(255,255,255,.025) !important;
   }
+  .photo img {
+    object-fit: contain !important;
+    object-position: 50% 50% !important;
+    transform: none !important;
+    background: #050505 !important;
+  }
   .portrait small,
   .portrait strong,
   .photo-credit {
@@ -326,7 +332,7 @@
     right: auto !important; bottom: auto !important;
     width: auto !important;
     display: block !important;
-    margin: 8px 18px 30px !important;
+    margin: 18px 18px 42px !important;
     padding-top: 10px !important;
     text-align: left !important;
     font-size: 10px !important;
@@ -386,7 +392,10 @@
   .bill-rig {
     width: calc(100vw - 48px) !important;
     margin: 0 auto !important;
-    transform: rotateX(20deg) rotateZ(-2deg) !important;
+    --rig-rotate-x: 10deg;
+    --rig-rotate-y: 0deg;
+    --rig-rotate-z: -1deg;
+    --rig-scale: .96;
   }
 
   /* ── Room decorative layers: hide on mobile for performance ── */
@@ -587,9 +596,13 @@
     overflow: hidden !important;
   }
   .bill-rig {
-    width: min(100%, 620px) !important;
+    width: min(calc(100vw - 34px), 620px) !important;
+    left: 50% !important;
     top: 50% !important;
-    transform: translate(-50%, -50%) rotateX(10deg) rotateZ(-1deg) scale(.96) !important;
+    --rig-rotate-x: 10deg;
+    --rig-rotate-y: 0deg;
+    --rig-rotate-z: -1deg;
+    --rig-scale: .96;
   }
   .chamber.light-chamber .controls,
   .chamber#chamber .controls {

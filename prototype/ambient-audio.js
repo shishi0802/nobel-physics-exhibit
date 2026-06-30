@@ -34,7 +34,9 @@
   let hintTimer = null;
   let dragState = null;
   let sceneKey = '';
-  const storagePrefix = 'ambientAudioDock:';
+  let suppressClick = false;
+  const storagePrefix = 'ambientAudioDock:v4:';
+  const dockGap = 10;
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -43,12 +45,17 @@
   function syncHintPosition() {
     if (!button || !hintEl) return;
     const buttonRect = button.getBoundingClientRect();
+    const buttonLeft = Number.isFinite(parseFloat(button.style.left)) ? parseFloat(button.style.left) : buttonRect.left;
+    const buttonTop = Number.isFinite(parseFloat(button.style.top)) ? parseFloat(button.style.top) : buttonRect.top;
+    const buttonWidth = button.offsetWidth || buttonRect.width || 34;
+    const buttonHeight = button.offsetHeight || buttonRect.height || 34;
     const hintWidth = hintEl.offsetWidth || 120;
-    const gap = 12;
-    const leftCandidate = buttonRect.left - hintWidth - gap;
-    const maxLeft = window.innerWidth - hintWidth - 12;
-    const left = leftCandidate > 12 ? leftCandidate : Math.min(buttonRect.right + gap, maxLeft);
-    const top = clamp(buttonRect.top + (buttonRect.height - 32) / 2, 12, window.innerHeight - 44);
+    const rightDocked = buttonLeft > window.innerWidth / 2;
+    const rawLeft = rightDocked
+      ? buttonLeft - hintWidth - dockGap
+      : buttonLeft + buttonWidth + dockGap;
+    const left = clamp(rawLeft, 10, window.innerWidth - hintWidth - 10);
+    const top = clamp(buttonTop + (buttonHeight - 32) / 2, 12, window.innerHeight - 44);
     hintEl.style.left = `${left}px`;
     hintEl.style.top = `${top}px`;
   }
@@ -64,7 +71,12 @@
     if (!button) return;
     const width = button.offsetWidth || 34;
     const height = button.offsetHeight || 34;
-    const clampedLeft = clamp(left, 10, window.innerWidth - width - 10);
+    const hintWidth = hintEl?.offsetWidth || 138;
+    const groupWidth = width + dockGap + hintWidth;
+    const groupedRightSide = left + width / 2 > window.innerWidth / 2;
+    const minLeft = groupedRightSide ? groupWidth - width + 10 : 10;
+    const maxLeft = groupedRightSide ? window.innerWidth - width - 10 : window.innerWidth - groupWidth - 10;
+    const clampedLeft = clamp(left, minLeft, Math.max(minLeft, maxLeft));
     const clampedTop = clamp(top, 10, window.innerHeight - height - 10);
     button.style.left = `${clampedLeft}px`;
     button.style.top = `${clampedTop}px`;
@@ -75,19 +87,27 @@
   function snapDock() {
     if (!button) return;
     const width = button.offsetWidth || 34;
+    const hintWidth = hintEl?.offsetWidth || 138;
     const rect = button.getBoundingClientRect();
     const margin = window.innerWidth <= 760 ? 18 : 26;
     const centerX = rect.left + rect.width / 2;
-    const left = centerX < window.innerWidth / 2 ? margin : window.innerWidth - width - margin;
-    placeDock(left, rect.top);
+    const left = centerX < window.innerWidth / 2
+      ? margin
+      : window.innerWidth - width - margin;
+    const adjustedLeft = centerX < window.innerWidth / 2
+      ? left
+      : Math.max(hintWidth + dockGap + margin, left);
+    placeDock(adjustedLeft, rect.top);
     persistDockPosition();
   }
 
   function defaultDockPosition() {
     const mobile = window.innerWidth <= 760;
+    const width = button?.offsetWidth || (mobile ? 32 : 34);
+    const hintWidth = hintEl?.offsetWidth || (mobile ? 146 : 172);
     return mobile
-      ? { left: window.innerWidth - 32 - 18, top: 98 }
-      : { left: Math.min(Math.max(window.innerWidth * 0.17, 178), 268), top: 27 };
+      ? { left: window.innerWidth - width - 18, top: 190 }
+      : { left: Math.max(hintWidth + dockGap + 26, Math.min(Math.max(window.innerWidth * 0.17, 178), 268)), top: 27 };
   }
 
   function restoreDockPosition() {
@@ -105,6 +125,8 @@
     const rect = button.getBoundingClientRect();
     dragState = {
       pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
       offsetX: event.clientX - rect.left,
       offsetY: event.clientY - rect.top,
       moved: false
@@ -115,7 +137,8 @@
 
   function moveDrag(event) {
     if (!dragState || event.pointerId !== dragState.pointerId) return;
-    dragState.moved = true;
+    const distance = Math.hypot(event.clientX - dragState.startX, event.clientY - dragState.startY);
+    dragState.moved = dragState.moved || distance > 4;
     placeDock(event.clientX - dragState.offsetX, event.clientY - dragState.offsetY);
   }
 
@@ -126,7 +149,12 @@
     const moved = dragState.moved;
     dragState = null;
     snapDock();
-    if (moved) dismissHint();
+    if (moved) {
+      suppressClick = true;
+      setTimeout(() => {
+        suppressClick = false;
+      }, 0);
+    }
   }
 
   function showHint(text, durationMs = 3600) {
@@ -251,13 +279,24 @@
     hintEl.textContent = `♩ ${sceneLabels[key] || '背景音乐'}`;
     document.body.appendChild(hintEl);
 
-    button.addEventListener('click', () => setPlaying(!playing));
+    button.addEventListener('click', (event) => {
+      if (suppressClick) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+      setPlaying(!playing);
+    });
     button.addEventListener('mouseenter', () => showHint(sceneLabels[key] || '背景音乐', 2200));
     button.addEventListener('focus', () => showHint(sceneLabels[key] || '背景音乐', 2200));
     button.addEventListener('pointerdown', startDrag);
     button.addEventListener('pointermove', moveDrag);
     button.addEventListener('pointerup', endDrag);
     button.addEventListener('pointercancel', endDrag);
+    hintEl.addEventListener('pointerdown', startDrag);
+    hintEl.addEventListener('pointermove', moveDrag);
+    hintEl.addEventListener('pointerup', endDrag);
+    hintEl.addEventListener('pointercancel', endDrag);
 
     restoreDockPosition();
     syncHintPosition();
