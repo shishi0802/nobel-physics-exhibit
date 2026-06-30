@@ -387,16 +387,16 @@
     transform: rotateX(20deg) rotateZ(-2deg) !important;
   }
 
-  /* ── Ambient disc button: align with the top rail, away from the hard edge ── */
+  /* ── Ambient disc button: sit below the top rail on mobile ── */
   .ambient-audio {
     left: auto !important;
     right: 74px !important;
-    top: 16px !important;
+    top: 70px !important;
   }
   .ambient-hint {
     left: auto !important;
     right: 116px !important;
-    top: 22px !important;
+    top: 76px !important;
     font-size: 9px !important;
     line-height: 32px !important;
   }
