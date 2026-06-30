@@ -7,3 +7,6 @@ prototype/*preview*.png
 prototype/*check*.png
 诺奖物理学家人格图鉴-设计全案.docx
 AGENTS.md
+.vercel/
+.env*
+dist-cn/
