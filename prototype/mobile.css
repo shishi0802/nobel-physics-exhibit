@@ -193,45 +193,143 @@
   .corridor {
     display: flex;
     flex-direction: column;
-    padding-top: 62px;
-    padding-bottom: 64px;
+    padding: 58px 0 28px;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
     min-height: 100svh !important;
+    gap: 14px;
   }
   .intro {
     position: relative !important;
     left: auto !important; top: auto !important;
     width: auto !important;
-    padding: 0 20px 16px;
+    padding: 0 18px 0;
   }
-  .intro h1 { font-size: clamp(28px, 7vw, 40px) !important; }
+  .intro .kicker {
+    margin-bottom: 12px !important;
+    font-size: 10px !important;
+  }
+  .intro h1 {
+    font-size: clamp(30px, 8vw, 42px) !important;
+    line-height: 1.02 !important;
+  }
+  .intro p {
+    margin-top: 12px !important;
+    font-size: 12px !important;
+    line-height: 1.68 !important;
+  }
+  .progress-panel {
+    margin-top: 14px !important;
+    padding-top: 10px !important;
+    font-size: 10px !important;
+  }
+  .progress-panel .hint {
+    margin-top: 8px !important;
+    font-size: 11px !important;
+    line-height: 1.55 !important;
+  }
   .rail-wrap {
     position: relative !important;
     left: auto !important; right: auto !important;
     top: auto !important; bottom: auto !important;
-    height: 48vw !important;
-    max-height: 260px !important;
-    margin: 0 0 16px;
+    height: clamp(230px, 62vw, 292px) !important;
+    max-height: none !important;
+    margin: 0;
+    overflow: visible !important;
+    mask-image: linear-gradient(90deg, transparent 0, #000 20%, #000 80%, transparent 100%) !important;
   }
-  .portrait { transform: translateX(calc(var(--distance, 0) * 70vw)) translateY(10px) scale(.66) !important; }
-  .portrait.active { transform: translateX(0) translateY(-6px) scale(1) !important; }
-  .portrait.active { width: clamp(130px, 32vw, 190px) !important; }
+  .portrait {
+    width: clamp(104px, 28vw, 138px) !important;
+    transform: translateX(calc(var(--distance, 0) * 58vw)) translateY(18px) scale(.62) !important;
+  }
+  .portrait.active {
+    width: clamp(168px, 46vw, 218px) !important;
+    transform: translateX(0) translateY(0) scale(1) !important;
+  }
+  .portrait.near {
+    opacity: .36 !important;
+  }
+  .photo {
+    height: clamp(198px, 52vw, 260px) !important;
+    outline-offset: 5px !important;
+    box-shadow:
+      0 24px 58px rgba(0,0,0,.48),
+      0 0 0 7px rgba(8,8,7,.72),
+      0 0 0 8px rgba(216,192,122,.10),
+      inset 0 0 58px rgba(255,255,255,.025) !important;
+  }
+  .portrait small,
+  .portrait strong,
+  .photo-credit {
+    text-align: center !important;
+  }
   .detail {
     position: relative !important;
     right: auto !important; top: auto !important;
     width: auto !important;
     max-height: none !important;
-    margin: 0 20px;
-    padding: 16px 0 0;
+    margin: 0 18px;
+    padding: 14px 0 0;
     background: transparent !important;
     box-shadow: none !important;
   }
-  .detail h2 { font-size: 26px !important; }
-  .detail p { font-size: 13px !important; }
-  .controls.corridor-controls {
+  .detail .tag {
+    font-size: 9px !important;
+    margin-bottom: 9px !important;
+  }
+  .detail h2 {
+    font-size: clamp(26px, 7vw, 34px) !important;
+    line-height: 1.1 !important;
+  }
+  .detail p {
+    font-size: 12px !important;
+    line-height: 1.68 !important;
+  }
+  .bio-meta {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    margin-top: 14px !important;
+    padding-top: 12px !important;
+  }
+  .relic {
+    margin-top: 12px !important;
+    padding-top: 12px !important;
+  }
+  .relic.unlocked {
+    grid-template-columns: 54px 1fr !important;
+    gap: 12px !important;
+  }
+  .totem {
+    width: 52px !important;
+    height: 52px !important;
+  }
+  .chips {
+    margin-top: 12px !important;
+  }
+  .corridor > .controls {
     position: relative !important;
     left: auto !important; bottom: auto !important;
-    padding: 12px 20px 0;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px 18px !important;
+    padding: 4px 18px 0 !important;
+  }
+  .corridor > .controls button,
+  .corridor > .controls a {
+    width: auto !important;
+    min-height: 36px !important;
+    font-size: 10px !important;
+    letter-spacing: .12em !important;
+  }
+  .next-gallery {
+    position: relative !important;
+    right: auto !important; bottom: auto !important;
+    width: auto !important;
+    margin: 0 18px 24px !important;
+    padding-top: 10px !important;
+    text-align: left !important;
+    font-size: 10px !important;
+    letter-spacing: .12em !important;
   }
 
   /* ── physicist-test.html ─────────────────────── */
@@ -289,15 +387,15 @@
     transform: rotateX(20deg) rotateZ(-2deg) !important;
   }
 
-  /* ── Ambient disc button: stay fixed top-right on mobile ── */
+  /* ── Ambient disc button: align with the top rail, away from the hard edge ── */
   .ambient-audio {
     left: auto !important;
-    right: 18px !important;
+    right: 74px !important;
     top: 16px !important;
   }
   .ambient-hint {
     left: auto !important;
-    right: 60px !important;
+    right: 116px !important;
     top: 22px !important;
     font-size: 9px !important;
     line-height: 32px !important;
@@ -308,4 +406,216 @@
 
   /* ── Portal transition ───────────────────────── */
   .portal-transition { display: none !important; }
+
+  /* ── Mobile refinement pass: atlas + exhibit rooms ── */
+  .test,
+  .chamber:not(.light-chamber),
+  .chamber.light-chamber,
+  .corridor {
+    width: 100% !important;
+    min-height: 100svh !important;
+    height: auto !important;
+  }
+
+  .test .topline span,
+  .corridor .topline span,
+  .chamber .topline span {
+    max-width: 52vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  /* Test room: make intro/questions readable instead of one-screen cramped. */
+  .test {
+    gap: 16px;
+  }
+  .test .stage {
+    padding: 0 18px !important;
+  }
+  .test .stage h1 {
+    font-size: clamp(34px, 10vw, 46px) !important;
+    line-height: 1.04 !important;
+  }
+  .test .lead,
+  .test .question-text {
+    font-size: 13px !important;
+    line-height: 1.72 !important;
+  }
+  .test .stage.question-mode {
+    display: block !important;
+    min-height: 0 !important;
+  }
+  .test .question-title {
+    font-size: clamp(22px, 6.4vw, 30px) !important;
+    line-height: 1.24 !important;
+    margin: 8px 0 14px !important;
+  }
+  .test .answers {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .test .answer {
+    min-height: 0 !important;
+    padding: 13px 0 !important;
+  }
+  .test .answer span {
+    font-size: 13px !important;
+    line-height: 1.62 !important;
+  }
+  .test .panel {
+    margin: 0 18px 18px !important;
+  }
+  .test .navline {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 8px 18px 22px !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 18px !important;
+  }
+
+  /* Quantum / imaging / time: one-column museum instrument layout. */
+  .chamber:not(.light-chamber) {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+    padding: 58px 0 24px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  .chamber:not(.light-chamber) .title-panel {
+    padding: 0 18px !important;
+  }
+  .chamber:not(.light-chamber) .title-panel h1 {
+    font-size: clamp(28px, 8vw, 40px) !important;
+    line-height: 1.08 !important;
+  }
+  .chamber:not(.light-chamber) .title-panel .subtitle {
+    font-size: 12px !important;
+    line-height: 1.68 !important;
+  }
+  .chamber:not(.light-chamber) .guide {
+    margin-top: 12px !important;
+  }
+  .chamber:not(.light-chamber) .guide ol {
+    font-size: 11px !important;
+    line-height: 1.68 !important;
+  }
+  .chamber:not(.light-chamber) .experiment,
+  .chamber:not(.light-chamber) .viewer {
+    width: calc(100vw - 28px) !important;
+    height: clamp(230px, 62vw, 330px) !important;
+    max-height: none !important;
+    margin: 0 auto !important;
+  }
+  .chamber:not(.light-chamber) .controls {
+    padding: 0 18px 0 !important;
+  }
+  .chamber:not(.light-chamber) .control-row {
+    margin-top: 12px !important;
+  }
+  .chamber:not(.light-chamber) .mode,
+  .chamber:not(.light-chamber) .toggle,
+  .chamber:not(.light-chamber) .submode {
+    min-height: 36px !important;
+  }
+  .chamber:not(.light-chamber) .readout,
+  .chamber:not(.light-chamber) .mode-readout {
+    font-size: 12px !important;
+    line-height: 1.65 !important;
+  }
+  .chamber:not(.light-chamber) .navline {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 4px 18px 20px !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 14px 18px !important;
+  }
+
+  /* Light room: keep the banknote as the hero, controls underneath. */
+  .chamber.light-chamber,
+  .chamber#chamber {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+    padding: 58px 0 24px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  .chamber.light-chamber .title,
+  .chamber#chamber .title {
+    padding: 0 18px !important;
+  }
+  .chamber.light-chamber .title h1,
+  .chamber#chamber .title h1 {
+    font-size: clamp(30px, 8vw, 42px) !important;
+    line-height: 1.06 !important;
+  }
+  .chamber.light-chamber .title p,
+  .chamber#chamber .title p {
+    font-size: 12px !important;
+    line-height: 1.66 !important;
+  }
+  .stage.bill-stage,
+  .chamber#chamber .stage {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: calc(100vw - 28px) !important;
+    height: clamp(210px, 56vw, 300px) !important;
+    transform: none !important;
+    margin: 0 auto !important;
+  }
+  .bill-rig {
+    width: min(100%, 560px) !important;
+    transform: rotateX(12deg) rotateZ(-1deg) !important;
+  }
+  .chamber.light-chamber .controls,
+  .chamber#chamber .controls {
+    position: relative !important;
+    right: auto !important;
+    top: auto !important;
+    width: auto !important;
+    padding: 0 18px !important;
+  }
+  .modes {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .observe-launch,
+  .tool-toggle {
+    min-height: 38px !important;
+  }
+  .panel-hint,
+  .readout {
+    font-size: 12px !important;
+    line-height: 1.6 !important;
+  }
+  .chamber.light-chamber .navline,
+  .chamber#chamber .navline {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 4px 18px 20px !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 14px 18px !important;
+  }
+
+  /* Corridor: complete mobile atlas layout, no horizontal drag required. */
+  .corridor .detail {
+    border-top: 1px solid rgba(238,233,220,.13);
+  }
+  .corridor > .controls,
+  .corridor .next-gallery {
+    flex-shrink: 0;
+  }
 }
